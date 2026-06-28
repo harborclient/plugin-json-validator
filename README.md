@@ -2,6 +2,9 @@
 
 Attach JSON Schemas to requests and validate response bodies against them with path-level error details.
 
+![Screenshot](screenshot.png)
+
+
 ## Features
 
 - **JSON Schemas sidebar** — manage a library of named schemas with add, edit, and delete
