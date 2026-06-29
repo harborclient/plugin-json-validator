@@ -2,6 +2,7 @@ import { installReact } from '@harborclient/sdk';
 import type { PluginContext, SidebarSectionContribution } from '@harborclient/sdk';
 import { initStore } from './store';
 import { SchemasHeaderActions, SchemasSidebar } from './SchemasSidebar';
+import { SchemaModal } from './SchemaModal';
 import { SchemaSelectTab } from './SchemaSelectTab';
 import { ValidationTab } from './ValidationTab';
 
@@ -23,6 +24,11 @@ export function activate(hc: PluginContext): void {
       headerActions: SchemasHeaderActions,
       Component: SchemasSidebar
     } as SidebarSectionContribution),
+    hc.ui.registerModal({
+      id: 'schema-editor',
+      title: 'Add JSON Schema',
+      Component: SchemaModal
+    }),
     hc.ui.registerRequestTab({
       id: 'schema',
       title: 'JSON Schema',

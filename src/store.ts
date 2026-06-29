@@ -67,6 +67,33 @@ export async function initStore(context: PluginContext): Promise<void> {
 }
 
 /**
+ * Returns the plugin context when the store has been initialized.
+ */
+export function getPluginContext(): PluginContext | null {
+  return hc;
+}
+
+/**
+ * Reloads schema and selection data from persisted plugin storage.
+ *
+ * Separate plugin webviews do not share in-memory state; call this after another
+ * surface writes storage (for example when a modal overlay saves a schema).
+ */
+export async function reloadFromStorage(): Promise<void> {
+  if (!hc) {
+    return;
+  }
+  const [storedSchemas, storedSelections] = await Promise.all([
+    hc.storage.get<SchemaEntry[]>(SCHEMAS_KEY),
+    hc.storage.get<Selections>(SELECTIONS_KEY)
+  ]);
+  schemas = Array.isArray(storedSchemas) ? storedSchemas : [];
+  selections =
+    storedSelections && typeof storedSelections === 'object' ? { ...storedSelections } : {};
+  notify();
+}
+
+/**
  * Subscribes to store changes for useSyncExternalStore.
  *
  * @param listener - Callback invoked when store state changes.

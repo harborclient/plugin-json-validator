@@ -2,12 +2,13 @@
   "id": "com.harborclient.plugins.json-schema",
   "name": "JSON Schema Validator",
   "author": "HarborClient",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": { "harborclient": ">=1.8.4" },
   "renderer": "dist/renderer.js",
   "permissions": ["ui", "storage"],
   "contributes": {
     "sidebarSections": [{ "id": "schemas", "title": "JSON Schemas" }],
+    "modals": [{ "id": "schema-editor", "title": "Add JSON Schema" }],
     "requestTabs": [{ "id": "schema", "title": "JSON Schema" }],
     "responseTabs": [{ "id": "validation", "title": "JSON Validation" }]
   }

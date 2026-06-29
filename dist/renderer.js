@@ -6880,7 +6880,7 @@ var require_dist = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
 var hostReact = null;
 function setHostReact(react) {
   hostReact = react;
@@ -6894,12 +6894,12 @@ function requireHostReact() {
   return hostReact;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/runtime/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/index.js
 function installReact(react) {
   setHostReact(react);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/runtime/react.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/react.js
 function hook(name2) {
   const react = requireHostReact();
   const fn = react[name2];
@@ -6913,6 +6913,9 @@ function useState(initialState) {
 }
 function useEffect(effect, deps) {
   return hook("useEffect")(effect, deps);
+}
+function useCallback(callback, deps) {
+  return hook("useCallback")(callback, deps);
 }
 function useMemo(factory, deps) {
   return hook("useMemo")(factory, deps);
@@ -6974,6 +6977,21 @@ function createSchemaId() {
 }
 async function initStore(context) {
   hc = context;
+  const [storedSchemas, storedSelections] = await Promise.all([
+    hc.storage.get(SCHEMAS_KEY),
+    hc.storage.get(SELECTIONS_KEY)
+  ]);
+  schemas = Array.isArray(storedSchemas) ? storedSchemas : [];
+  selections = storedSelections && typeof storedSelections === "object" ? { ...storedSelections } : {};
+  notify();
+}
+function getPluginContext() {
+  return hc;
+}
+async function reloadFromStorage() {
+  if (!hc) {
+    return;
+  }
   const [storedSchemas, storedSelections] = await Promise.all([
     hc.storage.get(SCHEMAS_KEY),
     hc.storage.get(SELECTIONS_KEY)
@@ -7049,7 +7067,7 @@ function getSchemaById(id2) {
   return schemas.find((entry) => entry.id === id2);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
 var Fragment = Symbol.for("@harborclient/sdk.Fragment");
 function build(type, props, key) {
   const react = requireHostReact();
@@ -7063,22 +7081,22 @@ function build(type, props, key) {
 var jsx = build;
 var jsxs = build;
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/Button/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Button/index.js
 var VARIANT_CLASSES = {
-  primary: "cursor-pointer rounded-md border border-transparent bg-accent px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  secondary: "cursor-pointer rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-text shadow-sm hover:bg-selection disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  primaryDanger: "cursor-pointer rounded-md border border-transparent bg-danger px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  secondaryDanger: "cursor-pointer rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-danger shadow-sm hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  toolbar: "cursor-pointer rounded-md border-none bg-transparent px-2 py-1 text-[15px] hover:bg-selection app-no-drag",
-  icon: "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 focus-visible:opacity-100 hover:bg-selection hover:text-text app-no-drag",
-  iconDanger: "inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 focus-visible:opacity-100 hover:bg-danger/15 hover:text-danger app-no-drag"
+  primary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-accent px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
+  secondary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-text shadow-sm hover:bg-selection disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
+  primaryDanger: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-danger px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
+  secondaryDanger: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-danger shadow-sm hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
+  toolbar: "inline-flex min-h-[34px] cursor-pointer items-center rounded-md border-none bg-transparent px-2 py-1 text-[15px] hover:bg-selection app-no-drag",
+  icon: "inline-flex size-[30px] shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted hover:bg-selection hover:text-text app-no-drag",
+  iconDanger: "inline-flex size-[30px] shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted hover:bg-danger/15 hover:text-danger app-no-drag"
 };
-function Button({ variant = "primary", className, type = "button", ...props }) {
+function Button({ variant = "primary", className, type = "button", innerRef, ...props }) {
   const classes = className ? `${VARIANT_CLASSES[variant]} ${className}` : VARIANT_CLASSES[variant];
-  return jsx("button", { type, className: classes, ...props });
+  return jsx("button", { ref: innerRef, type, className: classes, ...props });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
 function spacingClasses(spacing) {
   switch (spacing) {
     case "section":
@@ -7090,7 +7108,7 @@ function spacingClasses(spacing) {
       return "mt-1";
   }
 }
-function FieldError({ children, id: id2, spacing = "field", roleAlert = false, className }) {
+function FieldError({ children, id: id2, spacing = "field", roleAlert = true, className }) {
   if (children == null || children === "")
     return null;
   const base2 = `${spacingClasses(spacing)} text-[14px] text-danger`;
@@ -10950,7 +10968,7 @@ var FontAwesomeIcon = React2.forwardRef((props, ref) => {
 FontAwesomeIcon.displayName = "FontAwesomeIcon";
 var DEFAULT_CLASSNAMES = `${LAYER_CLASSES.default} ${STYLE_CLASSES.fixedWidth}`;
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
 function FaIcon({ icon: icon3, className = "h-3.5 w-3.5", title }) {
   return createElement(FontAwesomeIcon, {
     icon: icon3,
@@ -10972,7 +10990,7 @@ var faBars = {
   icon: [448, 512, ["navicon"], "f0c9", "M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"]
 };
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/Badge/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Badge/index.js
 function variantClasses(variant) {
   switch (variant) {
     case "success":
@@ -34148,7 +34166,7 @@ function _objectWithoutPropertiesLoose(r4, e4) {
 }
 
 // node_modules/.pnpm/@uiw+react-codemirror@4.25.10_@babel+runtime@8.0.0_@codemirror+autocomplete@6.20.3_@cod_e67f98ff469220c0ad9bb15b36961e8d/node_modules/@uiw/react-codemirror/esm/index.js
-import React3, { useRef as useRef2, forwardRef, useImperativeHandle, useCallback } from "react";
+import React3, { useRef as useRef2, forwardRef, useImperativeHandle, useCallback as useCallback2 } from "react";
 
 // node_modules/.pnpm/@uiw+react-codemirror@4.25.10_@babel+runtime@8.0.0_@codemirror+autocomplete@6.20.3_@cod_e67f98ff469220c0ad9bb15b36961e8d/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
 import { useEffect as useEffect2, useLayoutEffect, useState as useState2 } from "react";
@@ -37478,7 +37496,7 @@ var ReactCodeMirror = /* @__PURE__ */ forwardRef((props, ref) => {
     state,
     view
   }), [editor, container, state, view]);
-  var setEditorRef = useCallback((el) => {
+  var setEditorRef = useCallback2((el) => {
     editor.current = el;
     setContainer(el);
   }, [setContainer]);
@@ -39376,7 +39394,7 @@ var e3 = { airline: { airline: [{ name: `Aegean Airlines`, iataCode: `A3` }, { n
 // node_modules/.pnpm/@faker-js+faker@10.5.0/node_modules/@faker-js/faker/dist/locale/en.js
 var r3 = new yt({ locale: [e3, Ct] });
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/variables/dynamic.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/variables/dynamic.js
 function categoryImageUrl(category) {
   return r3.image.urlLoremFlickr({ category });
 }
@@ -39876,17 +39894,28 @@ function getDynamicVariableDescription(key) {
 }
 var DYNAMIC_VARIABLE_NAMES = Object.keys(DYNAMIC_VARIABLES).sort();
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/variables/tokens.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/variables/tokens.js
 var VARIABLE_NAME_CHARS = "\\w$.-";
 var VARIABLE_TOKEN_PATTERN = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
 function variableLookup(variables) {
   return new Map(variables.filter((v3) => v3.key.trim()).map((v3) => [v3.key.trim(), v3.value !== "" ? v3.value : v3.defaultValue]));
 }
+function getVariableTooltipContent(key, variables) {
+  const value = resolveVariable(key, variables);
+  if (value !== void 0) {
+    return { text: value, muted: false };
+  }
+  const dynamicDescription = getDynamicVariableDescription(key);
+  if (dynamicDescription) {
+    return { text: `Dynamic: ${dynamicDescription}`, muted: true };
+  }
+  return { text: "Not defined", muted: true };
+}
 function resolveVariable(key, variables) {
   return variableLookup(variables).get(key);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/runtime/store.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/store.js
 function createExternalStore(initial2) {
   let state = initial2;
   const listeners2 = /* @__PURE__ */ new Set();
@@ -39907,7 +39936,7 @@ function createExternalStore(initial2) {
   };
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
 var DEFAULT_CODE_EDITOR_SETUP = {
   lineNumbers: true,
   foldGutter: true,
@@ -39915,7 +39944,7 @@ var DEFAULT_CODE_EDITOR_SETUP = {
   highlightActiveLineGutter: true
 };
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
 var DEFAULT_CODE_EDITOR_CONFIG = {
   theme: "default",
   setup: DEFAULT_CODE_EDITOR_SETUP
@@ -43939,7 +43968,7 @@ var xcodeDarkInit = (options) => {
 };
 var xcodeDark = xcodeDarkInit();
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
 var themeExtensions = {
   dracula,
   githubLight,
@@ -43956,7 +43985,7 @@ function getCodeEditorThemeExtension(value) {
   return themeExtensions[value];
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
 var lightHighlight = HighlightStyle.define([
   { tag: tags.propertyName, color: "#881391" },
   { tag: tags.string, color: "#c41a16" },
@@ -44085,58 +44114,124 @@ var variableHighlighter = ViewPlugin.fromClass(class {
     this.decorations = variableMatcher.updateDeco(update, this.decorations);
   }
 }, { decorations: (v3) => v3.decorations });
-function variableTooltip(variables, onEditVariable) {
-  return hoverTooltip((view, pos) => {
-    const line = view.state.doc.lineAt(pos);
-    const pattern = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
-    for (const match of line.text.matchAll(pattern)) {
-      const start = line.from + (match.index ?? 0);
-      const end3 = start + match[0].length;
-      if (pos < start || pos > end3)
-        continue;
-      const key = match[1];
-      const value = resolveVariable(key, variables);
-      const dynamicDescription = getDynamicVariableDescription(key);
-      return {
-        pos: start,
-        end: end3,
-        above: true,
-        create() {
-          const dom2 = document.createElement("div");
-          dom2.className = "cm-variable-tooltip";
-          const valueEl = document.createElement("div");
-          if (value !== void 0) {
-            valueEl.textContent = value;
-          } else if (dynamicDescription) {
-            valueEl.textContent = `Dynamic: ${dynamicDescription}`;
-          } else {
-            valueEl.textContent = "Not defined";
-            valueEl.className = "cm-variable-tooltip-muted";
-          }
-          dom2.appendChild(valueEl);
-          if (onEditVariable) {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.textContent = "Edit value";
-            btn.className = "cm-variable-tooltip-edit";
-            btn.addEventListener("mousedown", (e4) => {
-              e4.preventDefault();
-              onEditVariable();
-            });
-            dom2.appendChild(btn);
-          }
-          return { dom: dom2 };
-        }
-      };
+function findVariableAtPos(doc2, pos) {
+  const line = doc2.lineAt(pos);
+  const pattern = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
+  for (const match of line.text.matchAll(pattern)) {
+    const start = line.from + (match.index ?? 0);
+    const end3 = start + match[0].length;
+    if (pos < start || pos > end3)
+      continue;
+    return { key: match[1], start, end: end3 };
+  }
+  return null;
+}
+function buildVariableTooltipDom(key, variables, onEditVariable) {
+  const content2 = getVariableTooltipContent(key, variables);
+  const dom2 = document.createElement("div");
+  dom2.className = "cm-variable-tooltip";
+  const valueEl = document.createElement("div");
+  valueEl.textContent = content2.text;
+  if (content2.muted) {
+    valueEl.className = "cm-variable-tooltip-muted";
+  }
+  dom2.appendChild(valueEl);
+  if (onEditVariable) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Edit value";
+    btn.className = "cm-variable-tooltip-edit";
+    btn.setAttribute("aria-label", `Edit value for ${key}`);
+    btn.addEventListener("mousedown", (e4) => {
+      e4.preventDefault();
+      onEditVariable();
+    });
+    dom2.appendChild(btn);
+  }
+  return dom2;
+}
+function mergeDescribedBy(...ids) {
+  const merged = ids.filter((id2) => id2 != null && id2 !== "");
+  return merged.length > 0 ? merged.join(" ") : void 0;
+}
+function setContentDescribedBy(content2, getValidationDescribedBy, tooltipId) {
+  if (!content2)
+    return;
+  const describedBy = mergeDescribedBy(getValidationDescribedBy(), tooltipId);
+  if (describedBy) {
+    content2.setAttribute("aria-describedby", describedBy);
+  } else {
+    content2.removeAttribute("aria-describedby");
+  }
+}
+function variableSelectionTooltip(tooltipId, onTooltipChange, getValidationDescribedBy) {
+  return EditorView.updateListener.of((update) => {
+    if (!update.selectionSet && !update.docChanged)
+      return;
+    const content2 = update.view.dom.querySelector(".cm-content");
+    const pos = update.state.selection.main.head;
+    const match = findVariableAtPos(update.state.doc, pos);
+    if (!match) {
+      onTooltipChange(null);
+      setContentDescribedBy(content2, getValidationDescribedBy);
+      return;
     }
-    return null;
+    const coords = update.view.coordsAtPos(match.start);
+    if (!coords) {
+      onTooltipChange(null);
+      setContentDescribedBy(content2, getValidationDescribedBy);
+      return;
+    }
+    onTooltipChange({
+      key: match.key,
+      top: coords.top,
+      left: coords.left + (coords.right - coords.left) / 2
+    });
+    setContentDescribedBy(content2, getValidationDescribedBy, tooltipId);
   });
 }
-function CodeEditor({ value, onChange: onChange2, language: language2 = "text", readOnly: readOnly2 = false, placeholder: placeholder2, minHeight = "144px", className = "", variables, onEditVariable, completionSource, themeOverride, setupOverride, id: id2, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy }) {
+function variableTooltipEscapeHandler(isOpen, onDismiss, getValidationDescribedBy) {
+  return EditorView.domEventHandlers({
+    keydown(event, view) {
+      if (event.key === "Escape" && isOpen()) {
+        event.preventDefault();
+        onDismiss(view);
+        setContentDescribedBy(view.dom.querySelector(".cm-content"), getValidationDescribedBy);
+        return true;
+      }
+      return false;
+    }
+  });
+}
+function variableTooltip(variables, onEditVariable) {
+  return hoverTooltip((view, pos) => {
+    const match = findVariableAtPos(view.state.doc, pos);
+    if (!match)
+      return null;
+    return {
+      pos: match.start,
+      end: match.end,
+      above: true,
+      create() {
+        return { dom: buildVariableTooltipDom(match.key, variables, onEditVariable) };
+      }
+    };
+  });
+}
+function CodeEditor({ value, onChange: onChange2, language: language2 = "text", readOnly: readOnly2 = false, placeholder: placeholder2, minHeight = "144px", className = "", variables, onEditVariable, completionSource, themeOverride, setupOverride, id: id2, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy }) {
   const config16 = useCodeEditorConfig();
   const resolvedTheme = themeOverride ?? config16.theme;
   const resolvedSetup = setupOverride ?? (readOnly2 ? null : config16.setup);
   const [isDark, setIsDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const [selectionTooltip, setSelectionTooltip] = useState(null);
+  const selectionTooltipRef = useRef(selectionTooltip);
+  selectionTooltipRef.current = selectionTooltip;
+  const setSelectionTooltipRef = useRef(setSelectionTooltip);
+  setSelectionTooltipRef.current = setSelectionTooltip;
+  const ariaDescribedByRef = useRef(ariaDescribedBy);
+  ariaDescribedByRef.current = ariaDescribedBy;
+  const tooltipId = useId();
+  const getValidationDescribedBy = () => ariaDescribedByRef.current;
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => setIsDark(media.matches);
@@ -44167,7 +44262,11 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
       next.push(StreamLanguage.define(shell));
     }
     if (variables) {
-      next.push(variableHighlighter, variableTooltip(variables, onEditVariable));
+      next.push(variableHighlighter, variableTooltip(variables, onEditVariable), variableSelectionTooltip(tooltipId, (state) => {
+        setSelectionTooltipRef.current(state);
+      }, getValidationDescribedBy), variableTooltipEscapeHandler(() => selectionTooltipRef.current != null, () => {
+        setSelectionTooltipRef.current(null);
+      }, getValidationDescribedBy));
     }
     const contentAttrs = {};
     if (id2)
@@ -44176,6 +44275,10 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
       contentAttrs["aria-label"] = ariaLabel;
     if (ariaLabelledBy)
       contentAttrs["aria-labelledby"] = ariaLabelledBy;
+    if (ariaInvalid != null)
+      contentAttrs["aria-invalid"] = String(ariaInvalid);
+    if (ariaDescribedBy)
+      contentAttrs["aria-describedby"] = ariaDescribedBy;
     if (Object.keys(contentAttrs).length > 0) {
       next.push(EditorView.contentAttributes.of(contentAttrs));
     }
@@ -44189,7 +44292,10 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
     completionSource,
     id2,
     ariaLabel,
-    ariaLabelledBy
+    ariaLabelledBy,
+    ariaInvalid,
+    ariaDescribedBy,
+    tooltipId
   ]);
   const basicSetup3 = useMemo(() => {
     if (!resolvedSetup) {
@@ -44224,7 +44330,8 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
     };
   }, [resolvedSetup, readOnly2]);
   const wrapperClassName = readOnly2 ? `overflow-hidden rounded-md bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}` : `min-h-36 resize-y overflow-hidden rounded-md border border-separator bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--mac-accent)_35%,transparent),inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}`;
-  return jsx("div", { className: wrapperClassName, children: createElement(esm_default, {
+  const selectionTooltipContent = selectionTooltip ? getVariableTooltipContent(selectionTooltip.key, variables ?? []) : null;
+  return jsxs("div", { className: wrapperClassName, children: [createElement(esm_default, {
     value,
     onChange: readOnly2 ? void 0 : onChange2,
     extensions,
@@ -44234,10 +44341,14 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
     placeholder: placeholder2,
     minHeight,
     basicSetup: basicSetup3
-  }) });
+  }), selectionTooltip && selectionTooltipContent && variables ? jsxs("div", { id: tooltipId, role: "tooltip", className: "pointer-events-auto fixed z-50 flex max-w-sm -translate-x-1/2 -translate-y-full flex-col gap-1.5 rounded-md border border-separator bg-surface px-3 py-2 text-[14px] text-text shadow-md app-no-drag", style: { top: selectionTooltip.top - 4, left: selectionTooltip.left }, children: [jsx("span", { className: selectionTooltipContent.muted ? "text-muted" : void 0, children: selectionTooltipContent.text }), onEditVariable ? jsx("button", { type: "button", className: "self-start text-[14px] text-accent hover:underline", "aria-label": `Edit value for ${selectionTooltip.key}`, onMouseDown: (event) => {
+    event.preventDefault();
+    onEditVariable();
+    setSelectionTooltip(null);
+  }, children: "Edit value" }) : null] }) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
 function variantClasses2(variant) {
   if (variant === "centered") {
     return "flex flex-1 items-center justify-center p-4 text-center text-[14px] text-muted";
@@ -44250,7 +44361,7 @@ function EmptyState({ children, variant = "inline", className }) {
   return jsx("div", { className: classes, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/forms/classes.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/classes.js
 var field = "rounded-md border border-separator bg-field px-2 py-1 text-[15px] text-text app-no-drag";
 var surfaceField = "w-full rounded-md border border-separator bg-field px-3 py-2 text-[14px] text-text";
 var VARIANT_CLASSES2 = {
@@ -44268,18 +44379,80 @@ function mergeFieldClasses(variant, className) {
   return void 0;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/forms/Input.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/Input.js
 function Input({ ref, variant = "control", type, className, ...props }) {
   const resolvedVariant = type === "checkbox" || type === "radio" ? "plain" : variant;
   return jsx("input", { ref, type, className: mergeFieldClasses(resolvedVariant, className), ...props });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/forms/Select.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/Select.js
 function Select({ ref, variant = "control", className, children, ...props }) {
   return jsx("select", { ref, className: mergeFieldClasses(variant, className), ...props, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/enhanceControl.js
+var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+var FORM_CONTROL_TAGS = /* @__PURE__ */ new Set(["button", "input", "select", "textarea"]);
+function getSingleChild(node) {
+  if (node == null || typeof node === "boolean")
+    return void 0;
+  if (Array.isArray(node)) {
+    const filtered = node.filter((n3) => n3 != null && n3 !== false);
+    return filtered.length === 1 ? filtered[0] : void 0;
+  }
+  return node;
+}
+function applyAriaProps(child, options) {
+  const { describedBy, invalid: invalid2, id: id2 } = options;
+  const props = {};
+  if (id2 && child.props.id == null) {
+    props.id = id2;
+  }
+  if (describedBy) {
+    const existing = typeof child.props["aria-describedby"] === "string" ? child.props["aria-describedby"] : void 0;
+    props["aria-describedby"] = existing ? `${existing} ${describedBy}` : describedBy;
+  }
+  if (invalid2) {
+    props["aria-invalid"] = true;
+  }
+  if (Object.keys(props).length === 0)
+    return child;
+  return cloneElement(child, props);
+}
+function enhanceControl(child, options) {
+  const { describedBy, invalid: invalid2, id: id2 } = options;
+  if (!describedBy && !invalid2 && !id2)
+    return child;
+  const single = getSingleChild(child);
+  if (single !== void 0 && single !== child) {
+    return enhanceControl(single, options);
+  }
+  if (!isValidElement(child))
+    return child;
+  if (child.type === REACT_FRAGMENT_TYPE) {
+    const inner = getSingleChild(child.props.children);
+    if (inner && isValidElement(inner)) {
+      return cloneElement(child, {}, enhanceControl(inner, options));
+    }
+    return child;
+  }
+  if (typeof child.type === "string") {
+    if (FORM_CONTROL_TAGS.has(child.type)) {
+      return applyAriaProps(child, options);
+    }
+    const inner = getSingleChild(child.props.children);
+    if (inner && isValidElement(inner)) {
+      const enhanced = enhanceControl(inner, options);
+      if (enhanced !== inner) {
+        return cloneElement(child, {}, enhanced);
+      }
+    }
+    return child;
+  }
+  return applyAriaProps(child, options);
+}
+
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
 function labelClasses(tone, srOnly, inline) {
   const base2 = "text-[14px]";
   const visibility = srOnly ? "sr-only" : "";
@@ -44290,18 +44463,9 @@ function labelClasses(tone, srOnly, inline) {
   const color = tone === "muted" ? "text-muted" : "font-medium text-text";
   return `${base2} ${color} ${visibility}`.trim();
 }
-function enhanceControl(child, describedBy) {
-  if (!describedBy || !isValidElement(child)) {
-    return child;
-  }
-  const existingDescribedBy = typeof child.props["aria-describedby"] === "string" ? child.props["aria-describedby"] : void 0;
-  const mergedDescribedBy = existingDescribedBy ? `${existingDescribedBy} ${describedBy}` : describedBy;
-  return cloneElement(child, {
-    "aria-invalid": true,
-    "aria-describedby": mergedDescribedBy
-  });
-}
-function FormGroup({ label, children, htmlFor, description, error, errorId, layout = "stacked", labelTone = "default", srOnly = false, className, labelClassName }) {
+function FormGroup({ label, children, htmlFor, description, error, errorId, descriptionId, layout = "stacked", labelTone = "default", srOnly = false, className, labelClassName }) {
+  const generatedId = useId();
+  const controlId = htmlFor ?? generatedId;
   const extra = className ?? "";
   if (layout === "associated") {
     const associatedClasses = labelClassName ?? "text-[14px] text-text";
@@ -44310,28 +44474,73 @@ function FormGroup({ label, children, htmlFor, description, error, errorId, layo
   if (layout === "checkboxAdjacent") {
     const wrapperClasses2 = extra ? `flex items-start gap-2 ${extra}` : "flex items-start gap-2";
     const adjacentLabelClasses = labelClassName ?? "min-w-0 flex-1 text-[14px] text-text";
-    return jsxs("div", { className: wrapperClasses2, children: [children, jsx("label", { htmlFor, className: adjacentLabelClasses, children: label })] });
+    const linkedChildren = enhanceControl(children, { id: controlId });
+    return jsxs("div", { className: wrapperClasses2, children: [linkedChildren, jsx("label", { htmlFor: controlId, className: adjacentLabelClasses, children: label })] });
   }
   if (layout === "radio") {
     const wrapperClasses2 = extra ? `inline-flex cursor-pointer items-center gap-1.5 text-[14px] text-text app-no-drag ${extra}` : "inline-flex cursor-pointer items-center gap-1.5 text-[14px] text-text app-no-drag";
-    return jsxs("label", { htmlFor, className: wrapperClasses2, children: [children, label] });
+    const linkedChildren = enhanceControl(children, { id: controlId });
+    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [linkedChildren, label] });
   }
   if (layout === "checkbox") {
     const wrapperClasses2 = extra ? `flex items-center gap-2 ${extra}` : "flex items-center gap-2";
-    return jsxs("label", { htmlFor, className: wrapperClasses2, children: [children, jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label })] });
+    const linkedChildren = enhanceControl(children, { id: controlId });
+    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [linkedChildren, jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label })] });
   }
   if (layout === "inline") {
     const wrapperClasses2 = extra ? `flex min-w-0 flex-1 items-center gap-2 ${extra}` : "flex min-w-0 flex-1 items-center gap-2";
-    return jsxs("label", { htmlFor, className: wrapperClasses2, children: [jsx("span", { className: labelClasses(labelTone, srOnly, true), children: label }), children] });
+    const linkedChildren = enhanceControl(children, { id: controlId });
+    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [jsx("span", { className: labelClasses(labelTone, srOnly, true), children: label }), linkedChildren] });
   }
+  const resolvedDescriptionId = description != null && description !== "" ? descriptionId ?? (htmlFor ? `${htmlFor}-description` : void 0) : void 0;
   const resolvedErrorId = error != null && error !== "" ? errorId ?? (htmlFor ? `${htmlFor}-error` : void 0) : void 0;
-  const control = enhanceControl(children, resolvedErrorId);
+  const describedByIds = [resolvedDescriptionId, resolvedErrorId].filter((id2) => id2 != null);
+  const describedBy = describedByIds.length > 0 ? describedByIds.join(" ") : void 0;
+  const control = enhanceControl(children, {
+    describedBy,
+    invalid: resolvedErrorId != null,
+    id: htmlFor
+  });
   const wrapperClasses = extra ? `flex flex-col gap-1 ${extra}` : "flex flex-col gap-1";
-  return jsxs("div", { className: wrapperClasses, children: [jsxs("label", { htmlFor, className: "flex flex-col gap-1", children: [jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label }), control, description != null && description !== "" ? jsx("p", { className: "m-0 text-[14px] text-muted", children: description }) : null] }), resolvedErrorId ? jsx(FieldError, { id: resolvedErrorId, spacing: "field", children: error }) : null] });
+  return jsxs("div", { className: wrapperClasses, children: [jsxs("label", { htmlFor, className: "flex flex-col gap-1", children: [jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label }), control, resolvedDescriptionId ? jsx("p", { id: resolvedDescriptionId, className: "m-0 text-[14px] text-muted", children: description }) : null] }), resolvedErrorId ? jsx(FieldError, { id: resolvedErrorId, spacing: "field", children: error }) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
 var FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+var inertLockCounts = /* @__PURE__ */ new WeakMap();
+function setInertLocked(element, locked) {
+  const count = inertLockCounts.get(element) ?? 0;
+  if (locked) {
+    inertLockCounts.set(element, count + 1);
+    element.inert = true;
+    return;
+  }
+  const next = count - 1;
+  if (next <= 0) {
+    inertLockCounts.delete(element);
+    element.inert = false;
+  } else {
+    inertLockCounts.set(element, next);
+  }
+}
+function lockOverlaySiblings(overlay) {
+  const parent = overlay.parentElement;
+  if (!parent)
+    return [];
+  const locked = [];
+  for (const child of parent.children) {
+    if (child === overlay)
+      continue;
+    setInertLocked(child, true);
+    locked.push(child);
+  }
+  return locked;
+}
+function unlockOverlaySiblings(siblings) {
+  for (const sibling of siblings) {
+    setInertLocked(sibling, false);
+  }
+}
 function getFocusableElements(container) {
   const candidates = Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR));
   return candidates.filter((element) => {
@@ -44348,6 +44557,7 @@ function useDialogFocus(panelRef) {
     const panel = panelRef.current;
     if (!panel)
       return;
+    const inertedSiblings = lockOverlaySiblings(panel);
     const previousFocus = document.activeElement;
     if (!panel.contains(document.activeElement)) {
       const focusables = getFocusableElements(panel);
@@ -44382,6 +44592,7 @@ function useDialogFocus(panelRef) {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      unlockOverlaySiblings(inertedSiblings);
       if (previousFocus instanceof HTMLElement && document.contains(previousFocus)) {
         previousFocus.focus();
       }
@@ -44389,22 +44600,23 @@ function useDialogFocus(panelRef) {
   }, [panelRef]);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
-function ModalHeader({ titleId, title, description, headerActions, closeDisabled = false, onClose }) {
-  return jsxs("div", { className: "flex flex-wrap items-center gap-2 border-b border-separator px-4 py-4", children: [jsxs("div", { className: "min-w-0 flex-1", children: [jsx("h2", { id: titleId, className: "m-0 flex flex-wrap items-center gap-2 text-[17px] font-semibold text-text", children: title }), description ? jsx("p", { className: "m-0 mt-1 text-[14px] text-muted", children: description }) : null] }), jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [headerActions, jsx(Button, { type: "button", variant: "icon", className: "shrink-0 opacity-100", "aria-label": "Close", disabled: closeDisabled, onClick: onClose, children: jsx(FaIcon, { icon: faXmark, className: "h-4 w-4" }) })] })] });
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
+function ModalHeader({ titleId, title, description, descriptionId, headerActions, closeDisabled = false, onClose }) {
+  return jsxs("div", { className: "flex flex-wrap items-center gap-2 border-b border-separator px-4 py-4", children: [jsxs("div", { className: "min-w-0 flex-1", children: [jsx("h2", { id: titleId, className: "m-0 flex flex-wrap items-center gap-2 text-[17px] font-semibold text-text", children: title }), description ? jsx("p", { id: descriptionId, className: "m-0 mt-1 text-[14px] text-muted", children: description }) : null] }), jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [headerActions, jsx(Button, { type: "button", variant: "icon", className: "shrink-0", "aria-label": "Close", disabled: closeDisabled, onClick: onClose, children: jsx(FaIcon, { icon: faXmark, className: "h-4 w-4" }) })] })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
 function ModalFooter({ children, spaced = false, className }) {
   const base2 = spaced ? "mt-4 flex justify-end gap-2" : "flex justify-end gap-2";
   const classes = className ? `${base2} ${className}` : base2;
   return jsx("div", { className: classes, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/Modal/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/index.js
 function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = false, title, description, headerActions, closeDisabled = false, labelledBy, label, children }) {
   const panelRef = useRef(null);
-  useDialogFocus(panelRef);
+  const overlayRef = useRef(null);
+  useDialogFocus(overlayRef);
   useEffect(() => {
     if (disableEscape)
       return;
@@ -44418,28 +44630,137 @@ function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = 
   }, [disableEscape, onClose]);
   const overlayClass = `fixed inset-0 flex items-center justify-center bg-black/40 ${overlayClassName ?? "z-50"}`;
   const panelClass = title ? `${className} flex max-h-[85vh] flex-col overflow-hidden rounded-lg border border-separator bg-surface shadow-xl` : `${className} rounded-lg border border-separator bg-surface p-4 shadow-xl`;
-  return jsx("div", { className: overlayClass, onClick: onClose, children: jsx("div", { ref: panelRef, role: "dialog", "aria-modal": "true", "aria-labelledby": labelledBy, "aria-label": label, className: panelClass, onClick: (event) => event.stopPropagation(), children: title && labelledBy ? jsxs(Fragment, { children: [jsx(ModalHeader, { titleId: labelledBy, title, description, headerActions, closeDisabled, onClose }), jsx("div", { className: "flex-1 overflow-y-auto p-4", children })] }) : children }) });
+  const descriptionId = description && labelledBy ? `${labelledBy}-description` : void 0;
+  return jsxs("div", { ref: overlayRef, className: overlayClass, children: [jsx("div", { ref: panelRef, role: "dialog", "aria-modal": "true", "aria-labelledby": labelledBy, "aria-describedby": descriptionId, "aria-label": label, className: `relative z-10 ${panelClass}`, onClick: (event) => event.stopPropagation(), children: title && labelledBy ? jsxs(Fragment, { children: [jsx(ModalHeader, { titleId: labelledBy, title, description, descriptionId, headerActions, closeDisabled, onClose }), jsx("div", { className: "flex-1 overflow-y-auto p-4", children })] }) : children }), jsx("button", { type: "button", tabIndex: -1, className: "absolute inset-0 z-0 cursor-default border-none bg-transparent p-0", "aria-label": "Close dialog", onClick: onClose })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/utils.js
+function isEnabled(index, disabled2) {
+  return !disabled2.has(index);
+}
+function firstEnabled(disabled2, itemCount) {
+  for (let index = 0; index < itemCount; index++) {
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function lastEnabled(disabled2, itemCount) {
+  for (let index = itemCount - 1; index >= 0; index--) {
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function nextEnabled(current, direction, disabled2, itemCount) {
+  for (let step = 1; step < itemCount; step++) {
+    const index = (current + direction * step + itemCount) % itemCount;
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function resolveTabListKeyAction(key, currentIndex, itemCount, options) {
+  if (itemCount <= 0)
+    return null;
+  const disabled2 = new Set(options?.disabledIndices ?? []);
+  if (key === "Home")
+    return firstEnabled(disabled2, itemCount);
+  if (key === "End")
+    return lastEnabled(disabled2, itemCount);
+  if (key === "ArrowRight" || key === "ArrowDown") {
+    return nextEnabled(currentIndex, 1, disabled2, itemCount);
+  }
+  if (key === "ArrowLeft" || key === "ArrowUp") {
+    return nextEnabled(currentIndex, -1, disabled2, itemCount);
+  }
+  return null;
+}
+function resolveMenuTypeahead(labels, currentIndex, key, buffer) {
+  if (labels.length === 0 || key.length !== 1 || key === " ")
+    return null;
+  const newBuffer = buffer + key;
+  const prefix = newBuffer.toLowerCase();
+  for (let offset = 1; offset <= labels.length; offset++) {
+    const index = (currentIndex + offset) % labels.length;
+    if (labels[index].toLowerCase().startsWith(prefix)) {
+      return { index, buffer: newBuffer };
+    }
+  }
+  return null;
+}
+
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
+var TYPEAHEAD_TIMEOUT_MS = 500;
 function menuItemClass(variant) {
   const base2 = "block w-full cursor-pointer border-none bg-transparent px-3.5 py-1.5 text-left text-[14px] app-no-drag";
   return variant === "danger" ? `${base2} text-text hover:bg-danger/15 hover:text-danger` : `${base2} text-text hover:bg-selection`;
 }
 function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange }) {
   const isOpen = openMenuId === menuId;
+  const menuElementId = `${menuId}-menu`;
   const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const itemRefs = useRef([]);
+  const typeaheadBuffer = useRef("");
+  const typeaheadTimer = useRef(null);
+  const wasOpenRef = useRef(isOpen);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+  const flatItems = useMemo(() => groups.flat(), [groups]);
+  const itemLabels = useMemo(() => flatItems.map((item) => item.label), [flatItems]);
+  const clearTypeahead = useCallback(() => {
+    typeaheadBuffer.current = "";
+    if (typeaheadTimer.current != null) {
+      window.clearTimeout(typeaheadTimer.current);
+      typeaheadTimer.current = null;
+    }
+  }, []);
+  const closeMenu = useCallback(() => {
+    clearTypeahead();
+    onOpenChange(null);
+    requestAnimationFrame(() => {
+      triggerRef.current?.focus();
+    });
+  }, [clearTypeahead, onOpenChange]);
+  const focusItem = useCallback((index) => {
+    setFocusedIndex(index);
+    requestAnimationFrame(() => {
+      itemRefs.current[index]?.focus();
+    });
+  }, []);
+  const openMenu = useCallback((focusLast = false) => {
+    if (flatItems.length === 0)
+      return;
+    setFocusedIndex(focusLast ? flatItems.length - 1 : 0);
+    onOpenChange(menuId);
+  }, [flatItems.length, menuId, onOpenChange]);
+  useEffect(() => {
+    if (isOpen && !wasOpenRef.current) {
+      requestAnimationFrame(() => {
+        itemRefs.current[focusedIndex]?.focus();
+      });
+    }
+    wasOpenRef.current = isOpen;
+  }, [focusedIndex, isOpen]);
+  useEffect(() => {
+    if (!isOpen) {
+      itemRefs.current = [];
+      setFocusedIndex(0);
+      clearTypeahead();
+    }
+  }, [clearTypeahead, isOpen]);
   useEffect(() => {
     if (!isOpen)
       return;
     const handleMouseDown = (e4) => {
       if (rootRef.current && !rootRef.current.contains(e4.target)) {
-        onOpenChange(null);
+        closeMenu();
       }
     };
     const handleKeyDown = (e4) => {
       if (e4.key === "Escape") {
-        onOpenChange(null);
+        e4.preventDefault();
+        closeMenu();
       }
     };
     document.addEventListener("mousedown", handleMouseDown);
@@ -44448,67 +44769,143 @@ function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange }) {
       document.removeEventListener("mousedown", handleMouseDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onOpenChange]);
-  return jsxs("div", { ref: rootRef, className: "relative shrink-0", children: [jsx(Button, { type: "button", variant: "icon", className: isOpen ? "opacity-100" : void 0, title: "Actions", "aria-label": "Row actions", "aria-haspopup": "menu", "aria-expanded": isOpen, onClick: (e4) => {
+  }, [closeMenu, isOpen]);
+  const handleTriggerKeyDown = (event) => {
+    if (isOpen)
+      return;
+    if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openMenu(false);
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      openMenu(true);
+    }
+  };
+  const handleMenuKeyDown = (event) => {
+    if (flatItems.length === 0)
+      return;
+    if (event.key === "Tab") {
+      closeMenu();
+      return;
+    }
+    const arrowIndex = resolveTabListKeyAction(event.key, focusedIndex, flatItems.length);
+    if (arrowIndex !== null) {
+      event.preventDefault();
+      clearTypeahead();
+      focusItem(arrowIndex);
+      return;
+    }
+    const typeahead = resolveMenuTypeahead(itemLabels, focusedIndex, event.key, typeaheadBuffer.current);
+    if (typeahead) {
+      event.preventDefault();
+      typeaheadBuffer.current = typeahead.buffer;
+      if (typeaheadTimer.current != null) {
+        window.clearTimeout(typeaheadTimer.current);
+      }
+      typeaheadTimer.current = window.setTimeout(() => {
+        typeaheadBuffer.current = "";
+        typeaheadTimer.current = null;
+      }, TYPEAHEAD_TIMEOUT_MS);
+      focusItem(typeahead.index);
+    }
+  };
+  return jsxs("div", { ref: rootRef, className: "relative shrink-0", children: [jsx(Button, { innerRef: triggerRef, type: "button", variant: "icon", title: "Actions", "aria-label": "Row actions", "aria-haspopup": "menu", "aria-expanded": isOpen, "aria-controls": isOpen ? menuElementId : void 0, onClick: (e4) => {
     e4.stopPropagation();
-    onOpenChange(isOpen ? null : menuId);
-  }, children: jsx(FaIcon, { icon: faBars, className: "h-3.5 w-3.5" }) }), isOpen && jsx("div", { role: "menu", className: "absolute right-0 top-full z-10 mt-0.5 min-w-[120px] rounded-md border border-separator bg-surface py-1 shadow-md app-no-drag", children: groups.map((group, groupIndex) => jsx("div", { role: "group", className: groupIndex > 0 ? "border-t border-separator" : void 0, children: group.map((item) => jsx("button", { type: "button", role: "menuitem", className: menuItemClass(item.variant), onClick: (e4) => {
-    e4.stopPropagation();
-    onOpenChange(null);
-    item.onSelect();
-  }, children: item.label }, item.label)) }, groupIndex)) })] });
+    if (isOpen) {
+      closeMenu();
+    } else {
+      openMenu(false);
+    }
+  }, onKeyDown: handleTriggerKeyDown, children: jsx(FaIcon, { icon: faBars, className: "h-3.5 w-3.5" }) }), isOpen && jsx("div", { id: menuElementId, role: "menu", className: "absolute right-0 top-full z-10 mt-0.5 min-w-[120px] rounded-md border border-separator bg-surface py-1 shadow-md app-no-drag", onKeyDown: handleMenuKeyDown, children: groups.map((group, groupIndex) => {
+    let flatIndex = groups.slice(0, groupIndex).reduce((count, g3) => count + g3.length, 0);
+    return jsx("div", { className: groupIndex > 0 ? "border-t border-separator" : void 0, children: group.map((item) => {
+      const itemIndex = flatIndex++;
+      return jsx("button", { ref: (el) => {
+        itemRefs.current[itemIndex] = el;
+      }, type: "button", role: "menuitem", tabIndex: itemIndex === focusedIndex ? 0 : -1, className: menuItemClass(item.variant), onClick: (e4) => {
+        e4.stopPropagation();
+        closeMenu();
+        item.onSelect();
+      }, children: item.label }, item.label);
+    }) }, groupIndex);
+  }) })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.5.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_1ce3235504e871aa5dbe742de87ddfcd/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
+// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
 function StatusMessage({ children, live = true, id: id2, className }) {
   const base2 = "text-[14px] text-muted";
   const classes = className ? `${base2} ${className}` : base2;
   return jsx("p", { id: id2, className: classes, role: live ? "status" : void 0, "aria-live": live ? "polite" : void 0, children });
 }
 
-// src/modalSignal.ts
-var modalState = { open: false, editingId: null };
-var modalListeners = /* @__PURE__ */ new Set();
-function notifyModal() {
-  for (const listener2 of modalListeners) {
-    listener2();
-  }
-}
-function subscribeModal(listener2) {
-  modalListeners.add(listener2);
-  return () => {
-    modalListeners.delete(listener2);
+// src/SchemasSidebar.tsx
+var SIDEBAR_ROW_CLASS = "group flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-selection/60 app-no-drag";
+function SchemasHeaderActions() {
+  const handleAdd = () => {
+    getPluginContext()?.ui.openModal("schema-editor", { editingId: null });
   };
+  return /* @__PURE__ */ jsx(
+    Button,
+    {
+      type: "button",
+      variant: "toolbar",
+      "aria-label": "Add JSON Schema",
+      title: "Add JSON Schema",
+      className: "inline-flex min-w-[28px] items-center justify-center text-[14px] font-medium",
+      onClick: handleAdd,
+      children: "+"
+    }
+  );
 }
-function getModalSnapshot() {
-  return modalState;
-}
-function openAddModal() {
-  modalState = { open: true, editingId: null };
-  notifyModal();
-}
-function openEditModal(id2) {
-  modalState = { open: true, editingId: id2 };
-  notifyModal();
-}
-function closeModal() {
-  modalState = { open: false, editingId: null };
-  notifyModal();
-}
-function useModalState() {
-  return useSyncExternalStore(subscribeModal, getModalSnapshot, () => ({
-    open: false,
-    editingId: null
-  }));
-}
-
-// src/reactHost.ts
-import { createPortal } from "react-dom";
-function portalToBody(node) {
-  if (typeof document !== "undefined") {
-    return createPortal(node, document.body);
+function SchemasSidebar() {
+  const schemas2 = useSchemas();
+  const [openMenuId, setOpenMenuId] = useState(null);
+  useEffect(() => {
+    const reload = () => {
+      void reloadFromStorage();
+    };
+    window.addEventListener("focus", reload);
+    document.addEventListener("visibilitychange", reload);
+    return () => {
+      window.removeEventListener("focus", reload);
+      document.removeEventListener("visibilitychange", reload);
+    };
+  }, []);
+  if (schemas2.length === 0) {
+    return /* @__PURE__ */ jsx(EmptyState, { children: "No JSON Schemas yet. Add one with the + button above, then assign it on a request's JSON Schema tab." });
   }
-  return node;
+  return /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-0.5", children: schemas2.map((entry) => /* @__PURE__ */ jsxs("div", { className: SIDEBAR_ROW_CLASS, children: [
+    /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate py-0.5 text-[14px]", children: entry.name }),
+    /* @__PURE__ */ jsx(
+      RowActionsMenu,
+      {
+        menuId: `schema-${entry.id}`,
+        openMenuId,
+        onOpenChange: setOpenMenuId,
+        groups: [
+          [
+            {
+              label: "Edit",
+              onSelect: () => {
+                getPluginContext()?.ui.openModal("schema-editor", { editingId: entry.id });
+              }
+            }
+          ],
+          [
+            {
+              label: "Delete",
+              variant: "danger",
+              onSelect: () => {
+                void removeSchema(entry.id);
+              }
+            }
+          ]
+        ]
+      }
+    )
+  ] }, entry.id)) });
 }
 
 // src/SchemaModal.tsx
@@ -44537,7 +44934,11 @@ function SchemaModalStyles() {
   }, []);
   return null;
 }
-function SchemaModal({ editingId, onClose }) {
+function closeSchemaModal() {
+  getPluginContext()?.ui.closeModal("schema-editor");
+}
+function SchemaModal({ context }) {
+  const editingId = context?.editingId ?? null;
   const titleId = useId();
   const nameId = useId();
   const schemaLabelId = useId();
@@ -44576,159 +44977,84 @@ function SchemaModal({ editingId, onClose }) {
       } else {
         await addSchema(trimmedName, schema);
       }
-      closeModal();
-      onClose();
+      closeSchemaModal();
     } finally {
       setSaving(false);
     }
   };
   const modalTitle = editingId ? "Edit JSON Schema" : "Add JSON Schema";
-  return portalToBody(
-    /* @__PURE__ */ jsxs(Fragment, { children: [
-      /* @__PURE__ */ jsx(SchemaModalStyles, {}),
-      /* @__PURE__ */ jsxs(
-        Modal,
-        {
-          labelledBy: titleId,
-          onClose: () => {
-            closeModal();
-            onClose();
-          },
-          overlayClassName: "z-[1000]",
-          className: `${MODAL_PANEL_CLASS} flex flex-col overflow-hidden`,
-          title: modalTitle,
-          children: [
-            /* @__PURE__ */ jsxs("div", { className: "flex min-h-0 flex-1 flex-col gap-4 mb-4", children: [
-              /* @__PURE__ */ jsxs(FormGroup, { label: "Name", htmlFor: nameId, children: [
-                /* @__PURE__ */ jsx(
-                  Input,
-                  {
-                    id: nameId,
-                    value: name2,
-                    onChange: (event) => {
-                      setName(event.target.value);
-                    },
-                    "aria-invalid": nameError ? true : void 0,
-                    "aria-describedby": nameError ? nameErrorId : void 0,
-                    placeholder: "User response"
-                  }
-                ),
-                /* @__PURE__ */ jsx(FieldError, { id: nameErrorId, roleAlert: true, children: nameError })
-              ] }),
-              /* @__PURE__ */ jsxs(
-                FormGroup,
-                {
-                  label: "Schema",
-                  htmlFor: schemaLabelId,
-                  className: "flex min-h-0 flex-1 flex-col",
-                  children: [
-                    /* @__PURE__ */ jsx(
-                      CodeEditor,
-                      {
-                        id: schemaLabelId,
-                        value: schema,
-                        onChange: setSchema,
-                        language: "json",
-                        className: "json-schema-validator-editor min-h-0 flex-1",
-                        "aria-labelledby": schemaLabelId,
-                        "aria-invalid": schemaError ? true : void 0,
-                        "aria-describedby": schemaError ? schemaErrorId : void 0
-                      }
-                    ),
-                    /* @__PURE__ */ jsx(FieldError, { id: schemaErrorId, roleAlert: true, children: schemaError })
-                  ]
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxs(ModalFooter, { children: [
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(SchemaModalStyles, {}),
+    /* @__PURE__ */ jsxs(
+      Modal,
+      {
+        labelledBy: titleId,
+        onClose: closeSchemaModal,
+        overlayClassName: "z-[1000]",
+        className: `${MODAL_PANEL_CLASS} flex flex-col overflow-hidden`,
+        title: modalTitle,
+        children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex min-h-0 flex-1 flex-col gap-4 mb-4", children: [
+            /* @__PURE__ */ jsxs(FormGroup, { label: "Name", htmlFor: nameId, children: [
               /* @__PURE__ */ jsx(
-                Button,
+                Input,
                 {
-                  type: "button",
-                  variant: "secondary",
-                  onClick: () => {
-                    closeModal();
-                    onClose();
+                  id: nameId,
+                  value: name2,
+                  onChange: (event) => {
+                    setName(event.target.value);
                   },
-                  children: "Cancel"
+                  "aria-invalid": nameError ? true : void 0,
+                  "aria-describedby": nameError ? nameErrorId : void 0,
+                  placeholder: "User response"
                 }
               ),
-              /* @__PURE__ */ jsx(
-                Button,
-                {
-                  type: "button",
-                  variant: "primary",
-                  disabled: saving,
-                  onClick: () => {
-                    void handleSave();
-                  },
-                  children: "Save"
-                }
-              )
-            ] })
-          ]
-        }
-      )
-    ] })
-  );
-}
-
-// src/SchemasSidebar.tsx
-var SIDEBAR_ROW_CLASS = "group flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-selection/60 app-no-drag";
-function SchemasHeaderActions() {
-  const modal = useModalState();
-  return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(
-      Button,
-      {
-        type: "button",
-        variant: "toolbar",
-        "aria-label": "Add JSON Schema",
-        title: "Add JSON Schema",
-        className: "inline-flex min-w-[28px] items-center justify-center text-[14px] font-medium",
-        onClick: openAddModal,
-        children: "+"
-      }
-    ),
-    modal.open ? /* @__PURE__ */ jsx(SchemaModal, { editingId: modal.editingId, onClose: () => void 0 }) : null
-  ] });
-}
-function SchemasSidebar() {
-  const schemas2 = useSchemas();
-  const [openMenuId, setOpenMenuId] = useState(null);
-  if (schemas2.length === 0) {
-    return /* @__PURE__ */ jsx(EmptyState, { children: "No JSON Schemas yet. Add one with the + button above, then assign it on a request's JSON Schema tab." });
-  }
-  return /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-0.5", children: schemas2.map((entry) => /* @__PURE__ */ jsxs("div", { className: SIDEBAR_ROW_CLASS, children: [
-    /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate py-0.5 text-[14px]", children: entry.name }),
-    /* @__PURE__ */ jsx(
-      RowActionsMenu,
-      {
-        menuId: `schema-${entry.id}`,
-        openMenuId,
-        onOpenChange: setOpenMenuId,
-        groups: [
-          [
-            {
-              label: "Edit",
-              onSelect: () => {
-                openEditModal(entry.id);
+              /* @__PURE__ */ jsx(FieldError, { id: nameErrorId, roleAlert: true, children: nameError })
+            ] }),
+            /* @__PURE__ */ jsxs(
+              FormGroup,
+              {
+                label: "Schema",
+                htmlFor: schemaLabelId,
+                className: "flex min-h-0 flex-1 flex-col",
+                children: [
+                  /* @__PURE__ */ jsx(
+                    CodeEditor,
+                    {
+                      id: schemaLabelId,
+                      value: schema,
+                      onChange: setSchema,
+                      language: "json",
+                      className: "json-schema-validator-editor min-h-0 flex-1",
+                      "aria-labelledby": schemaLabelId,
+                      "aria-invalid": schemaError ? true : void 0,
+                      "aria-describedby": schemaError ? schemaErrorId : void 0
+                    }
+                  ),
+                  /* @__PURE__ */ jsx(FieldError, { id: schemaErrorId, roleAlert: true, children: schemaError })
+                ]
               }
-            }
-          ],
-          [
-            {
-              label: "Delete",
-              variant: "danger",
-              onSelect: () => {
-                void removeSchema(entry.id);
+            )
+          ] }),
+          /* @__PURE__ */ jsxs(ModalFooter, { children: [
+            /* @__PURE__ */ jsx(Button, { type: "button", variant: "secondary", onClick: closeSchemaModal, children: "Cancel" }),
+            /* @__PURE__ */ jsx(
+              Button,
+              {
+                type: "button",
+                variant: "primary",
+                disabled: saving,
+                onClick: () => {
+                  void handleSave();
+                },
+                children: "Save"
               }
-            }
-          ]
+            )
+          ] })
         ]
       }
     )
-  ] }, entry.id)) });
+  ] });
 }
 
 // src/requestKey.ts
@@ -44892,6 +45218,11 @@ function activate(hc2) {
       order: 20,
       headerActions: SchemasHeaderActions,
       Component: SchemasSidebar
+    }),
+    hc2.ui.registerModal({
+      id: "schema-editor",
+      title: "Add JSON Schema",
+      Component: SchemaModal
     }),
     hc2.ui.registerRequestTab({
       id: "schema",

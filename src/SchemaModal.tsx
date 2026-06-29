@@ -1,5 +1,4 @@
-import type { ReactPortal } from 'react';
-import { useEffect, useId, useState } from '@harborclient/sdk/react';
+import { useEffect, useId, useState, type JSX } from '@harborclient/sdk/react';
 import {
   Button,
   CodeEditor,
@@ -9,20 +8,17 @@ import {
   Modal,
   ModalFooter
 } from '@harborclient/sdk/components';
-import { addSchema, getSchemaById, updateSchema } from './store';
-import { closeModal } from './modalSignal';
-import { portalToBody } from './reactHost';
+import { addSchema, getSchemaById, getPluginContext, updateSchema } from './store';
+
+interface SchemaEditorContext {
+  editingId?: string | null;
+}
 
 interface Props {
   /**
-   * When set, the modal edits an existing schema; otherwise it creates a new one.
+   * Host-provided context from {@link PluginUi.openModal}.
    */
-  editingId: string | null;
-
-  /**
-   * Called after the modal closes.
-   */
-  onClose: () => void;
+  context?: SchemaEditorContext;
 }
 
 const DEFAULT_SCHEMA = '{\n  "type": "object",\n  "properties": {}\n}';
@@ -64,9 +60,17 @@ function SchemaModalStyles() {
 }
 
 /**
+ * Closes the host modal overlay for the schema editor.
+ */
+function closeSchemaModal(): void {
+  getPluginContext()?.ui.closeModal('schema-editor');
+}
+
+/**
  * Modal for adding or editing a JSON Schema in the plugin library.
  */
-export function SchemaModal({ editingId, onClose }: Props): ReactPortal {
+export function SchemaModal({ context }: Props): JSX.Element {
+  const editingId = context?.editingId ?? null;
   const titleId = useId();
   const nameId = useId();
   const schemaLabelId = useId();
@@ -118,8 +122,7 @@ export function SchemaModal({ editingId, onClose }: Props): ReactPortal {
       } else {
         await addSchema(trimmedName, schema);
       }
-      closeModal();
-      onClose();
+      closeSchemaModal();
     } finally {
       setSaving(false);
     }
@@ -127,15 +130,12 @@ export function SchemaModal({ editingId, onClose }: Props): ReactPortal {
 
   const modalTitle = editingId ? 'Edit JSON Schema' : 'Add JSON Schema';
 
-  return portalToBody(
+  return (
     <>
       <SchemaModalStyles />
       <Modal
         labelledBy={titleId}
-        onClose={() => {
-          closeModal();
-          onClose();
-        }}
+        onClose={closeSchemaModal}
         overlayClassName="z-[1000]"
         className={`${MODAL_PANEL_CLASS} flex flex-col overflow-hidden`}
         title={modalTitle}
@@ -179,14 +179,7 @@ export function SchemaModal({ editingId, onClose }: Props): ReactPortal {
         </div>
 
         <ModalFooter>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              closeModal();
-              onClose();
-            }}
-          >
+          <Button type="button" variant="secondary" onClick={closeSchemaModal}>
             Cancel
           </Button>
           <Button
@@ -202,5 +195,5 @@ export function SchemaModal({ editingId, onClose }: Props): ReactPortal {
         </ModalFooter>
       </Modal>
     </>
-  ) as ReactPortal;
+  );
 }
