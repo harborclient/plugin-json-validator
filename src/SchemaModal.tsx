@@ -8,7 +8,7 @@ import {
   Modal,
   ModalFooter
 } from '@harborclient/sdk/components';
-import { addSchema, getSchemaById, getPluginContext, updateSchema } from './store';
+import { addSchema, getSchemaById, requirePluginContext, updateSchema } from './store';
 
 interface SchemaEditorContext {
   editingId?: string | null;
@@ -63,7 +63,7 @@ function SchemaModalStyles() {
  * Closes the host modal overlay for the schema editor.
  */
 function closeSchemaModal(): void {
-  getPluginContext()?.ui.closeModal('schema-editor');
+  requirePluginContext().ui.closeModal('schema-editor');
 }
 
 /**

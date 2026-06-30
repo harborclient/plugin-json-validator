@@ -1,6 +1,6 @@
 import { installReact } from '@harborclient/sdk';
 import type { PluginContext, SidebarSectionContribution } from '@harborclient/sdk';
-import { initStore } from './store';
+import { initStore, resetStore } from './store';
 import { SchemasHeaderActions, SchemasSidebar } from './SchemasSidebar';
 import { SchemaModal } from './SchemaModal';
 import { SchemaSelectTab } from './SchemaSelectTab';
@@ -16,6 +16,7 @@ export function activate(hc: PluginContext): void {
 
   void initStore(hc);
 
+  hc.subscriptions.push({ dispose: resetStore });
   hc.subscriptions.push(
     hc.ui.registerSidebarSection({
       id: 'schemas',

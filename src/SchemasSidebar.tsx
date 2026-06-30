@@ -1,6 +1,13 @@
 import { useEffect, useState } from '@harborclient/sdk/react';
+import { syncOnWindowFocus } from '@harborclient/sdk/store';
 import { Button, EmptyState, RowActionsMenu } from '@harborclient/sdk/components';
-import { getPluginContext, reloadFromStorage, removeSchema, useSchemas } from './store';
+import {
+  getSchemasStore,
+  getSelectionsStore,
+  removeSchema,
+  requirePluginContext,
+  useSchemas
+} from './store';
 
 /** Tailwind classes matching HarborClient sidebar source rows (Collections, Environments). */
 const SIDEBAR_ROW_CLASS =
@@ -14,7 +21,7 @@ export function SchemasHeaderActions() {
    * Opens the schema editor modal for a new entry.
    */
   const handleAdd = (): void => {
-    getPluginContext()?.ui.openModal('schema-editor', { editingId: null });
+    requirePluginContext().ui.openModal('schema-editor', { editingId: null });
   };
 
   return (
@@ -43,14 +50,9 @@ export function SchemasSidebar() {
    * overlay appear without a full app restart.
    */
   useEffect(() => {
-    const reload = (): void => {
-      void reloadFromStorage();
-    };
-    window.addEventListener('focus', reload);
-    document.addEventListener('visibilitychange', reload);
+    const syncDisposable = syncOnWindowFocus([getSchemasStore(), getSelectionsStore()]);
     return () => {
-      window.removeEventListener('focus', reload);
-      document.removeEventListener('visibilitychange', reload);
+      syncDisposable.dispose();
     };
   }, []);
 
@@ -77,7 +79,7 @@ export function SchemasSidebar() {
                 {
                   label: 'Edit',
                   onSelect: () => {
-                    getPluginContext()?.ui.openModal('schema-editor', { editingId: entry.id });
+                    requirePluginContext().ui.openModal('schema-editor', { editingId: entry.id });
                   }
                 }
               ],

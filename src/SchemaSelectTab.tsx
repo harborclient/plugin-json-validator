@@ -1,7 +1,6 @@
 import { useId } from '@harborclient/sdk/react';
 import type { RequestTabContext } from '@harborclient/sdk';
 import { FormGroup, Select, StatusMessage } from '@harborclient/sdk/components';
-import { requestKey } from './requestKey';
 import { setSelection, useSchemas, useSelection } from './store';
 
 interface Props {
@@ -16,7 +15,7 @@ interface Props {
  */
 export function SchemaSelectTab({ context }: Props) {
   const selectId = useId();
-  const key = requestKey(context.draft);
+  const key = context.requestKey;
   const schemas = useSchemas();
   const selectedId = useSelection(key);
 
@@ -48,8 +47,8 @@ export function SchemaSelectTab({ context }: Props) {
         </Select>
       </FormGroup>
       <StatusMessage>
-        Selection is remembered for requests with the same method and URL. Changing the URL clears
-        the association for the new address.
+        Selection is remembered per saved request. Unsaved tabs are keyed by method and URL until
+        you save.
       </StatusMessage>
     </div>
   );

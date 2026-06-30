@@ -4328,15 +4328,15 @@ var require_core = __commonJS({
         }
         return metaSchema;
       }
-      _removeAllSchemas(schemas2, regex) {
-        for (const keyRef in schemas2) {
-          const sch = schemas2[keyRef];
+      _removeAllSchemas(schemas, regex) {
+        for (const keyRef in schemas) {
+          const sch = schemas[keyRef];
           if (!regex || regex.test(keyRef)) {
             if (typeof sch == "string") {
-              delete schemas2[keyRef];
+              delete schemas[keyRef];
             } else if (sch && !sch.meta) {
               this._cache.delete(sch.schema);
-              delete schemas2[keyRef];
+              delete schemas[keyRef];
             }
           }
         }
@@ -6880,12 +6880,29 @@ var require_dist = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
+var HOST_REACT_GLOBAL_KEY = "__HARBORCLIENT_HOST_REACT__";
 var hostReact = null;
+function readGlobalHostReact() {
+  if (typeof globalThis === "undefined") {
+    return null;
+  }
+  const candidate = globalThis[HOST_REACT_GLOBAL_KEY];
+  return candidate ?? null;
+}
 function setHostReact(react) {
   hostReact = react;
+  if (typeof globalThis !== "undefined") {
+    globalThis[HOST_REACT_GLOBAL_KEY] = react;
+  }
 }
 function requireHostReact() {
+  if (hostReact == null) {
+    const globalReact = readGlobalHostReact();
+    if (globalReact != null) {
+      hostReact = globalReact;
+    }
+  }
   if (hostReact == null) {
     throw new Error(
       "Plugin React host is not installed. Call installReact(hc.react) at the start of activate()."
@@ -6894,12 +6911,12 @@ function requireHostReact() {
   return hostReact;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/index.js
 function installReact(react) {
   setHostReact(react);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/react.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/react.js
 function hook(name2) {
   const react = requireHostReact();
   const fn = react[name2];
@@ -6926,6 +6943,22 @@ function useRef(initialValue) {
 function useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
   return hook("useSyncExternalStore")(subscribe, getSnapshot, getServerSnapshot);
 }
+function forwardRef(render3) {
+  let forwarded = null;
+  function LazyForwardRef(props, ref) {
+    const react = requireHostReact();
+    if (forwarded === null) {
+      forwarded = react.forwardRef(render3);
+    }
+    return react.createElement(forwarded, { ...props, ref });
+  }
+  const displayName = render3.displayName ?? render3.name ?? "Component";
+  LazyForwardRef.displayName = `ForwardRef(${displayName})`;
+  return LazyForwardRef;
+}
+function useImperativeHandle(ref, create, deps) {
+  return hook("useImperativeHandle")(ref, create, deps);
+}
 function cloneElement(element, props, ...children) {
   return hook("cloneElement")(element, props, ...children);
 }
@@ -6941,33 +6974,151 @@ function useContext(context) {
 function useId() {
   return hook("useId")();
 }
+function useLayoutEffect(effect, deps) {
+  return hook("useLayoutEffect")(effect, deps);
+}
 function createElement(type, props, ...children) {
   return hook("createElement")(type, props, ...children);
+}
+var reactNamespace = {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+  forwardRef,
+  useImperativeHandle,
+  cloneElement,
+  isValidElement,
+  createContext,
+  useContext,
+  useId,
+  useLayoutEffect,
+  createElement
+};
+var defaultExport = new Proxy(reactNamespace, {
+  get(target, prop, receiver) {
+    if (prop in target) {
+      return Reflect.get(target, prop, receiver);
+    }
+    return requireHostReact()[prop];
+  }
+});
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/store.js
+function createExternalStore(initial2) {
+  let state = initial2;
+  const listeners = /* @__PURE__ */ new Set();
+  return {
+    subscribe: (listener2) => {
+      listeners.add(listener2);
+      return () => {
+        listeners.delete(listener2);
+      };
+    },
+    getSnapshot: () => state,
+    setState: (next) => {
+      state = next;
+      for (const listener2 of listeners) {
+        listener2();
+      }
+    }
+  };
+}
+function defaultEquals(a3, b3) {
+  return JSON.stringify(a3) === JSON.stringify(b3);
+}
+function createStorageStore(options) {
+  const { storage, key, parse: parse2, equals = defaultEquals, keepCurrentWhenMissing = false } = options;
+  const external = createExternalStore(parse2(void 0));
+  async function reloadFromStorage() {
+    const raw = await storage.get(key);
+    if (raw === void 0 && keepCurrentWhenMissing) {
+      return;
+    }
+    const next = parse2(raw);
+    const current = external.getSnapshot();
+    if (!equals(current, next)) {
+      external.setState(next);
+    }
+  }
+  async function set2(next) {
+    const current = external.getSnapshot();
+    if (equals(current, next)) {
+      return;
+    }
+    external.setState(next);
+    await storage.set(key, next);
+  }
+  function useValue() {
+    return useSyncExternalStore(external.subscribe, external.getSnapshot, external.getSnapshot);
+  }
+  return {
+    subscribe: external.subscribe,
+    getSnapshot: external.getSnapshot,
+    useValue,
+    reloadFromStorage,
+    set: set2
+  };
+}
+function setIntervalDisposable(callback, intervalMs) {
+  const timer = setInterval(callback, intervalMs);
+  return {
+    dispose: () => {
+      clearInterval(timer);
+    }
+  };
+}
+function syncOnWindowFocus(stores, options) {
+  const list = Array.isArray(stores) ? stores : [stores];
+  const reload = () => {
+    for (const store of list) {
+      void store.reloadFromStorage();
+    }
+  };
+  window.addEventListener("focus", reload);
+  document.addEventListener("visibilitychange", reload);
+  reload();
+  const intervalDisposable = options?.intervalMs !== void 0 ? setIntervalDisposable(reload, options.intervalMs) : null;
+  return {
+    dispose: () => {
+      window.removeEventListener("focus", reload);
+      document.removeEventListener("visibilitychange", reload);
+      intervalDisposable?.dispose();
+    }
+  };
 }
 
 // src/store.ts
 var SCHEMAS_KEY = "schemas";
 var SELECTIONS_KEY = "selections";
 var hc = null;
-var schemas = [];
-var selections = {};
-var listeners = /* @__PURE__ */ new Set();
-function notify() {
-  for (const listener2 of listeners) {
-    listener2();
-  }
+var schemasStore = null;
+var selectionsStore = null;
+function parseSchemas(raw) {
+  return Array.isArray(raw) ? raw : [];
 }
-async function persistSchemas() {
-  if (!hc) {
-    return;
-  }
-  await hc.storage.set(SCHEMAS_KEY, schemas);
+function parseSelections(raw) {
+  return raw && typeof raw === "object" && !Array.isArray(raw) ? { ...raw } : {};
 }
-async function persistSelections() {
-  if (!hc) {
-    return;
+function requireSchemasStore() {
+  if (!schemasStore) {
+    throw new Error("JSON validator store is not initialized.");
   }
-  await hc.storage.set(SELECTIONS_KEY, selections);
+  return schemasStore;
+}
+function requireSelectionsStore() {
+  if (!selectionsStore) {
+    throw new Error("JSON validator store is not initialized.");
+  }
+  return selectionsStore;
+}
+function requirePluginContext() {
+  if (!hc) {
+    throw new Error("JSON validator store is not initialized.");
+  }
+  return hc;
 }
 function createSchemaId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -6977,40 +7128,28 @@ function createSchemaId() {
 }
 async function initStore(context) {
   hc = context;
-  const [storedSchemas, storedSelections] = await Promise.all([
-    hc.storage.get(SCHEMAS_KEY),
-    hc.storage.get(SELECTIONS_KEY)
-  ]);
-  schemas = Array.isArray(storedSchemas) ? storedSchemas : [];
-  selections = storedSelections && typeof storedSelections === "object" ? { ...storedSelections } : {};
-  notify();
+  schemasStore = createStorageStore({
+    storage: hc.storage,
+    key: SCHEMAS_KEY,
+    parse: parseSchemas
+  });
+  selectionsStore = createStorageStore({
+    storage: hc.storage,
+    key: SELECTIONS_KEY,
+    parse: parseSelections
+  });
+  await Promise.all([schemasStore.reloadFromStorage(), selectionsStore.reloadFromStorage()]);
 }
-function getPluginContext() {
-  return hc;
+function resetStore() {
+  hc = null;
+  schemasStore = null;
+  selectionsStore = null;
 }
-async function reloadFromStorage() {
-  if (!hc) {
-    return;
-  }
-  const [storedSchemas, storedSelections] = await Promise.all([
-    hc.storage.get(SCHEMAS_KEY),
-    hc.storage.get(SELECTIONS_KEY)
-  ]);
-  schemas = Array.isArray(storedSchemas) ? storedSchemas : [];
-  selections = storedSelections && typeof storedSelections === "object" ? { ...storedSelections } : {};
-  notify();
+function getSchemasStore() {
+  return requireSchemasStore();
 }
-function subscribeStore(listener2) {
-  listeners.add(listener2);
-  return () => {
-    listeners.delete(listener2);
-  };
-}
-function getSchemasSnapshot() {
-  return schemas;
-}
-function getSelectionsSnapshot() {
-  return selections;
+function getSelectionsStore() {
+  return requireSelectionsStore();
 }
 async function addSchema(name2, schema) {
   const entry = {
@@ -7018,56 +7157,54 @@ async function addSchema(name2, schema) {
     name: name2.trim(),
     schema
   };
-  schemas = [...schemas, entry];
-  notify();
-  await persistSchemas();
+  const store = requireSchemasStore();
+  await store.set([...store.getSnapshot(), entry]);
   return entry;
 }
 async function updateSchema(id2, name2, schema) {
-  schemas = schemas.map(
-    (entry) => entry.id === id2 ? { ...entry, name: name2.trim(), schema } : entry
+  const store = requireSchemasStore();
+  await store.set(
+    store.getSnapshot().map((entry) => entry.id === id2 ? { ...entry, name: name2.trim(), schema } : entry)
   );
-  notify();
-  await persistSchemas();
 }
 async function removeSchema(id2) {
-  schemas = schemas.filter((entry) => entry.id !== id2);
+  const schemas = requireSchemasStore();
+  const selections = requireSelectionsStore();
+  await schemas.set(schemas.getSnapshot().filter((entry) => entry.id !== id2));
   const nextSelections = {};
-  for (const [key, schemaId] of Object.entries(selections)) {
+  for (const [key, schemaId] of Object.entries(selections.getSnapshot())) {
     if (schemaId !== id2) {
       nextSelections[key] = schemaId;
     }
   }
-  selections = nextSelections;
-  notify();
-  await Promise.all([persistSchemas(), persistSelections()]);
+  await selections.set(nextSelections);
 }
 async function setSelection(key, schemaId) {
-  const next = { ...selections };
+  const store = requireSelectionsStore();
+  const next = { ...store.getSnapshot() };
   if (!schemaId) {
     delete next[key];
   } else {
     next[key] = schemaId;
   }
-  selections = next;
-  notify();
-  await persistSelections();
+  await store.set(next);
 }
 function useSchemas() {
-  return useSyncExternalStore(subscribeStore, getSchemasSnapshot, getSchemasSnapshot);
+  return requireSchemasStore().useValue();
 }
 function useSelection(key) {
+  const store = requireSelectionsStore();
   return useSyncExternalStore(
-    subscribeStore,
-    () => getSelectionsSnapshot()[key] ?? "",
+    store.subscribe,
+    () => store.getSnapshot()[key] ?? "",
     () => ""
   );
 }
 function getSchemaById(id2) {
-  return schemas.find((entry) => entry.id === id2);
+  return requireSchemasStore().getSnapshot().find((entry) => entry.id === id2);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
 var Fragment = Symbol.for("@harborclient/sdk.Fragment");
 function build(type, props, key) {
   const react = requireHostReact();
@@ -7081,7 +7218,7 @@ function build(type, props, key) {
 var jsx = build;
 var jsxs = build;
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Button/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Button/index.js
 var VARIANT_CLASSES = {
   primary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-accent px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
   secondary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-text shadow-sm hover:bg-selection disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
@@ -7096,7 +7233,7 @@ function Button({ variant = "primary", className, type = "button", innerRef, ...
   return jsx("button", { ref: innerRef, type, className: classes, ...props });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
 function spacingClasses(spacing) {
   switch (spacing) {
     case "section":
@@ -10560,7 +10697,7 @@ var layer = api.layer;
 var text = api.text;
 var counter = api.counter;
 
-// src/reactJsxRuntimeShim.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime-host.js
 import * as React from "react";
 function build4(type, props, key) {
   const { children, ...rest } = props ?? {};
@@ -10968,7 +11105,7 @@ var FontAwesomeIcon = React2.forwardRef((props, ref) => {
 FontAwesomeIcon.displayName = "FontAwesomeIcon";
 var DEFAULT_CLASSNAMES = `${LAYER_CLASSES.default} ${STYLE_CLASSES.fixedWidth}`;
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
 function FaIcon({ icon: icon3, className = "h-3.5 w-3.5", title }) {
   return createElement(FontAwesomeIcon, {
     icon: icon3,
@@ -10990,7 +11127,7 @@ var faBars = {
   icon: [448, 512, ["navicon"], "f0c9", "M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"]
 };
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Badge/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Badge/index.js
 function variantClasses(variant) {
   switch (variant) {
     case "success":
@@ -34166,10 +34303,10 @@ function _objectWithoutPropertiesLoose(r4, e4) {
 }
 
 // node_modules/.pnpm/@uiw+react-codemirror@4.25.10_@babel+runtime@8.0.0_@codemirror+autocomplete@6.20.3_@cod_e67f98ff469220c0ad9bb15b36961e8d/node_modules/@uiw/react-codemirror/esm/index.js
-import React3, { useRef as useRef2, forwardRef, useImperativeHandle, useCallback as useCallback2 } from "react";
+import React3, { useRef as useRef2, forwardRef as forwardRef2, useImperativeHandle as useImperativeHandle2, useCallback as useCallback2 } from "react";
 
 // node_modules/.pnpm/@uiw+react-codemirror@4.25.10_@babel+runtime@8.0.0_@codemirror+autocomplete@6.20.3_@cod_e67f98ff469220c0ad9bb15b36961e8d/node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-import { useEffect as useEffect2, useLayoutEffect, useState as useState2 } from "react";
+import { useEffect as useEffect2, useLayoutEffect as useLayoutEffect2, useState as useState2 } from "react";
 
 // node_modules/.pnpm/@codemirror+commands@6.10.4/node_modules/@codemirror/commands/dist/index.js
 var toggleComment = (target) => {
@@ -34453,8 +34590,8 @@ var HistEvent = class _HistEvent {
       return null;
     return new _HistEvent(tr.changes.invert(tr.startState.doc), effects, void 0, selection2 || tr.startState.selection, none3);
   }
-  static selection(selections2) {
-    return new _HistEvent(void 0, none3, void 0, void 0, selections2);
+  static selection(selections) {
+    return new _HistEvent(void 0, none3, void 0, void 0, selections);
   }
 };
 function updateBranch(branch, to, maxLen, newEvent) {
@@ -34504,9 +34641,9 @@ function popSelection(branch) {
 function addMappingToBranch(branch, mapping) {
   if (!branch.length)
     return branch;
-  let length = branch.length, selections2 = none3;
+  let length = branch.length, selections = none3;
   while (length) {
-    let event = mapEvent(branch[length - 1], mapping, selections2);
+    let event = mapEvent(branch[length - 1], mapping, selections);
     if (event.changes && !event.changes.empty || event.effects.length) {
       let result = branch.slice(0, length);
       result[length - 1] = event;
@@ -34514,18 +34651,18 @@ function addMappingToBranch(branch, mapping) {
     } else {
       mapping = event.mapped;
       length--;
-      selections2 = event.selectionsAfter;
+      selections = event.selectionsAfter;
     }
   }
-  return selections2.length ? [HistEvent.selection(selections2)] : none3;
+  return selections.length ? [HistEvent.selection(selections)] : none3;
 }
 function mapEvent(event, mapping, extraSelections) {
-  let selections2 = conc(event.selectionsAfter.length ? event.selectionsAfter.map((s3) => s3.map(mapping)) : none3, extraSelections);
+  let selections = conc(event.selectionsAfter.length ? event.selectionsAfter.map((s3) => s3.map(mapping)) : none3, extraSelections);
   if (!event.changes)
-    return HistEvent.selection(selections2);
+    return HistEvent.selection(selections);
   let mappedChanges = event.changes.map(mapping), before = mapping.mapDesc(event.changes, true);
   let fullMapping = event.mapped ? event.mapped.composeDesc(before) : before;
-  return new HistEvent(mappedChanges, StateEffect.mapEffects(event.effects, mapping), fullMapping, event.startSelection.map(before), selections2);
+  return new HistEvent(mappedChanges, StateEffect.mapEffects(event.effects, mapping), fullMapping, event.startSelection.map(before), selections);
 }
 var joinableUserEvent = /^(input\.type|delete)($|\.)/;
 var HistoryState = class _HistoryState {
@@ -37373,7 +37510,7 @@ function useCodeMirror(props) {
     getExtensions.push(EditorView.updateListener.of(onUpdate));
   }
   getExtensions = getExtensions.concat(extensions);
-  useLayoutEffect(() => {
+  useLayoutEffect2(() => {
     if (container && !state) {
       var config16 = {
         doc: value,
@@ -37464,7 +37601,7 @@ function useCodeMirror(props) {
 
 // node_modules/.pnpm/@uiw+react-codemirror@4.25.10_@babel+runtime@8.0.0_@codemirror+autocomplete@6.20.3_@cod_e67f98ff469220c0ad9bb15b36961e8d/node_modules/@uiw/react-codemirror/esm/index.js
 var _excluded = ["className", "value", "selection", "extensions", "onChange", "onStatistics", "onCreateEditor", "onUpdate", "autoFocus", "theme", "height", "minHeight", "maxHeight", "width", "minWidth", "maxWidth", "basicSetup", "placeholder", "indentWithTab", "editable", "readOnly", "root", "initialState"];
-var ReactCodeMirror = /* @__PURE__ */ forwardRef((props, ref) => {
+var ReactCodeMirror = /* @__PURE__ */ forwardRef2((props, ref) => {
   var className = props.className, _props$value = props.value, value = _props$value === void 0 ? "" : _props$value, selection2 = props.selection, _props$extensions = props.extensions, extensions = _props$extensions === void 0 ? [] : _props$extensions, onChange2 = props.onChange, onStatistics = props.onStatistics, onCreateEditor = props.onCreateEditor, onUpdate = props.onUpdate, autoFocus = props.autoFocus, _props$theme = props.theme, theme2 = _props$theme === void 0 ? "light" : _props$theme, height = props.height, minHeight = props.minHeight, maxHeight = props.maxHeight, width = props.width, minWidth = props.minWidth, maxWidth = props.maxWidth, basicSetup3 = props.basicSetup, placeholder2 = props.placeholder, indentWithTab2 = props.indentWithTab, editable2 = props.editable, readOnly2 = props.readOnly, root = props.root, initialState = props.initialState, other = _objectWithoutPropertiesLoose(props, _excluded);
   var editor = useRef2(null);
   var _useCodeMirror = useCodeMirror({
@@ -37491,7 +37628,7 @@ var ReactCodeMirror = /* @__PURE__ */ forwardRef((props, ref) => {
     extensions,
     initialState
   }), state = _useCodeMirror.state, view = _useCodeMirror.view, container = _useCodeMirror.container, setContainer = _useCodeMirror.setContainer;
-  useImperativeHandle(ref, () => ({
+  useImperativeHandle2(ref, () => ({
     editor: editor.current,
     state,
     view
@@ -39394,7 +39531,7 @@ var e3 = { airline: { airline: [{ name: `Aegean Airlines`, iataCode: `A3` }, { n
 // node_modules/.pnpm/@faker-js+faker@10.5.0/node_modules/@faker-js/faker/dist/locale/en.js
 var r3 = new yt({ locale: [e3, Ct] });
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/variables/dynamic.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/variables/dynamic.js
 function categoryImageUrl(category) {
   return r3.image.urlLoremFlickr({ category });
 }
@@ -39894,7 +40031,7 @@ function getDynamicVariableDescription(key) {
 }
 var DYNAMIC_VARIABLE_NAMES = Object.keys(DYNAMIC_VARIABLES).sort();
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/variables/tokens.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/variables/tokens.js
 var VARIABLE_NAME_CHARS = "\\w$.-";
 var VARIABLE_TOKEN_PATTERN = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
 function variableLookup(variables) {
@@ -39915,28 +40052,7 @@ function resolveVariable(key, variables) {
   return variableLookup(variables).get(key);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/runtime/store.js
-function createExternalStore(initial2) {
-  let state = initial2;
-  const listeners2 = /* @__PURE__ */ new Set();
-  return {
-    subscribe: (listener2) => {
-      listeners2.add(listener2);
-      return () => {
-        listeners2.delete(listener2);
-      };
-    },
-    getSnapshot: () => state,
-    setState: (next) => {
-      state = next;
-      for (const listener2 of listeners2) {
-        listener2();
-      }
-    }
-  };
-}
-
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
 var DEFAULT_CODE_EDITOR_SETUP = {
   lineNumbers: true,
   foldGutter: true,
@@ -39944,7 +40060,7 @@ var DEFAULT_CODE_EDITOR_SETUP = {
   highlightActiveLineGutter: true
 };
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
 var DEFAULT_CODE_EDITOR_CONFIG = {
   theme: "default",
   setup: DEFAULT_CODE_EDITOR_SETUP
@@ -43968,7 +44084,7 @@ var xcodeDarkInit = (options) => {
 };
 var xcodeDark = xcodeDarkInit();
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
 var themeExtensions = {
   dracula,
   githubLight,
@@ -43985,7 +44101,7 @@ function getCodeEditorThemeExtension(value) {
   return themeExtensions[value];
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
 var lightHighlight = HighlightStyle.define([
   { tag: tags.propertyName, color: "#881391" },
   { tag: tags.string, color: "#c41a16" },
@@ -44348,7 +44464,7 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
   }, children: "Edit value" }) : null] }) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
 function variantClasses2(variant) {
   if (variant === "centered") {
     return "flex flex-1 items-center justify-center p-4 text-center text-[14px] text-muted";
@@ -44361,7 +44477,7 @@ function EmptyState({ children, variant = "inline", className }) {
   return jsx("div", { className: classes, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/classes.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/classes.js
 var field = "rounded-md border border-separator bg-field px-2 py-1 text-[15px] text-text app-no-drag";
 var surfaceField = "w-full rounded-md border border-separator bg-field px-3 py-2 text-[14px] text-text";
 var VARIANT_CLASSES2 = {
@@ -44379,18 +44495,18 @@ function mergeFieldClasses(variant, className) {
   return void 0;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/Input.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/Input.js
 function Input({ ref, variant = "control", type, className, ...props }) {
   const resolvedVariant = type === "checkbox" || type === "radio" ? "plain" : variant;
   return jsx("input", { ref, type, className: mergeFieldClasses(resolvedVariant, className), ...props });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/forms/Select.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/Select.js
 function Select({ ref, variant = "control", className, children, ...props }) {
   return jsx("select", { ref, className: mergeFieldClasses(variant, className), ...props, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/enhanceControl.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/enhanceControl.js
 var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
 var FORM_CONTROL_TAGS = /* @__PURE__ */ new Set(["button", "input", "select", "textarea"]);
 function getSingleChild(node) {
@@ -44452,7 +44568,7 @@ function enhanceControl(child, options) {
   return applyAriaProps(child, options);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
 function labelClasses(tone, srOnly, inline) {
   const base2 = "text-[14px]";
   const visibility = srOnly ? "sr-only" : "";
@@ -44505,7 +44621,7 @@ function FormGroup({ label, children, htmlFor, description, error, errorId, desc
   return jsxs("div", { className: wrapperClasses, children: [jsxs("label", { htmlFor, className: "flex flex-col gap-1", children: [jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label }), control, resolvedDescriptionId ? jsx("p", { id: resolvedDescriptionId, className: "m-0 text-[14px] text-muted", children: description }) : null] }), resolvedErrorId ? jsx(FieldError, { id: resolvedErrorId, spacing: "field", children: error }) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
 var FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 var inertLockCounts = /* @__PURE__ */ new WeakMap();
 function setInertLocked(element, locked) {
@@ -44600,19 +44716,19 @@ function useDialogFocus(panelRef) {
   }, [panelRef]);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
 function ModalHeader({ titleId, title, description, descriptionId, headerActions, closeDisabled = false, onClose }) {
   return jsxs("div", { className: "flex flex-wrap items-center gap-2 border-b border-separator px-4 py-4", children: [jsxs("div", { className: "min-w-0 flex-1", children: [jsx("h2", { id: titleId, className: "m-0 flex flex-wrap items-center gap-2 text-[17px] font-semibold text-text", children: title }), description ? jsx("p", { id: descriptionId, className: "m-0 mt-1 text-[14px] text-muted", children: description }) : null] }), jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [headerActions, jsx(Button, { type: "button", variant: "icon", className: "shrink-0", "aria-label": "Close", disabled: closeDisabled, onClick: onClose, children: jsx(FaIcon, { icon: faXmark, className: "h-4 w-4" }) })] })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
 function ModalFooter({ children, spaced = false, className }) {
   const base2 = spaced ? "mt-4 flex justify-end gap-2" : "flex justify-end gap-2";
   const classes = className ? `${base2} ${className}` : base2;
   return jsx("div", { className: classes, children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/Modal/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/index.js
 function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = false, title, description, headerActions, closeDisabled = false, labelledBy, label, children }) {
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
@@ -44634,7 +44750,7 @@ function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = 
   return jsxs("div", { ref: overlayRef, className: overlayClass, children: [jsx("div", { ref: panelRef, role: "dialog", "aria-modal": "true", "aria-labelledby": labelledBy, "aria-describedby": descriptionId, "aria-label": label, className: `relative z-10 ${panelClass}`, onClick: (event) => event.stopPropagation(), children: title && labelledBy ? jsxs(Fragment, { children: [jsx(ModalHeader, { titleId: labelledBy, title, description, descriptionId, headerActions, closeDisabled, onClose }), jsx("div", { className: "flex-1 overflow-y-auto p-4", children })] }) : children }), jsx("button", { type: "button", tabIndex: -1, className: "absolute inset-0 z-0 cursor-default border-none bg-transparent p-0", "aria-label": "Close dialog", onClick: onClose })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/utils.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/utils.js
 function isEnabled(index, disabled2) {
   return !disabled2.has(index);
 }
@@ -44690,7 +44806,7 @@ function resolveMenuTypeahead(labels, currentIndex, key, buffer) {
   return null;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
 var TYPEAHEAD_TIMEOUT_MS = 500;
 function menuItemClass(variant) {
   const base2 = "block w-full cursor-pointer border-none bg-transparent px-3.5 py-1.5 text-left text-[14px] app-no-drag";
@@ -44833,7 +44949,7 @@ function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange }) {
   }) })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@0.6.14_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search_47d90e3f55246fd089138cc6a136d024/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
 function StatusMessage({ children, live = true, id: id2, className }) {
   const base2 = "text-[14px] text-muted";
   const classes = className ? `${base2} ${className}` : base2;
@@ -44844,7 +44960,7 @@ function StatusMessage({ children, live = true, id: id2, className }) {
 var SIDEBAR_ROW_CLASS = "group flex items-center gap-1 rounded-md px-1.5 py-0.5 hover:bg-selection/60 app-no-drag";
 function SchemasHeaderActions() {
   const handleAdd = () => {
-    getPluginContext()?.ui.openModal("schema-editor", { editingId: null });
+    requirePluginContext().ui.openModal("schema-editor", { editingId: null });
   };
   return /* @__PURE__ */ jsx(
     Button,
@@ -44860,23 +44976,18 @@ function SchemasHeaderActions() {
   );
 }
 function SchemasSidebar() {
-  const schemas2 = useSchemas();
+  const schemas = useSchemas();
   const [openMenuId, setOpenMenuId] = useState(null);
   useEffect(() => {
-    const reload = () => {
-      void reloadFromStorage();
-    };
-    window.addEventListener("focus", reload);
-    document.addEventListener("visibilitychange", reload);
+    const syncDisposable = syncOnWindowFocus([getSchemasStore(), getSelectionsStore()]);
     return () => {
-      window.removeEventListener("focus", reload);
-      document.removeEventListener("visibilitychange", reload);
+      syncDisposable.dispose();
     };
   }, []);
-  if (schemas2.length === 0) {
+  if (schemas.length === 0) {
     return /* @__PURE__ */ jsx(EmptyState, { children: "No JSON Schemas yet. Add one with the + button above, then assign it on a request's JSON Schema tab." });
   }
-  return /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-0.5", children: schemas2.map((entry) => /* @__PURE__ */ jsxs("div", { className: SIDEBAR_ROW_CLASS, children: [
+  return /* @__PURE__ */ jsx("div", { className: "flex flex-col gap-0.5", children: schemas.map((entry) => /* @__PURE__ */ jsxs("div", { className: SIDEBAR_ROW_CLASS, children: [
     /* @__PURE__ */ jsx("span", { className: "min-w-0 flex-1 truncate py-0.5 text-[14px]", children: entry.name }),
     /* @__PURE__ */ jsx(
       RowActionsMenu,
@@ -44889,7 +45000,7 @@ function SchemasSidebar() {
             {
               label: "Edit",
               onSelect: () => {
-                getPluginContext()?.ui.openModal("schema-editor", { editingId: entry.id });
+                requirePluginContext().ui.openModal("schema-editor", { editingId: entry.id });
               }
             }
           ],
@@ -44935,7 +45046,7 @@ function SchemaModalStyles() {
   return null;
 }
 function closeSchemaModal() {
-  getPluginContext()?.ui.closeModal("schema-editor");
+  requirePluginContext().ui.closeModal("schema-editor");
 }
 function SchemaModal({ context }) {
   const editingId = context?.editingId ?? null;
@@ -45057,18 +45168,13 @@ function SchemaModal({ context }) {
   ] });
 }
 
-// src/requestKey.ts
-function requestKey(draft) {
-  return `${draft.method.trim().toUpperCase()} ${draft.url.trim()}`;
-}
-
 // src/SchemaSelectTab.tsx
 function SchemaSelectTab({ context }) {
   const selectId = useId();
-  const key = requestKey(context.draft);
-  const schemas2 = useSchemas();
+  const key = context.requestKey;
+  const schemas = useSchemas();
   const selectedId = useSelection(key);
-  if (schemas2.length === 0) {
+  if (schemas.length === 0) {
     return /* @__PURE__ */ jsx(StatusMessage, { children: "No JSON Schemas yet. Add one in the sidebar under JSON Schemas, then return here to assign it to this request." });
   }
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-3", style: { minHeight: "320px" }, children: [
@@ -45082,11 +45188,11 @@ function SchemaSelectTab({ context }) {
         },
         children: [
           /* @__PURE__ */ jsx("option", { value: "", children: "None" }),
-          schemas2.map((entry) => /* @__PURE__ */ jsx("option", { value: entry.id, children: entry.name }, entry.id))
+          schemas.map((entry) => /* @__PURE__ */ jsx("option", { value: entry.id, children: entry.name }, entry.id))
         ]
       }
     ) }),
-    /* @__PURE__ */ jsx(StatusMessage, { children: "Selection is remembered for requests with the same method and URL. Changing the URL clears the association for the new address." })
+    /* @__PURE__ */ jsx(StatusMessage, { children: "Selection is remembered per saved request. Unsaved tabs are keyed by method and URL until you save." })
   ] });
 }
 
@@ -45139,7 +45245,7 @@ function validateJson(schemaText, bodyText) {
 
 // src/ValidationTab.tsx
 function ValidationTab({ context }) {
-  const key = requestKey(context.draft);
+  const key = context.requestKey;
   const selectedId = useSelection(key);
   const schema = selectedId ? getSchemaById(selectedId) : void 0;
   const result = useMemo(() => {
@@ -45211,6 +45317,7 @@ function ValidationTab({ context }) {
 function activate(hc2) {
   installReact(hc2.react);
   void initStore(hc2);
+  hc2.subscriptions.push({ dispose: resetStore });
   hc2.subscriptions.push(
     hc2.ui.registerSidebarSection({
       id: "schemas",

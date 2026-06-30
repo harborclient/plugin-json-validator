@@ -1,7 +1,6 @@
 import { useMemo } from '@harborclient/sdk/react';
 import type { ResponseTabContext } from '@harborclient/sdk';
 import { Badge, StatusMessage } from '@harborclient/sdk/components';
-import { requestKey } from './requestKey';
 import { getSchemaById, useSelection } from './store';
 import { validateJson } from './validate';
 
@@ -16,7 +15,7 @@ interface Props {
  * Response viewer tab that validates the body against the selected JSON Schema.
  */
 export function ValidationTab({ context }: Props) {
-  const key = requestKey(context.draft);
+  const key = context.requestKey;
   const selectedId = useSelection(key);
   const schema = selectedId ? getSchemaById(selectedId) : undefined;
 
