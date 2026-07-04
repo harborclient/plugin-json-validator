@@ -2,19 +2,47 @@
   "id": "com.harborclient.plugins.json-schema",
   "name": "JSON Schema Validator",
   "author": "HarborClient",
-  "version": "1.0.3",
-  "categories": ["requests", "response"],
+  "version": "1.0.4",
+  "categories": [
+    "requests",
+    "response"
+  ],
   "summary": "Attach JSON Schemas to requests and validate response bodies against them with path-level error details.",
   "screenshots": [
     "https://raw.githubusercontent.com/harborclient/plugin-json-validator/main/screenshot.png"
   ],
-  "engines": { "harborclient": ">=1.8.4" },
+  "engines": {
+    "harborclient": ">=1.8.4"
+  },
   "renderer": "dist/renderer.js",
-  "permissions": ["ui", "storage"],
+  "permissions": [
+    "ui",
+    "storage"
+  ],
   "contributes": {
-    "sidebarSections": [{ "id": "schemas", "title": "JSON Schemas" }],
-    "modals": [{ "id": "schema-editor", "title": "Add JSON Schema" }],
-    "requestTabs": [{ "id": "schema", "title": "JSON Schema" }],
-    "responseTabs": [{ "id": "validation", "title": "JSON Validation" }]
+    "sidebarSections": [
+      {
+        "id": "schemas",
+        "title": "JSON Schemas"
+      }
+    ],
+    "modals": [
+      {
+        "id": "schema-editor",
+        "title": "Add JSON Schema"
+      }
+    ],
+    "requestTabs": [
+      {
+        "id": "schema",
+        "title": "JSON Schema"
+      }
+    ],
+    "responseTabs": [
+      {
+        "id": "validation",
+        "title": "JSON Validation"
+      }
+    ]
   }
 }
