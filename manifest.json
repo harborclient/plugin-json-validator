@@ -2,7 +2,7 @@
   "id": "com.harborclient.plugins.json-validator",
   "name": "JSON Schema Validator",
   "author": "HarborClient",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "categories": [
     "requests",
     "response"
