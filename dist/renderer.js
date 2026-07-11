@@ -1192,8 +1192,8 @@ var require_util = __commonJS({
     })(Type || (exports.Type = Type = {}));
     function getErrorPath(dataProp, dataPropType, jsPropertySyntax) {
       if (dataProp instanceof codegen_1.Name) {
-        const isNumber = dataPropType === Type.Num;
-        return jsPropertySyntax ? isNumber ? (0, codegen_1._)`"[" + ${dataProp} + "]"` : (0, codegen_1._)`"['" + ${dataProp} + "']"` : isNumber ? (0, codegen_1._)`"/" + ${dataProp}` : (0, codegen_1._)`"/" + ${dataProp}.replace(/~/g, "~0").replace(/\\//g, "~1")`;
+        const isNumber2 = dataPropType === Type.Num;
+        return jsPropertySyntax ? isNumber2 ? (0, codegen_1._)`"[" + ${dataProp} + "]"` : (0, codegen_1._)`"['" + ${dataProp} + "']"` : isNumber2 ? (0, codegen_1._)`"/" + ${dataProp}` : (0, codegen_1._)`"/" + ${dataProp}.replace(/~/g, "~0").replace(/\\//g, "~1")`;
       }
       return jsPropertySyntax ? (0, codegen_1.getProperty)(dataProp).toString() : "/" + escapeJsonPointer(dataProp);
     }
@@ -6880,21 +6880,17 @@ var require_dist = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/reactHost.js
 var HOST_REACT_GLOBAL_KEY = "__HARBORCLIENT_HOST_REACT__";
+var HOST_REACT_DOM_GLOBAL_KEY = "__HARBORCLIENT_HOST_REACT_DOM__";
 var hostReact = null;
+var hostReactDom = null;
 function readGlobalHostReact() {
   if (typeof globalThis === "undefined") {
     return null;
   }
   const candidate = globalThis[HOST_REACT_GLOBAL_KEY];
   return candidate ?? null;
-}
-function setHostReact(react) {
-  hostReact = react;
-  if (typeof globalThis !== "undefined") {
-    globalThis[HOST_REACT_GLOBAL_KEY] = react;
-  }
 }
 function requireHostReact() {
   if (hostReact == null) {
@@ -6910,13 +6906,29 @@ function requireHostReact() {
   }
   return hostReact;
 }
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/index.js
-function installReact(react) {
-  setHostReact(react);
+function readGlobalHostReactDom() {
+  if (typeof globalThis === "undefined") {
+    return null;
+  }
+  const candidate = globalThis[HOST_REACT_DOM_GLOBAL_KEY];
+  return candidate ?? null;
+}
+function requireHostReactDom() {
+  if (hostReactDom == null) {
+    const globalReactDom = readGlobalHostReactDom();
+    if (globalReactDom != null) {
+      hostReactDom = globalReactDom;
+    }
+  }
+  if (hostReactDom == null) {
+    throw new Error(
+      "Plugin React DOM host is not installed. The view host must call setHostReactDom() before activate()."
+    );
+  }
+  return hostReactDom;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/react.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/react.js
 function hook(name2) {
   const react = requireHostReact();
   const fn = react[name2];
@@ -7006,7 +7018,7 @@ var defaultExport = new Proxy(reactNamespace, {
   }
 });
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/store.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/store.js
 function createExternalStore(initial2) {
   let state = initial2;
   const listeners = /* @__PURE__ */ new Set();
@@ -7048,12 +7060,13 @@ function createStorageStore(options) {
     if (equals(current, next)) {
       return;
     }
-    external.setState(next);
     await storage.set(key, next);
+    external.setState(next);
   }
   function useValue() {
     return useSyncExternalStore(external.subscribe, external.getSnapshot, external.getSnapshot);
   }
+  void reloadFromStorage();
   return {
     subscribe: external.subscribe,
     getSnapshot: external.getSnapshot,
@@ -7204,7 +7217,7 @@ function getSchemaById(id2) {
   return requireSchemasStore().getSnapshot().find((entry) => entry.id === id2);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime.js
 var Fragment = Symbol.for("@harborclient/sdk.Fragment");
 function build(type, props, key) {
   const react = requireHostReact();
@@ -7218,22 +7231,3335 @@ function build(type, props, key) {
 var jsx = build;
 var jsxs = build;
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Button/index.js
-var VARIANT_CLASSES = {
-  primary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-accent px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  secondary: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-text shadow-sm hover:bg-selection disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  primaryDanger: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-transparent bg-danger px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  secondaryDanger: "inline-flex min-h-[34px] cursor-pointer items-center justify-center rounded-md border border-separator bg-control px-3 py-1 text-[15px] text-danger shadow-sm hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-50 app-no-drag",
-  toolbar: "inline-flex min-h-[34px] cursor-pointer items-center rounded-md border-none bg-transparent px-2 py-1 text-[15px] hover:bg-selection app-no-drag",
-  icon: "inline-flex size-[30px] shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted hover:bg-selection hover:text-text app-no-drag",
-  iconDanger: "inline-flex size-[30px] shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-muted hover:bg-danger/15 hover:text-danger app-no-drag"
-};
-function Button({ variant = "primary", className, type = "button", innerRef, ...props }) {
-  const classes = className ? `${VARIANT_CLASSES[variant]} ${className}` : VARIANT_CLASSES[variant];
-  return jsx("button", { ref: innerRef, type, className: classes, ...props });
+// node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs
+function r(e4) {
+  var t4, f3, n3 = "";
+  if ("string" == typeof e4 || "number" == typeof e4) n3 += e4;
+  else if ("object" == typeof e4) if (Array.isArray(e4)) {
+    var o3 = e4.length;
+    for (t4 = 0; t4 < o3; t4++) e4[t4] && (f3 = r(e4[t4])) && (n3 && (n3 += " "), n3 += f3);
+  } else for (f3 in e4) e4[f3] && (n3 && (n3 += " "), n3 += f3);
+  return n3;
+}
+function clsx() {
+  for (var e4, t4, f3 = 0, n3 = "", o3 = arguments.length; f3 < o3; f3++) (e4 = arguments[f3]) && (t4 = r(e4)) && (n3 && (n3 += " "), n3 += t4);
+  return n3;
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
+// node_modules/.pnpm/tailwind-merge@3.6.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs
+var concatArrays = (array1, array2) => {
+  const combinedArray = new Array(array1.length + array2.length);
+  for (let i3 = 0; i3 < array1.length; i3++) {
+    combinedArray[i3] = array1[i3];
+  }
+  for (let i3 = 0; i3 < array2.length; i3++) {
+    combinedArray[array1.length + i3] = array2[i3];
+  }
+  return combinedArray;
+};
+var createClassValidatorObject = (classGroupId, validator) => ({
+  classGroupId,
+  validator
+});
+var createClassPartObject = (nextPart = /* @__PURE__ */ new Map(), validators = null, classGroupId) => ({
+  nextPart,
+  validators,
+  classGroupId
+});
+var CLASS_PART_SEPARATOR = "-";
+var EMPTY_CONFLICTS = [];
+var ARBITRARY_PROPERTY_PREFIX = "arbitrary..";
+var createClassGroupUtils = (config16) => {
+  const classMap = createClassMap(config16);
+  const {
+    conflictingClassGroups,
+    conflictingClassGroupModifiers
+  } = config16;
+  const getClassGroupId = (className) => {
+    if (className.startsWith("[") && className.endsWith("]")) {
+      return getGroupIdForArbitraryProperty(className);
+    }
+    const classParts = className.split(CLASS_PART_SEPARATOR);
+    const startIndex = classParts[0] === "" && classParts.length > 1 ? 1 : 0;
+    return getGroupRecursive(classParts, startIndex, classMap);
+  };
+  const getConflictingClassGroupIds = (classGroupId, hasPostfixModifier) => {
+    if (hasPostfixModifier) {
+      const modifierConflicts = conflictingClassGroupModifiers[classGroupId];
+      const baseConflicts = conflictingClassGroups[classGroupId];
+      if (modifierConflicts) {
+        if (baseConflicts) {
+          return concatArrays(baseConflicts, modifierConflicts);
+        }
+        return modifierConflicts;
+      }
+      return baseConflicts || EMPTY_CONFLICTS;
+    }
+    return conflictingClassGroups[classGroupId] || EMPTY_CONFLICTS;
+  };
+  return {
+    getClassGroupId,
+    getConflictingClassGroupIds
+  };
+};
+var getGroupRecursive = (classParts, startIndex, classPartObject) => {
+  const classPathsLength = classParts.length - startIndex;
+  if (classPathsLength === 0) {
+    return classPartObject.classGroupId;
+  }
+  const currentClassPart = classParts[startIndex];
+  const nextClassPartObject = classPartObject.nextPart.get(currentClassPart);
+  if (nextClassPartObject) {
+    const result = getGroupRecursive(classParts, startIndex + 1, nextClassPartObject);
+    if (result) return result;
+  }
+  const validators = classPartObject.validators;
+  if (validators === null) {
+    return void 0;
+  }
+  const classRest = startIndex === 0 ? classParts.join(CLASS_PART_SEPARATOR) : classParts.slice(startIndex).join(CLASS_PART_SEPARATOR);
+  const validatorsLength = validators.length;
+  for (let i3 = 0; i3 < validatorsLength; i3++) {
+    const validatorObj = validators[i3];
+    if (validatorObj.validator(classRest)) {
+      return validatorObj.classGroupId;
+    }
+  }
+  return void 0;
+};
+var getGroupIdForArbitraryProperty = (className) => className.slice(1, -1).indexOf(":") === -1 ? void 0 : (() => {
+  const content2 = className.slice(1, -1);
+  const colonIndex = content2.indexOf(":");
+  const property = content2.slice(0, colonIndex);
+  return property ? ARBITRARY_PROPERTY_PREFIX + property : void 0;
+})();
+var createClassMap = (config16) => {
+  const {
+    theme: theme2,
+    classGroups
+  } = config16;
+  return processClassGroups(classGroups, theme2);
+};
+var processClassGroups = (classGroups, theme2) => {
+  const classMap = createClassPartObject();
+  for (const classGroupId in classGroups) {
+    const group = classGroups[classGroupId];
+    processClassesRecursively(group, classMap, classGroupId, theme2);
+  }
+  return classMap;
+};
+var processClassesRecursively = (classGroup, classPartObject, classGroupId, theme2) => {
+  const len = classGroup.length;
+  for (let i3 = 0; i3 < len; i3++) {
+    const classDefinition = classGroup[i3];
+    processClassDefinition(classDefinition, classPartObject, classGroupId, theme2);
+  }
+};
+var processClassDefinition = (classDefinition, classPartObject, classGroupId, theme2) => {
+  if (typeof classDefinition === "string") {
+    processStringDefinition(classDefinition, classPartObject, classGroupId);
+    return;
+  }
+  if (typeof classDefinition === "function") {
+    processFunctionDefinition(classDefinition, classPartObject, classGroupId, theme2);
+    return;
+  }
+  processObjectDefinition(classDefinition, classPartObject, classGroupId, theme2);
+};
+var processStringDefinition = (classDefinition, classPartObject, classGroupId) => {
+  const classPartObjectToEdit = classDefinition === "" ? classPartObject : getPart(classPartObject, classDefinition);
+  classPartObjectToEdit.classGroupId = classGroupId;
+};
+var processFunctionDefinition = (classDefinition, classPartObject, classGroupId, theme2) => {
+  if (isThemeGetter(classDefinition)) {
+    processClassesRecursively(classDefinition(theme2), classPartObject, classGroupId, theme2);
+    return;
+  }
+  if (classPartObject.validators === null) {
+    classPartObject.validators = [];
+  }
+  classPartObject.validators.push(createClassValidatorObject(classGroupId, classDefinition));
+};
+var processObjectDefinition = (classDefinition, classPartObject, classGroupId, theme2) => {
+  const entries = Object.entries(classDefinition);
+  const len = entries.length;
+  for (let i3 = 0; i3 < len; i3++) {
+    const [key, value] = entries[i3];
+    processClassesRecursively(value, getPart(classPartObject, key), classGroupId, theme2);
+  }
+};
+var getPart = (classPartObject, path) => {
+  let current = classPartObject;
+  const parts = path.split(CLASS_PART_SEPARATOR);
+  const len = parts.length;
+  for (let i3 = 0; i3 < len; i3++) {
+    const part = parts[i3];
+    let next = current.nextPart.get(part);
+    if (!next) {
+      next = createClassPartObject();
+      current.nextPart.set(part, next);
+    }
+    current = next;
+  }
+  return current;
+};
+var isThemeGetter = (func) => "isThemeGetter" in func && func.isThemeGetter === true;
+var createLruCache = (maxCacheSize) => {
+  if (maxCacheSize < 1) {
+    return {
+      get: () => void 0,
+      set: () => {
+      }
+    };
+  }
+  let cacheSize = 0;
+  let cache2 = /* @__PURE__ */ Object.create(null);
+  let previousCache = /* @__PURE__ */ Object.create(null);
+  const update = (key, value) => {
+    cache2[key] = value;
+    cacheSize++;
+    if (cacheSize > maxCacheSize) {
+      cacheSize = 0;
+      previousCache = cache2;
+      cache2 = /* @__PURE__ */ Object.create(null);
+    }
+  };
+  return {
+    get(key) {
+      let value = cache2[key];
+      if (value !== void 0) {
+        return value;
+      }
+      if ((value = previousCache[key]) !== void 0) {
+        update(key, value);
+        return value;
+      }
+    },
+    set(key, value) {
+      if (key in cache2) {
+        cache2[key] = value;
+      } else {
+        update(key, value);
+      }
+    }
+  };
+};
+var IMPORTANT_MODIFIER = "!";
+var MODIFIER_SEPARATOR = ":";
+var EMPTY_MODIFIERS = [];
+var createResultObject = (modifiers2, hasImportantModifier, baseClassName, maybePostfixModifierPosition, isExternal) => ({
+  modifiers: modifiers2,
+  hasImportantModifier,
+  baseClassName,
+  maybePostfixModifierPosition,
+  isExternal
+});
+var createParseClassName = (config16) => {
+  const {
+    prefix,
+    experimentalParseClassName
+  } = config16;
+  let parseClassName = (className) => {
+    const modifiers2 = [];
+    let bracketDepth = 0;
+    let parenDepth = 0;
+    let modifierStart = 0;
+    let postfixModifierPosition;
+    const len = className.length;
+    for (let index = 0; index < len; index++) {
+      const currentCharacter = className[index];
+      if (bracketDepth === 0 && parenDepth === 0) {
+        if (currentCharacter === MODIFIER_SEPARATOR) {
+          modifiers2.push(className.slice(modifierStart, index));
+          modifierStart = index + 1;
+          continue;
+        }
+        if (currentCharacter === "/") {
+          postfixModifierPosition = index;
+          continue;
+        }
+      }
+      if (currentCharacter === "[") bracketDepth++;
+      else if (currentCharacter === "]") bracketDepth--;
+      else if (currentCharacter === "(") parenDepth++;
+      else if (currentCharacter === ")") parenDepth--;
+    }
+    const baseClassNameWithImportantModifier = modifiers2.length === 0 ? className : className.slice(modifierStart);
+    let baseClassName = baseClassNameWithImportantModifier;
+    let hasImportantModifier = false;
+    if (baseClassNameWithImportantModifier.endsWith(IMPORTANT_MODIFIER)) {
+      baseClassName = baseClassNameWithImportantModifier.slice(0, -1);
+      hasImportantModifier = true;
+    } else if (
+      /**
+       * In Tailwind CSS v3 the important modifier was at the start of the base class name. This is still supported for legacy reasons.
+       * @see https://github.com/dcastil/tailwind-merge/issues/513#issuecomment-2614029864
+       */
+      baseClassNameWithImportantModifier.startsWith(IMPORTANT_MODIFIER)
+    ) {
+      baseClassName = baseClassNameWithImportantModifier.slice(1);
+      hasImportantModifier = true;
+    }
+    const maybePostfixModifierPosition = postfixModifierPosition && postfixModifierPosition > modifierStart ? postfixModifierPosition - modifierStart : void 0;
+    return createResultObject(modifiers2, hasImportantModifier, baseClassName, maybePostfixModifierPosition);
+  };
+  if (prefix) {
+    const fullPrefix = prefix + MODIFIER_SEPARATOR;
+    const parseClassNameOriginal = parseClassName;
+    parseClassName = (className) => className.startsWith(fullPrefix) ? parseClassNameOriginal(className.slice(fullPrefix.length)) : createResultObject(EMPTY_MODIFIERS, false, className, void 0, true);
+  }
+  if (experimentalParseClassName) {
+    const parseClassNameOriginal = parseClassName;
+    parseClassName = (className) => experimentalParseClassName({
+      className,
+      parseClassName: parseClassNameOriginal
+    });
+  }
+  return parseClassName;
+};
+var createSortModifiers = (config16) => {
+  const modifierWeights = /* @__PURE__ */ new Map();
+  config16.orderSensitiveModifiers.forEach((mod, index) => {
+    modifierWeights.set(mod, 1e6 + index);
+  });
+  return (modifiers2) => {
+    const result = [];
+    let currentSegment = [];
+    for (let i3 = 0; i3 < modifiers2.length; i3++) {
+      const modifier = modifiers2[i3];
+      const isArbitrary = modifier[0] === "[";
+      const isOrderSensitive = modifierWeights.has(modifier);
+      if (isArbitrary || isOrderSensitive) {
+        if (currentSegment.length > 0) {
+          currentSegment.sort();
+          result.push(...currentSegment);
+          currentSegment = [];
+        }
+        result.push(modifier);
+      } else {
+        currentSegment.push(modifier);
+      }
+    }
+    if (currentSegment.length > 0) {
+      currentSegment.sort();
+      result.push(...currentSegment);
+    }
+    return result;
+  };
+};
+var createConfigUtils = (config16) => ({
+  cache: createLruCache(config16.cacheSize),
+  parseClassName: createParseClassName(config16),
+  sortModifiers: createSortModifiers(config16),
+  postfixLookupClassGroupIds: createPostfixLookupClassGroupIds(config16),
+  ...createClassGroupUtils(config16)
+});
+var createPostfixLookupClassGroupIds = (config16) => {
+  const lookup = /* @__PURE__ */ Object.create(null);
+  const classGroupIds = config16.postfixLookupClassGroups;
+  if (classGroupIds) {
+    for (let i3 = 0; i3 < classGroupIds.length; i3++) {
+      lookup[classGroupIds[i3]] = true;
+    }
+  }
+  return lookup;
+};
+var SPLIT_CLASSES_REGEX = /\s+/;
+var mergeClassList = (classList, configUtils) => {
+  const {
+    parseClassName,
+    getClassGroupId,
+    getConflictingClassGroupIds,
+    sortModifiers,
+    postfixLookupClassGroupIds
+  } = configUtils;
+  const classGroupsInConflict = [];
+  const classNames = classList.trim().split(SPLIT_CLASSES_REGEX);
+  let result = "";
+  for (let index = classNames.length - 1; index >= 0; index -= 1) {
+    const originalClassName = classNames[index];
+    const {
+      isExternal,
+      modifiers: modifiers2,
+      hasImportantModifier,
+      baseClassName,
+      maybePostfixModifierPosition
+    } = parseClassName(originalClassName);
+    if (isExternal) {
+      result = originalClassName + (result.length > 0 ? " " + result : result);
+      continue;
+    }
+    let hasPostfixModifier = !!maybePostfixModifierPosition;
+    let classGroupId;
+    if (hasPostfixModifier) {
+      const baseClassNameWithoutPostfix = baseClassName.substring(0, maybePostfixModifierPosition);
+      classGroupId = getClassGroupId(baseClassNameWithoutPostfix);
+      const classGroupIdWithPostfix = classGroupId && postfixLookupClassGroupIds[classGroupId] ? getClassGroupId(baseClassName) : void 0;
+      if (classGroupIdWithPostfix && classGroupIdWithPostfix !== classGroupId) {
+        classGroupId = classGroupIdWithPostfix;
+        hasPostfixModifier = false;
+      }
+    } else {
+      classGroupId = getClassGroupId(baseClassName);
+    }
+    if (!classGroupId) {
+      if (!hasPostfixModifier) {
+        result = originalClassName + (result.length > 0 ? " " + result : result);
+        continue;
+      }
+      classGroupId = getClassGroupId(baseClassName);
+      if (!classGroupId) {
+        result = originalClassName + (result.length > 0 ? " " + result : result);
+        continue;
+      }
+      hasPostfixModifier = false;
+    }
+    const variantModifier = modifiers2.length === 0 ? "" : modifiers2.length === 1 ? modifiers2[0] : sortModifiers(modifiers2).join(":");
+    const modifierId = hasImportantModifier ? variantModifier + IMPORTANT_MODIFIER : variantModifier;
+    const classId = modifierId + classGroupId;
+    if (classGroupsInConflict.indexOf(classId) > -1) {
+      continue;
+    }
+    classGroupsInConflict.push(classId);
+    const conflictGroups = getConflictingClassGroupIds(classGroupId, hasPostfixModifier);
+    for (let i3 = 0; i3 < conflictGroups.length; ++i3) {
+      const group = conflictGroups[i3];
+      classGroupsInConflict.push(modifierId + group);
+    }
+    result = originalClassName + (result.length > 0 ? " " + result : result);
+  }
+  return result;
+};
+var twJoin = (...classLists) => {
+  let index = 0;
+  let argument;
+  let resolvedValue;
+  let string2 = "";
+  while (index < classLists.length) {
+    if (argument = classLists[index++]) {
+      if (resolvedValue = toValue(argument)) {
+        string2 && (string2 += " ");
+        string2 += resolvedValue;
+      }
+    }
+  }
+  return string2;
+};
+var toValue = (mix) => {
+  if (typeof mix === "string") {
+    return mix;
+  }
+  let resolvedValue;
+  let string2 = "";
+  for (let k3 = 0; k3 < mix.length; k3++) {
+    if (mix[k3]) {
+      if (resolvedValue = toValue(mix[k3])) {
+        string2 && (string2 += " ");
+        string2 += resolvedValue;
+      }
+    }
+  }
+  return string2;
+};
+var createTailwindMerge = (createConfigFirst, ...createConfigRest) => {
+  let configUtils;
+  let cacheGet;
+  let cacheSet;
+  let functionToCall;
+  const initTailwindMerge = (classList) => {
+    const config16 = createConfigRest.reduce((previousConfig, createConfigCurrent) => createConfigCurrent(previousConfig), createConfigFirst());
+    configUtils = createConfigUtils(config16);
+    cacheGet = configUtils.cache.get;
+    cacheSet = configUtils.cache.set;
+    functionToCall = tailwindMerge;
+    return tailwindMerge(classList);
+  };
+  const tailwindMerge = (classList) => {
+    const cachedResult = cacheGet(classList);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    const result = mergeClassList(classList, configUtils);
+    cacheSet(classList, result);
+    return result;
+  };
+  functionToCall = initTailwindMerge;
+  return (...args) => functionToCall(twJoin(...args));
+};
+var fallbackThemeArr = [];
+var fromTheme = (key) => {
+  const themeGetter = (theme2) => theme2[key] || fallbackThemeArr;
+  themeGetter.isThemeGetter = true;
+  return themeGetter;
+};
+var arbitraryValueRegex = /^\[(?:(\w[\w-]*):)?(.+)\]$/i;
+var arbitraryVariableRegex = /^\((?:(\w[\w-]*):)?(.+)\)$/i;
+var fractionRegex = /^\d+(?:\.\d+)?\/\d+(?:\.\d+)?$/;
+var tshirtUnitRegex = /^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$/;
+var lengthUnitRegex = /\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$/;
+var colorFunctionRegex = /^(rgba?|hsla?|hwb|(ok)?(lab|lch)|color-mix)\(.+\)$/;
+var shadowRegex = /^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)/;
+var imageRegex = /^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$/;
+var isFraction = (value) => fractionRegex.test(value);
+var isNumber = (value) => !!value && !Number.isNaN(Number(value));
+var isInteger = (value) => !!value && Number.isInteger(Number(value));
+var isPercent = (value) => value.endsWith("%") && isNumber(value.slice(0, -1));
+var isTshirtSize = (value) => tshirtUnitRegex.test(value);
+var isAny = () => true;
+var isLengthOnly = (value) => (
+  // `colorFunctionRegex` check is necessary because color functions can have percentages in them which which would be incorrectly classified as lengths.
+  // For example, `hsl(0 0% 0%)` would be classified as a length without this check.
+  // I could also use lookbehind assertion in `lengthUnitRegex` but that isn't supported widely enough.
+  lengthUnitRegex.test(value) && !colorFunctionRegex.test(value)
+);
+var isNever = () => false;
+var isShadow = (value) => shadowRegex.test(value);
+var isImage = (value) => imageRegex.test(value);
+var isAnyNonArbitrary = (value) => !isArbitraryValue(value) && !isArbitraryVariable(value);
+var isNamedContainerQuery = (value) => value.startsWith("@container") && (value[10] === "/" && value[11] !== void 0 || value[11] === "s" && value[16] !== void 0 && value.startsWith("-size/", 10) || value[11] === "n" && value[18] !== void 0 && value.startsWith("-normal/", 10));
+var isArbitrarySize = (value) => getIsArbitraryValue(value, isLabelSize, isNever);
+var isArbitraryValue = (value) => arbitraryValueRegex.test(value);
+var isArbitraryLength = (value) => getIsArbitraryValue(value, isLabelLength, isLengthOnly);
+var isArbitraryNumber = (value) => getIsArbitraryValue(value, isLabelNumber, isNumber);
+var isArbitraryWeight = (value) => getIsArbitraryValue(value, isLabelWeight, isAny);
+var isArbitraryFamilyName = (value) => getIsArbitraryValue(value, isLabelFamilyName, isNever);
+var isArbitraryPosition = (value) => getIsArbitraryValue(value, isLabelPosition, isNever);
+var isArbitraryImage = (value) => getIsArbitraryValue(value, isLabelImage, isImage);
+var isArbitraryShadow = (value) => getIsArbitraryValue(value, isLabelShadow, isShadow);
+var isArbitraryVariable = (value) => arbitraryVariableRegex.test(value);
+var isArbitraryVariableLength = (value) => getIsArbitraryVariable(value, isLabelLength);
+var isArbitraryVariableFamilyName = (value) => getIsArbitraryVariable(value, isLabelFamilyName);
+var isArbitraryVariablePosition = (value) => getIsArbitraryVariable(value, isLabelPosition);
+var isArbitraryVariableSize = (value) => getIsArbitraryVariable(value, isLabelSize);
+var isArbitraryVariableImage = (value) => getIsArbitraryVariable(value, isLabelImage);
+var isArbitraryVariableShadow = (value) => getIsArbitraryVariable(value, isLabelShadow, true);
+var isArbitraryVariableWeight = (value) => getIsArbitraryVariable(value, isLabelWeight, true);
+var getIsArbitraryValue = (value, testLabel, testValue) => {
+  const result = arbitraryValueRegex.exec(value);
+  if (result) {
+    if (result[1]) {
+      return testLabel(result[1]);
+    }
+    return testValue(result[2]);
+  }
+  return false;
+};
+var getIsArbitraryVariable = (value, testLabel, shouldMatchNoLabel = false) => {
+  const result = arbitraryVariableRegex.exec(value);
+  if (result) {
+    if (result[1]) {
+      return testLabel(result[1]);
+    }
+    return shouldMatchNoLabel;
+  }
+  return false;
+};
+var isLabelPosition = (label) => label === "position" || label === "percentage";
+var isLabelImage = (label) => label === "image" || label === "url";
+var isLabelSize = (label) => label === "length" || label === "size" || label === "bg-size";
+var isLabelLength = (label) => label === "length";
+var isLabelNumber = (label) => label === "number";
+var isLabelFamilyName = (label) => label === "family-name";
+var isLabelWeight = (label) => label === "number" || label === "weight";
+var isLabelShadow = (label) => label === "shadow";
+var getDefaultConfig = () => {
+  const themeColor = fromTheme("color");
+  const themeFont = fromTheme("font");
+  const themeText = fromTheme("text");
+  const themeFontWeight = fromTheme("font-weight");
+  const themeTracking = fromTheme("tracking");
+  const themeLeading = fromTheme("leading");
+  const themeBreakpoint = fromTheme("breakpoint");
+  const themeContainer = fromTheme("container");
+  const themeSpacing = fromTheme("spacing");
+  const themeRadius = fromTheme("radius");
+  const themeShadow = fromTheme("shadow");
+  const themeInsetShadow = fromTheme("inset-shadow");
+  const themeTextShadow = fromTheme("text-shadow");
+  const themeDropShadow = fromTheme("drop-shadow");
+  const themeBlur = fromTheme("blur");
+  const themePerspective = fromTheme("perspective");
+  const themeAspect = fromTheme("aspect");
+  const themeEase = fromTheme("ease");
+  const themeAnimate = fromTheme("animate");
+  const scaleBreak = () => ["auto", "avoid", "all", "avoid-page", "page", "left", "right", "column"];
+  const scalePosition = () => [
+    "center",
+    "top",
+    "bottom",
+    "left",
+    "right",
+    "top-left",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "left-top",
+    "top-right",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "right-top",
+    "bottom-right",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "right-bottom",
+    "bottom-left",
+    // Deprecated since Tailwind CSS v4.1.0, see https://github.com/tailwindlabs/tailwindcss/pull/17378
+    "left-bottom"
+  ];
+  const scalePositionWithArbitrary = () => [...scalePosition(), isArbitraryVariable, isArbitraryValue];
+  const scaleOverflow = () => ["auto", "hidden", "clip", "visible", "scroll"];
+  const scaleOverscroll = () => ["auto", "contain", "none"];
+  const scaleUnambiguousSpacing = () => [isArbitraryVariable, isArbitraryValue, themeSpacing];
+  const scaleInset = () => [isFraction, "full", "auto", ...scaleUnambiguousSpacing()];
+  const scaleGridTemplateColsRows = () => [isInteger, "none", "subgrid", isArbitraryVariable, isArbitraryValue];
+  const scaleGridColRowStartAndEnd = () => ["auto", {
+    span: ["full", isInteger, isArbitraryVariable, isArbitraryValue]
+  }, isInteger, isArbitraryVariable, isArbitraryValue];
+  const scaleGridColRowStartOrEnd = () => [isInteger, "auto", isArbitraryVariable, isArbitraryValue];
+  const scaleGridAutoColsRows = () => ["auto", "min", "max", "fr", isArbitraryVariable, isArbitraryValue];
+  const scaleAlignPrimaryAxis = () => ["start", "end", "center", "between", "around", "evenly", "stretch", "baseline", "center-safe", "end-safe"];
+  const scaleAlignSecondaryAxis = () => ["start", "end", "center", "stretch", "center-safe", "end-safe"];
+  const scaleMargin = () => ["auto", ...scaleUnambiguousSpacing()];
+  const scaleSizing = () => [isFraction, "auto", "full", "dvw", "dvh", "lvw", "lvh", "svw", "svh", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleSizingInline = () => [isFraction, "screen", "full", "dvw", "lvw", "svw", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleSizingBlock = () => [isFraction, "screen", "full", "lh", "dvh", "lvh", "svh", "min", "max", "fit", ...scaleUnambiguousSpacing()];
+  const scaleColor = () => [themeColor, isArbitraryVariable, isArbitraryValue];
+  const scaleBgPosition = () => [...scalePosition(), isArbitraryVariablePosition, isArbitraryPosition, {
+    position: [isArbitraryVariable, isArbitraryValue]
+  }];
+  const scaleBgRepeat = () => ["no-repeat", {
+    repeat: ["", "x", "y", "space", "round"]
+  }];
+  const scaleBgSize = () => ["auto", "cover", "contain", isArbitraryVariableSize, isArbitrarySize, {
+    size: [isArbitraryVariable, isArbitraryValue]
+  }];
+  const scaleGradientStopPosition = () => [isPercent, isArbitraryVariableLength, isArbitraryLength];
+  const scaleRadius = () => [
+    // Deprecated since Tailwind CSS v4.0.0
+    "",
+    "none",
+    "full",
+    themeRadius,
+    isArbitraryVariable,
+    isArbitraryValue
+  ];
+  const scaleBorderWidth = () => ["", isNumber, isArbitraryVariableLength, isArbitraryLength];
+  const scaleLineStyle = () => ["solid", "dashed", "dotted", "double"];
+  const scaleBlendMode = () => ["normal", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
+  const scaleMaskImagePosition = () => [isNumber, isPercent, isArbitraryVariablePosition, isArbitraryPosition];
+  const scaleBlur = () => [
+    // Deprecated since Tailwind CSS v4.0.0
+    "",
+    "none",
+    themeBlur,
+    isArbitraryVariable,
+    isArbitraryValue
+  ];
+  const scaleRotate = () => ["none", isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleScale = () => ["none", isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleSkew = () => [isNumber, isArbitraryVariable, isArbitraryValue];
+  const scaleTranslate = () => [isFraction, "full", ...scaleUnambiguousSpacing()];
+  return {
+    cacheSize: 500,
+    theme: {
+      animate: ["spin", "ping", "pulse", "bounce"],
+      aspect: ["video"],
+      blur: [isTshirtSize],
+      breakpoint: [isTshirtSize],
+      color: [isAny],
+      container: [isTshirtSize],
+      "drop-shadow": [isTshirtSize],
+      ease: ["in", "out", "in-out"],
+      font: [isAnyNonArbitrary],
+      "font-weight": ["thin", "extralight", "light", "normal", "medium", "semibold", "bold", "extrabold", "black"],
+      "inset-shadow": [isTshirtSize],
+      leading: ["none", "tight", "snug", "normal", "relaxed", "loose"],
+      perspective: ["dramatic", "near", "normal", "midrange", "distant", "none"],
+      radius: [isTshirtSize],
+      shadow: [isTshirtSize],
+      spacing: ["px", isNumber],
+      text: [isTshirtSize],
+      "text-shadow": [isTshirtSize],
+      tracking: ["tighter", "tight", "normal", "wide", "wider", "widest"]
+    },
+    classGroups: {
+      // --------------
+      // --- Layout ---
+      // --------------
+      /**
+       * Aspect Ratio
+       * @see https://tailwindcss.com/docs/aspect-ratio
+       */
+      aspect: [{
+        aspect: ["auto", "square", isFraction, isArbitraryValue, isArbitraryVariable, themeAspect]
+      }],
+      /**
+       * Container
+       * @see https://tailwindcss.com/docs/container
+       * @deprecated since Tailwind CSS v4.0.0
+       */
+      container: ["container"],
+      /**
+       * Container Type
+       * @see https://tailwindcss.com/docs/responsive-design#container-queries
+       */
+      "container-type": [{
+        "@container": ["", "normal", "size", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Container Name
+       * @see https://tailwindcss.com/docs/responsive-design#named-containers
+       */
+      "container-named": [isNamedContainerQuery],
+      /**
+       * Columns
+       * @see https://tailwindcss.com/docs/columns
+       */
+      columns: [{
+        columns: [isNumber, isArbitraryValue, isArbitraryVariable, themeContainer]
+      }],
+      /**
+       * Break After
+       * @see https://tailwindcss.com/docs/break-after
+       */
+      "break-after": [{
+        "break-after": scaleBreak()
+      }],
+      /**
+       * Break Before
+       * @see https://tailwindcss.com/docs/break-before
+       */
+      "break-before": [{
+        "break-before": scaleBreak()
+      }],
+      /**
+       * Break Inside
+       * @see https://tailwindcss.com/docs/break-inside
+       */
+      "break-inside": [{
+        "break-inside": ["auto", "avoid", "avoid-page", "avoid-column"]
+      }],
+      /**
+       * Box Decoration Break
+       * @see https://tailwindcss.com/docs/box-decoration-break
+       */
+      "box-decoration": [{
+        "box-decoration": ["slice", "clone"]
+      }],
+      /**
+       * Box Sizing
+       * @see https://tailwindcss.com/docs/box-sizing
+       */
+      box: [{
+        box: ["border", "content"]
+      }],
+      /**
+       * Display
+       * @see https://tailwindcss.com/docs/display
+       */
+      display: ["block", "inline-block", "inline", "flex", "inline-flex", "table", "inline-table", "table-caption", "table-cell", "table-column", "table-column-group", "table-footer-group", "table-header-group", "table-row-group", "table-row", "flow-root", "grid", "inline-grid", "contents", "list-item", "hidden"],
+      /**
+       * Screen Reader Only
+       * @see https://tailwindcss.com/docs/display#screen-reader-only
+       */
+      sr: ["sr-only", "not-sr-only"],
+      /**
+       * Floats
+       * @see https://tailwindcss.com/docs/float
+       */
+      float: [{
+        float: ["right", "left", "none", "start", "end"]
+      }],
+      /**
+       * Clear
+       * @see https://tailwindcss.com/docs/clear
+       */
+      clear: [{
+        clear: ["left", "right", "both", "none", "start", "end"]
+      }],
+      /**
+       * Isolation
+       * @see https://tailwindcss.com/docs/isolation
+       */
+      isolation: ["isolate", "isolation-auto"],
+      /**
+       * Object Fit
+       * @see https://tailwindcss.com/docs/object-fit
+       */
+      "object-fit": [{
+        object: ["contain", "cover", "fill", "none", "scale-down"]
+      }],
+      /**
+       * Object Position
+       * @see https://tailwindcss.com/docs/object-position
+       */
+      "object-position": [{
+        object: scalePositionWithArbitrary()
+      }],
+      /**
+       * Overflow
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      overflow: [{
+        overflow: scaleOverflow()
+      }],
+      /**
+       * Overflow X
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      "overflow-x": [{
+        "overflow-x": scaleOverflow()
+      }],
+      /**
+       * Overflow Y
+       * @see https://tailwindcss.com/docs/overflow
+       */
+      "overflow-y": [{
+        "overflow-y": scaleOverflow()
+      }],
+      /**
+       * Overscroll Behavior
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      overscroll: [{
+        overscroll: scaleOverscroll()
+      }],
+      /**
+       * Overscroll Behavior X
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      "overscroll-x": [{
+        "overscroll-x": scaleOverscroll()
+      }],
+      /**
+       * Overscroll Behavior Y
+       * @see https://tailwindcss.com/docs/overscroll-behavior
+       */
+      "overscroll-y": [{
+        "overscroll-y": scaleOverscroll()
+      }],
+      /**
+       * Position
+       * @see https://tailwindcss.com/docs/position
+       */
+      position: ["static", "fixed", "absolute", "relative", "sticky"],
+      /**
+       * Inset
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      inset: [{
+        inset: scaleInset()
+      }],
+      /**
+       * Inset Inline
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-x": [{
+        "inset-x": scaleInset()
+      }],
+      /**
+       * Inset Block
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-y": [{
+        "inset-y": scaleInset()
+      }],
+      /**
+       * Inset Inline Start
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       * @todo class group will be renamed to `inset-s` in next major release
+       */
+      start: [{
+        "inset-s": scaleInset(),
+        /**
+         * @deprecated since Tailwind CSS v4.2.0 in favor of `inset-s-*` utilities.
+         * @see https://github.com/tailwindlabs/tailwindcss/pull/19613
+         */
+        start: scaleInset()
+      }],
+      /**
+       * Inset Inline End
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       * @todo class group will be renamed to `inset-e` in next major release
+       */
+      end: [{
+        "inset-e": scaleInset(),
+        /**
+         * @deprecated since Tailwind CSS v4.2.0 in favor of `inset-e-*` utilities.
+         * @see https://github.com/tailwindlabs/tailwindcss/pull/19613
+         */
+        end: scaleInset()
+      }],
+      /**
+       * Inset Block Start
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-bs": [{
+        "inset-bs": scaleInset()
+      }],
+      /**
+       * Inset Block End
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      "inset-be": [{
+        "inset-be": scaleInset()
+      }],
+      /**
+       * Top
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      top: [{
+        top: scaleInset()
+      }],
+      /**
+       * Right
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      right: [{
+        right: scaleInset()
+      }],
+      /**
+       * Bottom
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      bottom: [{
+        bottom: scaleInset()
+      }],
+      /**
+       * Left
+       * @see https://tailwindcss.com/docs/top-right-bottom-left
+       */
+      left: [{
+        left: scaleInset()
+      }],
+      /**
+       * Visibility
+       * @see https://tailwindcss.com/docs/visibility
+       */
+      visibility: ["visible", "invisible", "collapse"],
+      /**
+       * Z-Index
+       * @see https://tailwindcss.com/docs/z-index
+       */
+      z: [{
+        z: [isInteger, "auto", isArbitraryVariable, isArbitraryValue]
+      }],
+      // ------------------------
+      // --- Flexbox and Grid ---
+      // ------------------------
+      /**
+       * Flex Basis
+       * @see https://tailwindcss.com/docs/flex-basis
+       */
+      basis: [{
+        basis: [isFraction, "full", "auto", themeContainer, ...scaleUnambiguousSpacing()]
+      }],
+      /**
+       * Flex Direction
+       * @see https://tailwindcss.com/docs/flex-direction
+       */
+      "flex-direction": [{
+        flex: ["row", "row-reverse", "col", "col-reverse"]
+      }],
+      /**
+       * Flex Wrap
+       * @see https://tailwindcss.com/docs/flex-wrap
+       */
+      "flex-wrap": [{
+        flex: ["nowrap", "wrap", "wrap-reverse"]
+      }],
+      /**
+       * Flex
+       * @see https://tailwindcss.com/docs/flex
+       */
+      flex: [{
+        flex: [isNumber, isFraction, "auto", "initial", "none", isArbitraryValue]
+      }],
+      /**
+       * Flex Grow
+       * @see https://tailwindcss.com/docs/flex-grow
+       */
+      grow: [{
+        grow: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Flex Shrink
+       * @see https://tailwindcss.com/docs/flex-shrink
+       */
+      shrink: [{
+        shrink: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Order
+       * @see https://tailwindcss.com/docs/order
+       */
+      order: [{
+        order: [isInteger, "first", "last", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Grid Template Columns
+       * @see https://tailwindcss.com/docs/grid-template-columns
+       */
+      "grid-cols": [{
+        "grid-cols": scaleGridTemplateColsRows()
+      }],
+      /**
+       * Grid Column Start / End
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-start-end": [{
+        col: scaleGridColRowStartAndEnd()
+      }],
+      /**
+       * Grid Column Start
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-start": [{
+        "col-start": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Column End
+       * @see https://tailwindcss.com/docs/grid-column
+       */
+      "col-end": [{
+        "col-end": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Template Rows
+       * @see https://tailwindcss.com/docs/grid-template-rows
+       */
+      "grid-rows": [{
+        "grid-rows": scaleGridTemplateColsRows()
+      }],
+      /**
+       * Grid Row Start / End
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-start-end": [{
+        row: scaleGridColRowStartAndEnd()
+      }],
+      /**
+       * Grid Row Start
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-start": [{
+        "row-start": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Row End
+       * @see https://tailwindcss.com/docs/grid-row
+       */
+      "row-end": [{
+        "row-end": scaleGridColRowStartOrEnd()
+      }],
+      /**
+       * Grid Auto Flow
+       * @see https://tailwindcss.com/docs/grid-auto-flow
+       */
+      "grid-flow": [{
+        "grid-flow": ["row", "col", "dense", "row-dense", "col-dense"]
+      }],
+      /**
+       * Grid Auto Columns
+       * @see https://tailwindcss.com/docs/grid-auto-columns
+       */
+      "auto-cols": [{
+        "auto-cols": scaleGridAutoColsRows()
+      }],
+      /**
+       * Grid Auto Rows
+       * @see https://tailwindcss.com/docs/grid-auto-rows
+       */
+      "auto-rows": [{
+        "auto-rows": scaleGridAutoColsRows()
+      }],
+      /**
+       * Gap
+       * @see https://tailwindcss.com/docs/gap
+       */
+      gap: [{
+        gap: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Gap X
+       * @see https://tailwindcss.com/docs/gap
+       */
+      "gap-x": [{
+        "gap-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Gap Y
+       * @see https://tailwindcss.com/docs/gap
+       */
+      "gap-y": [{
+        "gap-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Justify Content
+       * @see https://tailwindcss.com/docs/justify-content
+       */
+      "justify-content": [{
+        justify: [...scaleAlignPrimaryAxis(), "normal"]
+      }],
+      /**
+       * Justify Items
+       * @see https://tailwindcss.com/docs/justify-items
+       */
+      "justify-items": [{
+        "justify-items": [...scaleAlignSecondaryAxis(), "normal"]
+      }],
+      /**
+       * Justify Self
+       * @see https://tailwindcss.com/docs/justify-self
+       */
+      "justify-self": [{
+        "justify-self": ["auto", ...scaleAlignSecondaryAxis()]
+      }],
+      /**
+       * Align Content
+       * @see https://tailwindcss.com/docs/align-content
+       */
+      "align-content": [{
+        content: ["normal", ...scaleAlignPrimaryAxis()]
+      }],
+      /**
+       * Align Items
+       * @see https://tailwindcss.com/docs/align-items
+       */
+      "align-items": [{
+        items: [...scaleAlignSecondaryAxis(), {
+          baseline: ["", "last"]
+        }]
+      }],
+      /**
+       * Align Self
+       * @see https://tailwindcss.com/docs/align-self
+       */
+      "align-self": [{
+        self: ["auto", ...scaleAlignSecondaryAxis(), {
+          baseline: ["", "last"]
+        }]
+      }],
+      /**
+       * Place Content
+       * @see https://tailwindcss.com/docs/place-content
+       */
+      "place-content": [{
+        "place-content": scaleAlignPrimaryAxis()
+      }],
+      /**
+       * Place Items
+       * @see https://tailwindcss.com/docs/place-items
+       */
+      "place-items": [{
+        "place-items": [...scaleAlignSecondaryAxis(), "baseline"]
+      }],
+      /**
+       * Place Self
+       * @see https://tailwindcss.com/docs/place-self
+       */
+      "place-self": [{
+        "place-self": ["auto", ...scaleAlignSecondaryAxis()]
+      }],
+      // Spacing
+      /**
+       * Padding
+       * @see https://tailwindcss.com/docs/padding
+       */
+      p: [{
+        p: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline
+       * @see https://tailwindcss.com/docs/padding
+       */
+      px: [{
+        px: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block
+       * @see https://tailwindcss.com/docs/padding
+       */
+      py: [{
+        py: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline Start
+       * @see https://tailwindcss.com/docs/padding
+       */
+      ps: [{
+        ps: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Inline End
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pe: [{
+        pe: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block Start
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pbs: [{
+        pbs: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Block End
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pbe: [{
+        pbe: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Top
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pt: [{
+        pt: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Right
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pr: [{
+        pr: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Bottom
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pb: [{
+        pb: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Padding Left
+       * @see https://tailwindcss.com/docs/padding
+       */
+      pl: [{
+        pl: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Margin
+       * @see https://tailwindcss.com/docs/margin
+       */
+      m: [{
+        m: scaleMargin()
+      }],
+      /**
+       * Margin Inline
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mx: [{
+        mx: scaleMargin()
+      }],
+      /**
+       * Margin Block
+       * @see https://tailwindcss.com/docs/margin
+       */
+      my: [{
+        my: scaleMargin()
+      }],
+      /**
+       * Margin Inline Start
+       * @see https://tailwindcss.com/docs/margin
+       */
+      ms: [{
+        ms: scaleMargin()
+      }],
+      /**
+       * Margin Inline End
+       * @see https://tailwindcss.com/docs/margin
+       */
+      me: [{
+        me: scaleMargin()
+      }],
+      /**
+       * Margin Block Start
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mbs: [{
+        mbs: scaleMargin()
+      }],
+      /**
+       * Margin Block End
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mbe: [{
+        mbe: scaleMargin()
+      }],
+      /**
+       * Margin Top
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mt: [{
+        mt: scaleMargin()
+      }],
+      /**
+       * Margin Right
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mr: [{
+        mr: scaleMargin()
+      }],
+      /**
+       * Margin Bottom
+       * @see https://tailwindcss.com/docs/margin
+       */
+      mb: [{
+        mb: scaleMargin()
+      }],
+      /**
+       * Margin Left
+       * @see https://tailwindcss.com/docs/margin
+       */
+      ml: [{
+        ml: scaleMargin()
+      }],
+      /**
+       * Space Between X
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-x": [{
+        "space-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Space Between X Reverse
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-x-reverse": ["space-x-reverse"],
+      /**
+       * Space Between Y
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-y": [{
+        "space-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Space Between Y Reverse
+       * @see https://tailwindcss.com/docs/margin#adding-space-between-children
+       */
+      "space-y-reverse": ["space-y-reverse"],
+      // --------------
+      // --- Sizing ---
+      // --------------
+      /**
+       * Size
+       * @see https://tailwindcss.com/docs/width#setting-both-width-and-height
+       */
+      size: [{
+        size: scaleSizing()
+      }],
+      /**
+       * Inline Size
+       * @see https://tailwindcss.com/docs/width
+       */
+      "inline-size": [{
+        inline: ["auto", ...scaleSizingInline()]
+      }],
+      /**
+       * Min-Inline Size
+       * @see https://tailwindcss.com/docs/min-width
+       */
+      "min-inline-size": [{
+        "min-inline": ["auto", ...scaleSizingInline()]
+      }],
+      /**
+       * Max-Inline Size
+       * @see https://tailwindcss.com/docs/max-width
+       */
+      "max-inline-size": [{
+        "max-inline": ["none", ...scaleSizingInline()]
+      }],
+      /**
+       * Block Size
+       * @see https://tailwindcss.com/docs/height
+       */
+      "block-size": [{
+        block: ["auto", ...scaleSizingBlock()]
+      }],
+      /**
+       * Min-Block Size
+       * @see https://tailwindcss.com/docs/min-height
+       */
+      "min-block-size": [{
+        "min-block": ["auto", ...scaleSizingBlock()]
+      }],
+      /**
+       * Max-Block Size
+       * @see https://tailwindcss.com/docs/max-height
+       */
+      "max-block-size": [{
+        "max-block": ["none", ...scaleSizingBlock()]
+      }],
+      /**
+       * Width
+       * @see https://tailwindcss.com/docs/width
+       */
+      w: [{
+        w: [themeContainer, "screen", ...scaleSizing()]
+      }],
+      /**
+       * Min-Width
+       * @see https://tailwindcss.com/docs/min-width
+       */
+      "min-w": [{
+        "min-w": [
+          themeContainer,
+          "screen",
+          /** Deprecated. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          "none",
+          ...scaleSizing()
+        ]
+      }],
+      /**
+       * Max-Width
+       * @see https://tailwindcss.com/docs/max-width
+       */
+      "max-w": [{
+        "max-w": [
+          themeContainer,
+          "screen",
+          "none",
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          "prose",
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          {
+            screen: [themeBreakpoint]
+          },
+          ...scaleSizing()
+        ]
+      }],
+      /**
+       * Height
+       * @see https://tailwindcss.com/docs/height
+       */
+      h: [{
+        h: ["screen", "lh", ...scaleSizing()]
+      }],
+      /**
+       * Min-Height
+       * @see https://tailwindcss.com/docs/min-height
+       */
+      "min-h": [{
+        "min-h": ["screen", "lh", "none", ...scaleSizing()]
+      }],
+      /**
+       * Max-Height
+       * @see https://tailwindcss.com/docs/max-height
+       */
+      "max-h": [{
+        "max-h": ["screen", "lh", ...scaleSizing()]
+      }],
+      // ------------------
+      // --- Typography ---
+      // ------------------
+      /**
+       * Font Size
+       * @see https://tailwindcss.com/docs/font-size
+       */
+      "font-size": [{
+        text: ["base", themeText, isArbitraryVariableLength, isArbitraryLength]
+      }],
+      /**
+       * Font Smoothing
+       * @see https://tailwindcss.com/docs/font-smoothing
+       */
+      "font-smoothing": ["antialiased", "subpixel-antialiased"],
+      /**
+       * Font Style
+       * @see https://tailwindcss.com/docs/font-style
+       */
+      "font-style": ["italic", "not-italic"],
+      /**
+       * Font Weight
+       * @see https://tailwindcss.com/docs/font-weight
+       */
+      "font-weight": [{
+        font: [themeFontWeight, isArbitraryVariableWeight, isArbitraryWeight]
+      }],
+      /**
+       * Font Stretch
+       * @see https://tailwindcss.com/docs/font-stretch
+       */
+      "font-stretch": [{
+        "font-stretch": ["ultra-condensed", "extra-condensed", "condensed", "semi-condensed", "normal", "semi-expanded", "expanded", "extra-expanded", "ultra-expanded", isPercent, isArbitraryValue]
+      }],
+      /**
+       * Font Family
+       * @see https://tailwindcss.com/docs/font-family
+       */
+      "font-family": [{
+        font: [isArbitraryVariableFamilyName, isArbitraryFamilyName, themeFont]
+      }],
+      /**
+       * Font Feature Settings
+       * @see https://tailwindcss.com/docs/font-feature-settings
+       */
+      "font-features": [{
+        "font-features": [isArbitraryValue]
+      }],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-normal": ["normal-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-ordinal": ["ordinal"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-slashed-zero": ["slashed-zero"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-figure": ["lining-nums", "oldstyle-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-spacing": ["proportional-nums", "tabular-nums"],
+      /**
+       * Font Variant Numeric
+       * @see https://tailwindcss.com/docs/font-variant-numeric
+       */
+      "fvn-fraction": ["diagonal-fractions", "stacked-fractions"],
+      /**
+       * Letter Spacing
+       * @see https://tailwindcss.com/docs/letter-spacing
+       */
+      tracking: [{
+        tracking: [themeTracking, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Line Clamp
+       * @see https://tailwindcss.com/docs/line-clamp
+       */
+      "line-clamp": [{
+        "line-clamp": [isNumber, "none", isArbitraryVariable, isArbitraryNumber]
+      }],
+      /**
+       * Line Height
+       * @see https://tailwindcss.com/docs/line-height
+       */
+      leading: [{
+        leading: [
+          /** Deprecated since Tailwind CSS v4.0.0. @see https://github.com/tailwindlabs/tailwindcss.com/issues/2027#issuecomment-2620152757 */
+          themeLeading,
+          ...scaleUnambiguousSpacing()
+        ]
+      }],
+      /**
+       * List Style Image
+       * @see https://tailwindcss.com/docs/list-style-image
+       */
+      "list-image": [{
+        "list-image": ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * List Style Position
+       * @see https://tailwindcss.com/docs/list-style-position
+       */
+      "list-style-position": [{
+        list: ["inside", "outside"]
+      }],
+      /**
+       * List Style Type
+       * @see https://tailwindcss.com/docs/list-style-type
+       */
+      "list-style-type": [{
+        list: ["disc", "decimal", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Text Alignment
+       * @see https://tailwindcss.com/docs/text-align
+       */
+      "text-alignment": [{
+        text: ["left", "center", "right", "justify", "start", "end"]
+      }],
+      /**
+       * Placeholder Color
+       * @deprecated since Tailwind CSS v3.0.0
+       * @see https://v3.tailwindcss.com/docs/placeholder-color
+       */
+      "placeholder-color": [{
+        placeholder: scaleColor()
+      }],
+      /**
+       * Text Color
+       * @see https://tailwindcss.com/docs/text-color
+       */
+      "text-color": [{
+        text: scaleColor()
+      }],
+      /**
+       * Text Decoration
+       * @see https://tailwindcss.com/docs/text-decoration
+       */
+      "text-decoration": ["underline", "overline", "line-through", "no-underline"],
+      /**
+       * Text Decoration Style
+       * @see https://tailwindcss.com/docs/text-decoration-style
+       */
+      "text-decoration-style": [{
+        decoration: [...scaleLineStyle(), "wavy"]
+      }],
+      /**
+       * Text Decoration Thickness
+       * @see https://tailwindcss.com/docs/text-decoration-thickness
+       */
+      "text-decoration-thickness": [{
+        decoration: [isNumber, "from-font", "auto", isArbitraryVariable, isArbitraryLength]
+      }],
+      /**
+       * Text Decoration Color
+       * @see https://tailwindcss.com/docs/text-decoration-color
+       */
+      "text-decoration-color": [{
+        decoration: scaleColor()
+      }],
+      /**
+       * Text Underline Offset
+       * @see https://tailwindcss.com/docs/text-underline-offset
+       */
+      "underline-offset": [{
+        "underline-offset": [isNumber, "auto", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Text Transform
+       * @see https://tailwindcss.com/docs/text-transform
+       */
+      "text-transform": ["uppercase", "lowercase", "capitalize", "normal-case"],
+      /**
+       * Text Overflow
+       * @see https://tailwindcss.com/docs/text-overflow
+       */
+      "text-overflow": ["truncate", "text-ellipsis", "text-clip"],
+      /**
+       * Text Wrap
+       * @see https://tailwindcss.com/docs/text-wrap
+       */
+      "text-wrap": [{
+        text: ["wrap", "nowrap", "balance", "pretty"]
+      }],
+      /**
+       * Text Indent
+       * @see https://tailwindcss.com/docs/text-indent
+       */
+      indent: [{
+        indent: scaleUnambiguousSpacing()
+      }],
+      /**
+       * Tab Size
+       * @see https://tailwindcss.com/docs/tab-size
+       */
+      "tab-size": [{
+        tab: [isInteger, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Vertical Alignment
+       * @see https://tailwindcss.com/docs/vertical-align
+       */
+      "vertical-align": [{
+        align: ["baseline", "top", "middle", "bottom", "text-top", "text-bottom", "sub", "super", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Whitespace
+       * @see https://tailwindcss.com/docs/whitespace
+       */
+      whitespace: [{
+        whitespace: ["normal", "nowrap", "pre", "pre-line", "pre-wrap", "break-spaces"]
+      }],
+      /**
+       * Word Break
+       * @see https://tailwindcss.com/docs/word-break
+       */
+      break: [{
+        break: ["normal", "words", "all", "keep"]
+      }],
+      /**
+       * Overflow Wrap
+       * @see https://tailwindcss.com/docs/overflow-wrap
+       */
+      wrap: [{
+        wrap: ["break-word", "anywhere", "normal"]
+      }],
+      /**
+       * Hyphens
+       * @see https://tailwindcss.com/docs/hyphens
+       */
+      hyphens: [{
+        hyphens: ["none", "manual", "auto"]
+      }],
+      /**
+       * Content
+       * @see https://tailwindcss.com/docs/content
+       */
+      content: [{
+        content: ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      // -------------------
+      // --- Backgrounds ---
+      // -------------------
+      /**
+       * Background Attachment
+       * @see https://tailwindcss.com/docs/background-attachment
+       */
+      "bg-attachment": [{
+        bg: ["fixed", "local", "scroll"]
+      }],
+      /**
+       * Background Clip
+       * @see https://tailwindcss.com/docs/background-clip
+       */
+      "bg-clip": [{
+        "bg-clip": ["border", "padding", "content", "text"]
+      }],
+      /**
+       * Background Origin
+       * @see https://tailwindcss.com/docs/background-origin
+       */
+      "bg-origin": [{
+        "bg-origin": ["border", "padding", "content"]
+      }],
+      /**
+       * Background Position
+       * @see https://tailwindcss.com/docs/background-position
+       */
+      "bg-position": [{
+        bg: scaleBgPosition()
+      }],
+      /**
+       * Background Repeat
+       * @see https://tailwindcss.com/docs/background-repeat
+       */
+      "bg-repeat": [{
+        bg: scaleBgRepeat()
+      }],
+      /**
+       * Background Size
+       * @see https://tailwindcss.com/docs/background-size
+       */
+      "bg-size": [{
+        bg: scaleBgSize()
+      }],
+      /**
+       * Background Image
+       * @see https://tailwindcss.com/docs/background-image
+       */
+      "bg-image": [{
+        bg: ["none", {
+          linear: [{
+            to: ["t", "tr", "r", "br", "b", "bl", "l", "tl"]
+          }, isInteger, isArbitraryVariable, isArbitraryValue],
+          radial: ["", isArbitraryVariable, isArbitraryValue],
+          conic: [isInteger, isArbitraryVariable, isArbitraryValue]
+        }, isArbitraryVariableImage, isArbitraryImage]
+      }],
+      /**
+       * Background Color
+       * @see https://tailwindcss.com/docs/background-color
+       */
+      "bg-color": [{
+        bg: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops From Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-from-pos": [{
+        from: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops Via Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-via-pos": [{
+        via: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops To Position
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-to-pos": [{
+        to: scaleGradientStopPosition()
+      }],
+      /**
+       * Gradient Color Stops From
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-from": [{
+        from: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops Via
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-via": [{
+        via: scaleColor()
+      }],
+      /**
+       * Gradient Color Stops To
+       * @see https://tailwindcss.com/docs/gradient-color-stops
+       */
+      "gradient-to": [{
+        to: scaleColor()
+      }],
+      // ---------------
+      // --- Borders ---
+      // ---------------
+      /**
+       * Border Radius
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      rounded: [{
+        rounded: scaleRadius()
+      }],
+      /**
+       * Border Radius Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-s": [{
+        "rounded-s": scaleRadius()
+      }],
+      /**
+       * Border Radius End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-e": [{
+        "rounded-e": scaleRadius()
+      }],
+      /**
+       * Border Radius Top
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-t": [{
+        "rounded-t": scaleRadius()
+      }],
+      /**
+       * Border Radius Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-r": [{
+        "rounded-r": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-b": [{
+        "rounded-b": scaleRadius()
+      }],
+      /**
+       * Border Radius Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-l": [{
+        "rounded-l": scaleRadius()
+      }],
+      /**
+       * Border Radius Start Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-ss": [{
+        "rounded-ss": scaleRadius()
+      }],
+      /**
+       * Border Radius Start End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-se": [{
+        "rounded-se": scaleRadius()
+      }],
+      /**
+       * Border Radius End End
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-ee": [{
+        "rounded-ee": scaleRadius()
+      }],
+      /**
+       * Border Radius End Start
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-es": [{
+        "rounded-es": scaleRadius()
+      }],
+      /**
+       * Border Radius Top Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-tl": [{
+        "rounded-tl": scaleRadius()
+      }],
+      /**
+       * Border Radius Top Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-tr": [{
+        "rounded-tr": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom Right
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-br": [{
+        "rounded-br": scaleRadius()
+      }],
+      /**
+       * Border Radius Bottom Left
+       * @see https://tailwindcss.com/docs/border-radius
+       */
+      "rounded-bl": [{
+        "rounded-bl": scaleRadius()
+      }],
+      /**
+       * Border Width
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w": [{
+        border: scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-x": [{
+        "border-x": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-y": [{
+        "border-y": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline Start
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-s": [{
+        "border-s": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Inline End
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-e": [{
+        "border-e": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block Start
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-bs": [{
+        "border-bs": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Block End
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-be": [{
+        "border-be": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Top
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-t": [{
+        "border-t": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Right
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-r": [{
+        "border-r": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Bottom
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-b": [{
+        "border-b": scaleBorderWidth()
+      }],
+      /**
+       * Border Width Left
+       * @see https://tailwindcss.com/docs/border-width
+       */
+      "border-w-l": [{
+        "border-l": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width X
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-x": [{
+        "divide-x": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width X Reverse
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-x-reverse": ["divide-x-reverse"],
+      /**
+       * Divide Width Y
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-y": [{
+        "divide-y": scaleBorderWidth()
+      }],
+      /**
+       * Divide Width Y Reverse
+       * @see https://tailwindcss.com/docs/border-width#between-children
+       */
+      "divide-y-reverse": ["divide-y-reverse"],
+      /**
+       * Border Style
+       * @see https://tailwindcss.com/docs/border-style
+       */
+      "border-style": [{
+        border: [...scaleLineStyle(), "hidden", "none"]
+      }],
+      /**
+       * Divide Style
+       * @see https://tailwindcss.com/docs/border-style#setting-the-divider-style
+       */
+      "divide-style": [{
+        divide: [...scaleLineStyle(), "hidden", "none"]
+      }],
+      /**
+       * Border Color
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color": [{
+        border: scaleColor()
+      }],
+      /**
+       * Border Color Inline
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-x": [{
+        "border-x": scaleColor()
+      }],
+      /**
+       * Border Color Block
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-y": [{
+        "border-y": scaleColor()
+      }],
+      /**
+       * Border Color Inline Start
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-s": [{
+        "border-s": scaleColor()
+      }],
+      /**
+       * Border Color Inline End
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-e": [{
+        "border-e": scaleColor()
+      }],
+      /**
+       * Border Color Block Start
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-bs": [{
+        "border-bs": scaleColor()
+      }],
+      /**
+       * Border Color Block End
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-be": [{
+        "border-be": scaleColor()
+      }],
+      /**
+       * Border Color Top
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-t": [{
+        "border-t": scaleColor()
+      }],
+      /**
+       * Border Color Right
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-r": [{
+        "border-r": scaleColor()
+      }],
+      /**
+       * Border Color Bottom
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-b": [{
+        "border-b": scaleColor()
+      }],
+      /**
+       * Border Color Left
+       * @see https://tailwindcss.com/docs/border-color
+       */
+      "border-color-l": [{
+        "border-l": scaleColor()
+      }],
+      /**
+       * Divide Color
+       * @see https://tailwindcss.com/docs/divide-color
+       */
+      "divide-color": [{
+        divide: scaleColor()
+      }],
+      /**
+       * Outline Style
+       * @see https://tailwindcss.com/docs/outline-style
+       */
+      "outline-style": [{
+        outline: [...scaleLineStyle(), "none", "hidden"]
+      }],
+      /**
+       * Outline Offset
+       * @see https://tailwindcss.com/docs/outline-offset
+       */
+      "outline-offset": [{
+        "outline-offset": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Outline Width
+       * @see https://tailwindcss.com/docs/outline-width
+       */
+      "outline-w": [{
+        outline: ["", isNumber, isArbitraryVariableLength, isArbitraryLength]
+      }],
+      /**
+       * Outline Color
+       * @see https://tailwindcss.com/docs/outline-color
+       */
+      "outline-color": [{
+        outline: scaleColor()
+      }],
+      // ---------------
+      // --- Effects ---
+      // ---------------
+      /**
+       * Box Shadow
+       * @see https://tailwindcss.com/docs/box-shadow
+       */
+      shadow: [{
+        shadow: [
+          // Deprecated since Tailwind CSS v4.0.0
+          "",
+          "none",
+          themeShadow,
+          isArbitraryVariableShadow,
+          isArbitraryShadow
+        ]
+      }],
+      /**
+       * Box Shadow Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-shadow-color
+       */
+      "shadow-color": [{
+        shadow: scaleColor()
+      }],
+      /**
+       * Inset Box Shadow
+       * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-shadow
+       */
+      "inset-shadow": [{
+        "inset-shadow": ["none", themeInsetShadow, isArbitraryVariableShadow, isArbitraryShadow]
+      }],
+      /**
+       * Inset Box Shadow Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-inset-shadow-color
+       */
+      "inset-shadow-color": [{
+        "inset-shadow": scaleColor()
+      }],
+      /**
+       * Ring Width
+       * @see https://tailwindcss.com/docs/box-shadow#adding-a-ring
+       */
+      "ring-w": [{
+        ring: scaleBorderWidth()
+      }],
+      /**
+       * Ring Width Inset
+       * @see https://v3.tailwindcss.com/docs/ring-width#inset-rings
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-w-inset": ["ring-inset"],
+      /**
+       * Ring Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-ring-color
+       */
+      "ring-color": [{
+        ring: scaleColor()
+      }],
+      /**
+       * Ring Offset Width
+       * @see https://v3.tailwindcss.com/docs/ring-offset-width
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-offset-w": [{
+        "ring-offset": [isNumber, isArbitraryLength]
+      }],
+      /**
+       * Ring Offset Color
+       * @see https://v3.tailwindcss.com/docs/ring-offset-color
+       * @deprecated since Tailwind CSS v4.0.0
+       * @see https://github.com/tailwindlabs/tailwindcss/blob/v4.0.0/packages/tailwindcss/src/utilities.ts#L4158
+       */
+      "ring-offset-color": [{
+        "ring-offset": scaleColor()
+      }],
+      /**
+       * Inset Ring Width
+       * @see https://tailwindcss.com/docs/box-shadow#adding-an-inset-ring
+       */
+      "inset-ring-w": [{
+        "inset-ring": scaleBorderWidth()
+      }],
+      /**
+       * Inset Ring Color
+       * @see https://tailwindcss.com/docs/box-shadow#setting-the-inset-ring-color
+       */
+      "inset-ring-color": [{
+        "inset-ring": scaleColor()
+      }],
+      /**
+       * Text Shadow
+       * @see https://tailwindcss.com/docs/text-shadow
+       */
+      "text-shadow": [{
+        "text-shadow": ["none", themeTextShadow, isArbitraryVariableShadow, isArbitraryShadow]
+      }],
+      /**
+       * Text Shadow Color
+       * @see https://tailwindcss.com/docs/text-shadow#setting-the-shadow-color
+       */
+      "text-shadow-color": [{
+        "text-shadow": scaleColor()
+      }],
+      /**
+       * Opacity
+       * @see https://tailwindcss.com/docs/opacity
+       */
+      opacity: [{
+        opacity: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Mix Blend Mode
+       * @see https://tailwindcss.com/docs/mix-blend-mode
+       */
+      "mix-blend": [{
+        "mix-blend": [...scaleBlendMode(), "plus-darker", "plus-lighter"]
+      }],
+      /**
+       * Background Blend Mode
+       * @see https://tailwindcss.com/docs/background-blend-mode
+       */
+      "bg-blend": [{
+        "bg-blend": scaleBlendMode()
+      }],
+      /**
+       * Mask Clip
+       * @see https://tailwindcss.com/docs/mask-clip
+       */
+      "mask-clip": [{
+        "mask-clip": ["border", "padding", "content", "fill", "stroke", "view"]
+      }, "mask-no-clip"],
+      /**
+       * Mask Composite
+       * @see https://tailwindcss.com/docs/mask-composite
+       */
+      "mask-composite": [{
+        mask: ["add", "subtract", "intersect", "exclude"]
+      }],
+      /**
+       * Mask Image
+       * @see https://tailwindcss.com/docs/mask-image
+       */
+      "mask-image-linear-pos": [{
+        "mask-linear": [isNumber]
+      }],
+      "mask-image-linear-from-pos": [{
+        "mask-linear-from": scaleMaskImagePosition()
+      }],
+      "mask-image-linear-to-pos": [{
+        "mask-linear-to": scaleMaskImagePosition()
+      }],
+      "mask-image-linear-from-color": [{
+        "mask-linear-from": scaleColor()
+      }],
+      "mask-image-linear-to-color": [{
+        "mask-linear-to": scaleColor()
+      }],
+      "mask-image-t-from-pos": [{
+        "mask-t-from": scaleMaskImagePosition()
+      }],
+      "mask-image-t-to-pos": [{
+        "mask-t-to": scaleMaskImagePosition()
+      }],
+      "mask-image-t-from-color": [{
+        "mask-t-from": scaleColor()
+      }],
+      "mask-image-t-to-color": [{
+        "mask-t-to": scaleColor()
+      }],
+      "mask-image-r-from-pos": [{
+        "mask-r-from": scaleMaskImagePosition()
+      }],
+      "mask-image-r-to-pos": [{
+        "mask-r-to": scaleMaskImagePosition()
+      }],
+      "mask-image-r-from-color": [{
+        "mask-r-from": scaleColor()
+      }],
+      "mask-image-r-to-color": [{
+        "mask-r-to": scaleColor()
+      }],
+      "mask-image-b-from-pos": [{
+        "mask-b-from": scaleMaskImagePosition()
+      }],
+      "mask-image-b-to-pos": [{
+        "mask-b-to": scaleMaskImagePosition()
+      }],
+      "mask-image-b-from-color": [{
+        "mask-b-from": scaleColor()
+      }],
+      "mask-image-b-to-color": [{
+        "mask-b-to": scaleColor()
+      }],
+      "mask-image-l-from-pos": [{
+        "mask-l-from": scaleMaskImagePosition()
+      }],
+      "mask-image-l-to-pos": [{
+        "mask-l-to": scaleMaskImagePosition()
+      }],
+      "mask-image-l-from-color": [{
+        "mask-l-from": scaleColor()
+      }],
+      "mask-image-l-to-color": [{
+        "mask-l-to": scaleColor()
+      }],
+      "mask-image-x-from-pos": [{
+        "mask-x-from": scaleMaskImagePosition()
+      }],
+      "mask-image-x-to-pos": [{
+        "mask-x-to": scaleMaskImagePosition()
+      }],
+      "mask-image-x-from-color": [{
+        "mask-x-from": scaleColor()
+      }],
+      "mask-image-x-to-color": [{
+        "mask-x-to": scaleColor()
+      }],
+      "mask-image-y-from-pos": [{
+        "mask-y-from": scaleMaskImagePosition()
+      }],
+      "mask-image-y-to-pos": [{
+        "mask-y-to": scaleMaskImagePosition()
+      }],
+      "mask-image-y-from-color": [{
+        "mask-y-from": scaleColor()
+      }],
+      "mask-image-y-to-color": [{
+        "mask-y-to": scaleColor()
+      }],
+      "mask-image-radial": [{
+        "mask-radial": [isArbitraryVariable, isArbitraryValue]
+      }],
+      "mask-image-radial-from-pos": [{
+        "mask-radial-from": scaleMaskImagePosition()
+      }],
+      "mask-image-radial-to-pos": [{
+        "mask-radial-to": scaleMaskImagePosition()
+      }],
+      "mask-image-radial-from-color": [{
+        "mask-radial-from": scaleColor()
+      }],
+      "mask-image-radial-to-color": [{
+        "mask-radial-to": scaleColor()
+      }],
+      "mask-image-radial-shape": [{
+        "mask-radial": ["circle", "ellipse"]
+      }],
+      "mask-image-radial-size": [{
+        "mask-radial": [{
+          closest: ["side", "corner"],
+          farthest: ["side", "corner"]
+        }]
+      }],
+      "mask-image-radial-pos": [{
+        "mask-radial-at": scalePosition()
+      }],
+      "mask-image-conic-pos": [{
+        "mask-conic": [isNumber]
+      }],
+      "mask-image-conic-from-pos": [{
+        "mask-conic-from": scaleMaskImagePosition()
+      }],
+      "mask-image-conic-to-pos": [{
+        "mask-conic-to": scaleMaskImagePosition()
+      }],
+      "mask-image-conic-from-color": [{
+        "mask-conic-from": scaleColor()
+      }],
+      "mask-image-conic-to-color": [{
+        "mask-conic-to": scaleColor()
+      }],
+      /**
+       * Mask Mode
+       * @see https://tailwindcss.com/docs/mask-mode
+       */
+      "mask-mode": [{
+        mask: ["alpha", "luminance", "match"]
+      }],
+      /**
+       * Mask Origin
+       * @see https://tailwindcss.com/docs/mask-origin
+       */
+      "mask-origin": [{
+        "mask-origin": ["border", "padding", "content", "fill", "stroke", "view"]
+      }],
+      /**
+       * Mask Position
+       * @see https://tailwindcss.com/docs/mask-position
+       */
+      "mask-position": [{
+        mask: scaleBgPosition()
+      }],
+      /**
+       * Mask Repeat
+       * @see https://tailwindcss.com/docs/mask-repeat
+       */
+      "mask-repeat": [{
+        mask: scaleBgRepeat()
+      }],
+      /**
+       * Mask Size
+       * @see https://tailwindcss.com/docs/mask-size
+       */
+      "mask-size": [{
+        mask: scaleBgSize()
+      }],
+      /**
+       * Mask Type
+       * @see https://tailwindcss.com/docs/mask-type
+       */
+      "mask-type": [{
+        "mask-type": ["alpha", "luminance"]
+      }],
+      /**
+       * Mask Image
+       * @see https://tailwindcss.com/docs/mask-image
+       */
+      "mask-image": [{
+        mask: ["none", isArbitraryVariable, isArbitraryValue]
+      }],
+      // ---------------
+      // --- Filters ---
+      // ---------------
+      /**
+       * Filter
+       * @see https://tailwindcss.com/docs/filter
+       */
+      filter: [{
+        filter: [
+          // Deprecated since Tailwind CSS v3.0.0
+          "",
+          "none",
+          isArbitraryVariable,
+          isArbitraryValue
+        ]
+      }],
+      /**
+       * Blur
+       * @see https://tailwindcss.com/docs/blur
+       */
+      blur: [{
+        blur: scaleBlur()
+      }],
+      /**
+       * Brightness
+       * @see https://tailwindcss.com/docs/brightness
+       */
+      brightness: [{
+        brightness: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Contrast
+       * @see https://tailwindcss.com/docs/contrast
+       */
+      contrast: [{
+        contrast: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Drop Shadow
+       * @see https://tailwindcss.com/docs/drop-shadow
+       */
+      "drop-shadow": [{
+        "drop-shadow": [
+          // Deprecated since Tailwind CSS v4.0.0
+          "",
+          "none",
+          themeDropShadow,
+          isArbitraryVariableShadow,
+          isArbitraryShadow
+        ]
+      }],
+      /**
+       * Drop Shadow Color
+       * @see https://tailwindcss.com/docs/filter-drop-shadow#setting-the-shadow-color
+       */
+      "drop-shadow-color": [{
+        "drop-shadow": scaleColor()
+      }],
+      /**
+       * Grayscale
+       * @see https://tailwindcss.com/docs/grayscale
+       */
+      grayscale: [{
+        grayscale: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Hue Rotate
+       * @see https://tailwindcss.com/docs/hue-rotate
+       */
+      "hue-rotate": [{
+        "hue-rotate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Invert
+       * @see https://tailwindcss.com/docs/invert
+       */
+      invert: [{
+        invert: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Saturate
+       * @see https://tailwindcss.com/docs/saturate
+       */
+      saturate: [{
+        saturate: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Sepia
+       * @see https://tailwindcss.com/docs/sepia
+       */
+      sepia: [{
+        sepia: ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Filter
+       * @see https://tailwindcss.com/docs/backdrop-filter
+       */
+      "backdrop-filter": [{
+        "backdrop-filter": [
+          // Deprecated since Tailwind CSS v3.0.0
+          "",
+          "none",
+          isArbitraryVariable,
+          isArbitraryValue
+        ]
+      }],
+      /**
+       * Backdrop Blur
+       * @see https://tailwindcss.com/docs/backdrop-blur
+       */
+      "backdrop-blur": [{
+        "backdrop-blur": scaleBlur()
+      }],
+      /**
+       * Backdrop Brightness
+       * @see https://tailwindcss.com/docs/backdrop-brightness
+       */
+      "backdrop-brightness": [{
+        "backdrop-brightness": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Contrast
+       * @see https://tailwindcss.com/docs/backdrop-contrast
+       */
+      "backdrop-contrast": [{
+        "backdrop-contrast": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Grayscale
+       * @see https://tailwindcss.com/docs/backdrop-grayscale
+       */
+      "backdrop-grayscale": [{
+        "backdrop-grayscale": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Hue Rotate
+       * @see https://tailwindcss.com/docs/backdrop-hue-rotate
+       */
+      "backdrop-hue-rotate": [{
+        "backdrop-hue-rotate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Invert
+       * @see https://tailwindcss.com/docs/backdrop-invert
+       */
+      "backdrop-invert": [{
+        "backdrop-invert": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Opacity
+       * @see https://tailwindcss.com/docs/backdrop-opacity
+       */
+      "backdrop-opacity": [{
+        "backdrop-opacity": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Saturate
+       * @see https://tailwindcss.com/docs/backdrop-saturate
+       */
+      "backdrop-saturate": [{
+        "backdrop-saturate": [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Backdrop Sepia
+       * @see https://tailwindcss.com/docs/backdrop-sepia
+       */
+      "backdrop-sepia": [{
+        "backdrop-sepia": ["", isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      // --------------
+      // --- Tables ---
+      // --------------
+      /**
+       * Border Collapse
+       * @see https://tailwindcss.com/docs/border-collapse
+       */
+      "border-collapse": [{
+        border: ["collapse", "separate"]
+      }],
+      /**
+       * Border Spacing
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing": [{
+        "border-spacing": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Border Spacing X
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing-x": [{
+        "border-spacing-x": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Border Spacing Y
+       * @see https://tailwindcss.com/docs/border-spacing
+       */
+      "border-spacing-y": [{
+        "border-spacing-y": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Table Layout
+       * @see https://tailwindcss.com/docs/table-layout
+       */
+      "table-layout": [{
+        table: ["auto", "fixed"]
+      }],
+      /**
+       * Caption Side
+       * @see https://tailwindcss.com/docs/caption-side
+       */
+      caption: [{
+        caption: ["top", "bottom"]
+      }],
+      // ---------------------------------
+      // --- Transitions and Animation ---
+      // ---------------------------------
+      /**
+       * Transition Property
+       * @see https://tailwindcss.com/docs/transition-property
+       */
+      transition: [{
+        transition: ["", "all", "colors", "opacity", "shadow", "transform", "none", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Behavior
+       * @see https://tailwindcss.com/docs/transition-behavior
+       */
+      "transition-behavior": [{
+        transition: ["normal", "discrete"]
+      }],
+      /**
+       * Transition Duration
+       * @see https://tailwindcss.com/docs/transition-duration
+       */
+      duration: [{
+        duration: [isNumber, "initial", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Timing Function
+       * @see https://tailwindcss.com/docs/transition-timing-function
+       */
+      ease: [{
+        ease: ["linear", "initial", themeEase, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Transition Delay
+       * @see https://tailwindcss.com/docs/transition-delay
+       */
+      delay: [{
+        delay: [isNumber, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Animation
+       * @see https://tailwindcss.com/docs/animation
+       */
+      animate: [{
+        animate: ["none", themeAnimate, isArbitraryVariable, isArbitraryValue]
+      }],
+      // ------------------
+      // --- Transforms ---
+      // ------------------
+      /**
+       * Backface Visibility
+       * @see https://tailwindcss.com/docs/backface-visibility
+       */
+      backface: [{
+        backface: ["hidden", "visible"]
+      }],
+      /**
+       * Perspective
+       * @see https://tailwindcss.com/docs/perspective
+       */
+      perspective: [{
+        perspective: [themePerspective, isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Perspective Origin
+       * @see https://tailwindcss.com/docs/perspective-origin
+       */
+      "perspective-origin": [{
+        "perspective-origin": scalePositionWithArbitrary()
+      }],
+      /**
+       * Rotate
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      rotate: [{
+        rotate: scaleRotate()
+      }],
+      /**
+       * Rotate X
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-x": [{
+        "rotate-x": scaleRotate()
+      }],
+      /**
+       * Rotate Y
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-y": [{
+        "rotate-y": scaleRotate()
+      }],
+      /**
+       * Rotate Z
+       * @see https://tailwindcss.com/docs/rotate
+       */
+      "rotate-z": [{
+        "rotate-z": scaleRotate()
+      }],
+      /**
+       * Scale
+       * @see https://tailwindcss.com/docs/scale
+       */
+      scale: [{
+        scale: scaleScale()
+      }],
+      /**
+       * Scale X
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-x": [{
+        "scale-x": scaleScale()
+      }],
+      /**
+       * Scale Y
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-y": [{
+        "scale-y": scaleScale()
+      }],
+      /**
+       * Scale Z
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-z": [{
+        "scale-z": scaleScale()
+      }],
+      /**
+       * Scale 3D
+       * @see https://tailwindcss.com/docs/scale
+       */
+      "scale-3d": ["scale-3d"],
+      /**
+       * Skew
+       * @see https://tailwindcss.com/docs/skew
+       */
+      skew: [{
+        skew: scaleSkew()
+      }],
+      /**
+       * Skew X
+       * @see https://tailwindcss.com/docs/skew
+       */
+      "skew-x": [{
+        "skew-x": scaleSkew()
+      }],
+      /**
+       * Skew Y
+       * @see https://tailwindcss.com/docs/skew
+       */
+      "skew-y": [{
+        "skew-y": scaleSkew()
+      }],
+      /**
+       * Transform
+       * @see https://tailwindcss.com/docs/transform
+       */
+      transform: [{
+        transform: [isArbitraryVariable, isArbitraryValue, "", "none", "gpu", "cpu"]
+      }],
+      /**
+       * Transform Origin
+       * @see https://tailwindcss.com/docs/transform-origin
+       */
+      "transform-origin": [{
+        origin: scalePositionWithArbitrary()
+      }],
+      /**
+       * Transform Style
+       * @see https://tailwindcss.com/docs/transform-style
+       */
+      "transform-style": [{
+        transform: ["3d", "flat"]
+      }],
+      /**
+       * Translate
+       * @see https://tailwindcss.com/docs/translate
+       */
+      translate: [{
+        translate: scaleTranslate()
+      }],
+      /**
+       * Translate X
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-x": [{
+        "translate-x": scaleTranslate()
+      }],
+      /**
+       * Translate Y
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-y": [{
+        "translate-y": scaleTranslate()
+      }],
+      /**
+       * Translate Z
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-z": [{
+        "translate-z": scaleTranslate()
+      }],
+      /**
+       * Translate None
+       * @see https://tailwindcss.com/docs/translate
+       */
+      "translate-none": ["translate-none"],
+      /**
+       * Zoom
+       * @see https://tailwindcss.com/docs/zoom
+       */
+      zoom: [{
+        zoom: [isInteger, isArbitraryVariable, isArbitraryValue]
+      }],
+      // ---------------------
+      // --- Interactivity ---
+      // ---------------------
+      /**
+       * Accent Color
+       * @see https://tailwindcss.com/docs/accent-color
+       */
+      accent: [{
+        accent: scaleColor()
+      }],
+      /**
+       * Appearance
+       * @see https://tailwindcss.com/docs/appearance
+       */
+      appearance: [{
+        appearance: ["none", "auto"]
+      }],
+      /**
+       * Caret Color
+       * @see https://tailwindcss.com/docs/just-in-time-mode#caret-color-utilities
+       */
+      "caret-color": [{
+        caret: scaleColor()
+      }],
+      /**
+       * Color Scheme
+       * @see https://tailwindcss.com/docs/color-scheme
+       */
+      "color-scheme": [{
+        scheme: ["normal", "dark", "light", "light-dark", "only-dark", "only-light"]
+      }],
+      /**
+       * Cursor
+       * @see https://tailwindcss.com/docs/cursor
+       */
+      cursor: [{
+        cursor: ["auto", "default", "pointer", "wait", "text", "move", "help", "not-allowed", "none", "context-menu", "progress", "cell", "crosshair", "vertical-text", "alias", "copy", "no-drop", "grab", "grabbing", "all-scroll", "col-resize", "row-resize", "n-resize", "e-resize", "s-resize", "w-resize", "ne-resize", "nw-resize", "se-resize", "sw-resize", "ew-resize", "ns-resize", "nesw-resize", "nwse-resize", "zoom-in", "zoom-out", isArbitraryVariable, isArbitraryValue]
+      }],
+      /**
+       * Field Sizing
+       * @see https://tailwindcss.com/docs/field-sizing
+       */
+      "field-sizing": [{
+        "field-sizing": ["fixed", "content"]
+      }],
+      /**
+       * Pointer Events
+       * @see https://tailwindcss.com/docs/pointer-events
+       */
+      "pointer-events": [{
+        "pointer-events": ["auto", "none"]
+      }],
+      /**
+       * Resize
+       * @see https://tailwindcss.com/docs/resize
+       */
+      resize: [{
+        resize: ["none", "", "y", "x"]
+      }],
+      /**
+       * Scroll Behavior
+       * @see https://tailwindcss.com/docs/scroll-behavior
+       */
+      "scroll-behavior": [{
+        scroll: ["auto", "smooth"]
+      }],
+      /**
+       * Scrollbar Thumb Color
+       * @see https://tailwindcss.com/docs/scrollbar-color
+       */
+      "scrollbar-thumb-color": [{
+        "scrollbar-thumb": scaleColor()
+      }],
+      /**
+       * Scrollbar Track Color
+       * @see https://tailwindcss.com/docs/scrollbar-color
+       */
+      "scrollbar-track-color": [{
+        "scrollbar-track": scaleColor()
+      }],
+      /**
+       * Scrollbar Gutter
+       * @see https://tailwindcss.com/docs/scrollbar-gutter
+       */
+      "scrollbar-gutter": [{
+        "scrollbar-gutter": ["auto", "stable", "both"]
+      }],
+      /**
+       * Scrollbar Width
+       * @see https://tailwindcss.com/docs/scrollbar-width
+       */
+      "scrollbar-w": [{
+        scrollbar: ["auto", "thin", "none"]
+      }],
+      /**
+       * Scroll Margin
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-m": [{
+        "scroll-m": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mx": [{
+        "scroll-mx": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-my": [{
+        "scroll-my": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline Start
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-ms": [{
+        "scroll-ms": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Inline End
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-me": [{
+        "scroll-me": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block Start
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mbs": [{
+        "scroll-mbs": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Block End
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mbe": [{
+        "scroll-mbe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Top
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mt": [{
+        "scroll-mt": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Right
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mr": [{
+        "scroll-mr": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Bottom
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-mb": [{
+        "scroll-mb": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Margin Left
+       * @see https://tailwindcss.com/docs/scroll-margin
+       */
+      "scroll-ml": [{
+        "scroll-ml": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-p": [{
+        "scroll-p": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-px": [{
+        "scroll-px": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-py": [{
+        "scroll-py": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline Start
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-ps": [{
+        "scroll-ps": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Inline End
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pe": [{
+        "scroll-pe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block Start
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pbs": [{
+        "scroll-pbs": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Block End
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pbe": [{
+        "scroll-pbe": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Top
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pt": [{
+        "scroll-pt": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Right
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pr": [{
+        "scroll-pr": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Bottom
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pb": [{
+        "scroll-pb": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Padding Left
+       * @see https://tailwindcss.com/docs/scroll-padding
+       */
+      "scroll-pl": [{
+        "scroll-pl": scaleUnambiguousSpacing()
+      }],
+      /**
+       * Scroll Snap Align
+       * @see https://tailwindcss.com/docs/scroll-snap-align
+       */
+      "snap-align": [{
+        snap: ["start", "end", "center", "align-none"]
+      }],
+      /**
+       * Scroll Snap Stop
+       * @see https://tailwindcss.com/docs/scroll-snap-stop
+       */
+      "snap-stop": [{
+        snap: ["normal", "always"]
+      }],
+      /**
+       * Scroll Snap Type
+       * @see https://tailwindcss.com/docs/scroll-snap-type
+       */
+      "snap-type": [{
+        snap: ["none", "x", "y", "both"]
+      }],
+      /**
+       * Scroll Snap Type Strictness
+       * @see https://tailwindcss.com/docs/scroll-snap-type
+       */
+      "snap-strictness": [{
+        snap: ["mandatory", "proximity"]
+      }],
+      /**
+       * Touch Action
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      touch: [{
+        touch: ["auto", "none", "manipulation"]
+      }],
+      /**
+       * Touch Action X
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-x": [{
+        "touch-pan": ["x", "left", "right"]
+      }],
+      /**
+       * Touch Action Y
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-y": [{
+        "touch-pan": ["y", "up", "down"]
+      }],
+      /**
+       * Touch Action Pinch Zoom
+       * @see https://tailwindcss.com/docs/touch-action
+       */
+      "touch-pz": ["touch-pinch-zoom"],
+      /**
+       * User Select
+       * @see https://tailwindcss.com/docs/user-select
+       */
+      select: [{
+        select: ["none", "text", "all", "auto"]
+      }],
+      /**
+       * Will Change
+       * @see https://tailwindcss.com/docs/will-change
+       */
+      "will-change": [{
+        "will-change": ["auto", "scroll", "contents", "transform", isArbitraryVariable, isArbitraryValue]
+      }],
+      // -----------
+      // --- SVG ---
+      // -----------
+      /**
+       * Fill
+       * @see https://tailwindcss.com/docs/fill
+       */
+      fill: [{
+        fill: ["none", ...scaleColor()]
+      }],
+      /**
+       * Stroke Width
+       * @see https://tailwindcss.com/docs/stroke-width
+       */
+      "stroke-w": [{
+        stroke: [isNumber, isArbitraryVariableLength, isArbitraryLength, isArbitraryNumber]
+      }],
+      /**
+       * Stroke
+       * @see https://tailwindcss.com/docs/stroke
+       */
+      stroke: [{
+        stroke: ["none", ...scaleColor()]
+      }],
+      // ---------------------
+      // --- Accessibility ---
+      // ---------------------
+      /**
+       * Forced Color Adjust
+       * @see https://tailwindcss.com/docs/forced-color-adjust
+       */
+      "forced-color-adjust": [{
+        "forced-color-adjust": ["auto", "none"]
+      }]
+    },
+    conflictingClassGroups: {
+      "container-named": ["container-type"],
+      overflow: ["overflow-x", "overflow-y"],
+      overscroll: ["overscroll-x", "overscroll-y"],
+      inset: ["inset-x", "inset-y", "inset-bs", "inset-be", "start", "end", "top", "right", "bottom", "left"],
+      "inset-x": ["right", "left"],
+      "inset-y": ["top", "bottom"],
+      flex: ["basis", "grow", "shrink"],
+      gap: ["gap-x", "gap-y"],
+      p: ["px", "py", "ps", "pe", "pbs", "pbe", "pt", "pr", "pb", "pl"],
+      px: ["pr", "pl"],
+      py: ["pt", "pb"],
+      m: ["mx", "my", "ms", "me", "mbs", "mbe", "mt", "mr", "mb", "ml"],
+      mx: ["mr", "ml"],
+      my: ["mt", "mb"],
+      size: ["w", "h"],
+      "font-size": ["leading"],
+      "fvn-normal": ["fvn-ordinal", "fvn-slashed-zero", "fvn-figure", "fvn-spacing", "fvn-fraction"],
+      "fvn-ordinal": ["fvn-normal"],
+      "fvn-slashed-zero": ["fvn-normal"],
+      "fvn-figure": ["fvn-normal"],
+      "fvn-spacing": ["fvn-normal"],
+      "fvn-fraction": ["fvn-normal"],
+      "line-clamp": ["display", "overflow"],
+      rounded: ["rounded-s", "rounded-e", "rounded-t", "rounded-r", "rounded-b", "rounded-l", "rounded-ss", "rounded-se", "rounded-ee", "rounded-es", "rounded-tl", "rounded-tr", "rounded-br", "rounded-bl"],
+      "rounded-s": ["rounded-ss", "rounded-es"],
+      "rounded-e": ["rounded-se", "rounded-ee"],
+      "rounded-t": ["rounded-tl", "rounded-tr"],
+      "rounded-r": ["rounded-tr", "rounded-br"],
+      "rounded-b": ["rounded-br", "rounded-bl"],
+      "rounded-l": ["rounded-tl", "rounded-bl"],
+      "border-spacing": ["border-spacing-x", "border-spacing-y"],
+      "border-w": ["border-w-x", "border-w-y", "border-w-s", "border-w-e", "border-w-bs", "border-w-be", "border-w-t", "border-w-r", "border-w-b", "border-w-l"],
+      "border-w-x": ["border-w-r", "border-w-l"],
+      "border-w-y": ["border-w-t", "border-w-b"],
+      "border-color": ["border-color-x", "border-color-y", "border-color-s", "border-color-e", "border-color-bs", "border-color-be", "border-color-t", "border-color-r", "border-color-b", "border-color-l"],
+      "border-color-x": ["border-color-r", "border-color-l"],
+      "border-color-y": ["border-color-t", "border-color-b"],
+      translate: ["translate-x", "translate-y", "translate-none"],
+      "translate-none": ["translate", "translate-x", "translate-y", "translate-z"],
+      "scroll-m": ["scroll-mx", "scroll-my", "scroll-ms", "scroll-me", "scroll-mbs", "scroll-mbe", "scroll-mt", "scroll-mr", "scroll-mb", "scroll-ml"],
+      "scroll-mx": ["scroll-mr", "scroll-ml"],
+      "scroll-my": ["scroll-mt", "scroll-mb"],
+      "scroll-p": ["scroll-px", "scroll-py", "scroll-ps", "scroll-pe", "scroll-pbs", "scroll-pbe", "scroll-pt", "scroll-pr", "scroll-pb", "scroll-pl"],
+      "scroll-px": ["scroll-pr", "scroll-pl"],
+      "scroll-py": ["scroll-pt", "scroll-pb"],
+      touch: ["touch-x", "touch-y", "touch-pz"],
+      "touch-x": ["touch"],
+      "touch-y": ["touch"],
+      "touch-pz": ["touch"]
+    },
+    conflictingClassGroupModifiers: {
+      "font-size": ["leading"]
+    },
+    postfixLookupClassGroups: ["container-type"],
+    orderSensitiveModifiers: ["*", "**", "after", "backdrop", "before", "details-content", "file", "first-letter", "first-line", "marker", "placeholder", "selection"]
+  };
+};
+var twMerge = /* @__PURE__ */ createTailwindMerge(getDefaultConfig);
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/utils.js
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
+function isEnabled(index, disabled2) {
+  return !disabled2.has(index);
+}
+function firstEnabled(disabled2, itemCount) {
+  for (let index = 0; index < itemCount; index++) {
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function lastEnabled(disabled2, itemCount) {
+  for (let index = itemCount - 1; index >= 0; index--) {
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function nextEnabled(current, direction, disabled2, itemCount) {
+  for (let step = 1; step < itemCount; step++) {
+    const index = (current + direction * step + itemCount) % itemCount;
+    if (isEnabled(index, disabled2))
+      return index;
+  }
+  return null;
+}
+function resolveTabListKeyAction(key, currentIndex, itemCount, options) {
+  if (itemCount <= 0)
+    return null;
+  const disabled2 = new Set(options?.disabledIndices ?? []);
+  if (key === "Home")
+    return firstEnabled(disabled2, itemCount);
+  if (key === "End")
+    return lastEnabled(disabled2, itemCount);
+  if (key === "ArrowRight" || key === "ArrowDown") {
+    return nextEnabled(currentIndex, 1, disabled2, itemCount);
+  }
+  if (key === "ArrowLeft" || key === "ArrowUp") {
+    return nextEnabled(currentIndex, -1, disabled2, itemCount);
+  }
+  return null;
+}
+function resolveMenuTypeahead(labels, currentIndex, key, buffer) {
+  if (labels.length === 0 || key.length !== 1 || key === " ")
+    return null;
+  const newBuffer = buffer + key;
+  const prefix = newBuffer.toLowerCase();
+  for (let offset = 1; offset <= labels.length; offset++) {
+    const index = (currentIndex + offset) % labels.length;
+    if (labels[index].toLowerCase().startsWith(prefix)) {
+      return { index, buffer: newBuffer };
+    }
+  }
+  return null;
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/FieldError/index.js
 function spacingClasses(spacing) {
   switch (spacing) {
     case "section":
@@ -7245,62 +10571,134 @@ function spacingClasses(spacing) {
       return "mt-1";
   }
 }
-function FieldError({ children, id: id2, spacing = "field", roleAlert = true, className }) {
+function FieldError({ children, spacing = "field", roleAlert = true, className, ...props }) {
   if (children == null || children === "")
     return null;
-  const base2 = `${spacingClasses(spacing)} text-[14px] text-danger`;
-  const classes = className ? `${base2} ${className}` : base2;
-  return jsx("p", { id: id2, className: classes, role: roleAlert ? "alert" : void 0, children });
+  return jsx("p", { ...props, className: cn("hc-field-error text-[14px] text-danger", spacingClasses(spacing), className), role: roleAlert ? "alert" : void 0, children });
 }
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/Button/index.js
+var BUTTON_BASE = "inline-flex cursor-pointer items-center rounded-full app-no-drag";
+var VARIANT_CLASSES = {
+  primary: cn(BUTTON_BASE, "min-h-[32px] justify-center border border-transparent bg-accent px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"),
+  secondary: cn(BUTTON_BASE, "min-h-[32px] justify-center border border-separator bg-control px-3 py-1 text-[15px] text-text shadow-sm hover:bg-selection disabled:cursor-not-allowed disabled:opacity-50"),
+  primaryDanger: cn(BUTTON_BASE, "min-h-[32px] justify-center border border-transparent bg-danger px-3 py-1 text-[15px] font-medium text-white shadow-sm hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"),
+  secondaryDanger: cn(BUTTON_BASE, "min-h-[32px] justify-center border border-separator bg-control px-3 py-1 text-[15px] text-danger shadow-sm hover:bg-danger/15 disabled:cursor-not-allowed disabled:opacity-50"),
+  toolbar: cn(BUTTON_BASE, "min-h-[32px] border-none bg-transparent px-2 py-1 text-[15px] hover:bg-selection"),
+  icon: cn(BUTTON_BASE, "size-[30px] shrink-0 justify-center border-none bg-transparent text-muted hover:bg-selection hover:text-text"),
+  iconDanger: cn(BUTTON_BASE, "size-[30px] shrink-0 justify-center border-none bg-transparent text-muted hover:bg-danger/15 hover:text-danger")
+};
+function Button({ variant = "primary", className, type = "button", innerRef, ...props }) {
+  return jsx("button", { ref: innerRef, type, className: cn("hc-button", VARIANT_CLASSES[variant], className), ...props });
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/forms/classes.js
+var field = "rounded-lg border border-separator bg-field px-2.5 py-1.5 text-[16px] text-text app-no-drag";
+var surfaceField = "w-full rounded-lg border border-separator bg-field px-3 py-2.5 text-[15px] text-text";
+function mergeFieldClasses(variant, className, rootClass) {
+  const result = cn(rootClass, variant === "control" ? field : variant === "surface" ? surfaceField : void 0, className);
+  return result === "" ? void 0 : result;
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/forms/Input.js
+function Input({ ref, variant = "control", type, className, ...props }) {
+  const resolvedVariant = type === "checkbox" || type === "radio" ? "plain" : variant;
+  return jsx("input", { ref, type, className: mergeFieldClasses(resolvedVariant, className, "hc-input"), ...props });
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/forms/Select.js
+function Select({ ref, variant = "control", className, children, ...props }) {
+  return jsx("select", { ref, className: mergeFieldClasses(variant, className, "hc-select"), ...props, children });
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/react-dom.js
+function createPortal(children, container, key) {
+  return requireHostReactDom().createPortal(children, container, key);
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/portalToBody.js
+function portalToBody(node) {
+  if (typeof document === "undefined") {
+    throw new Error("portalToBody requires a DOM document");
+  }
+  return createPortal(node, document.body);
+}
+
+// node_modules/.pnpm/@fortawesome+free-solid-svg-icons@7.3.0/node_modules/@fortawesome/free-solid-svg-icons/index.mjs
+var faCheck = {
+  prefix: "fas",
+  iconName: "check",
+  icon: [448, 512, [10003, 10004], "f00c", "M434.8 70.1c14.3 10.4 17.5 30.4 7.1 44.7l-256 352c-5.5 7.6-14 12.3-23.4 13.1s-18.5-2.7-25.1-9.3l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l101.5 101.5 234-321.7c10.4-14.3 30.4-17.5 44.7-7.1z"]
+};
+var faXmark = {
+  prefix: "fas",
+  iconName: "xmark",
+  icon: [384, 512, [128473, 10005, 10006, 10060, 215, "close", "multiply", "remove", "times"], "f00d", "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"]
+};
+var faCircleCheck = {
+  prefix: "fas",
+  iconName: "circle-check",
+  icon: [512, 512, [61533, "check-circle"], "f058", "M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zM374 145.7c-10.7-7.8-25.7-5.4-33.5 5.3L221.1 315.2 169 263.1c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l72 72c5 5 11.8 7.5 18.8 7s13.4-4.1 17.5-9.8L379.3 179.2c7.8-10.7 5.4-25.7-5.3-33.5z"]
+};
+var faCopy = {
+  prefix: "fas",
+  iconName: "copy",
+  icon: [448, 512, [], "f0c5", "M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z"]
+};
+var faBars = {
+  prefix: "fas",
+  iconName: "bars",
+  icon: [448, 512, ["navicon"], "f0c9", "M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"]
+};
 
 // node_modules/.pnpm/@fortawesome+react-fontawesome@3.3.1_@fortawesome+fontawesome-svg-core@7.3.0_react@19.2.7/node_modules/@fortawesome/react-fontawesome/dist/index.js
 import React2, { useId as useId2, useMemo as useMemo2 } from "react";
 
 // node_modules/.pnpm/@fortawesome+fontawesome-svg-core@7.3.0/node_modules/@fortawesome/fontawesome-svg-core/index.mjs
-function _arrayLikeToArray(r4, a3) {
-  (null == a3 || a3 > r4.length) && (a3 = r4.length);
-  for (var e4 = 0, n3 = Array(a3); e4 < a3; e4++) n3[e4] = r4[e4];
+function _arrayLikeToArray(r5, a3) {
+  (null == a3 || a3 > r5.length) && (a3 = r5.length);
+  for (var e4 = 0, n3 = Array(a3); e4 < a3; e4++) n3[e4] = r5[e4];
   return n3;
 }
-function _arrayWithHoles(r4) {
-  if (Array.isArray(r4)) return r4;
+function _arrayWithHoles(r5) {
+  if (Array.isArray(r5)) return r5;
 }
-function _arrayWithoutHoles(r4) {
-  if (Array.isArray(r4)) return _arrayLikeToArray(r4);
+function _arrayWithoutHoles(r5) {
+  if (Array.isArray(r5)) return _arrayLikeToArray(r5);
 }
 function _classCallCheck(a3, n3) {
   if (!(a3 instanceof n3)) throw new TypeError("Cannot call a class as a function");
 }
-function _defineProperties(e4, r4) {
-  for (var t4 = 0; t4 < r4.length; t4++) {
-    var o3 = r4[t4];
+function _defineProperties(e4, r5) {
+  for (var t4 = 0; t4 < r5.length; t4++) {
+    var o3 = r5[t4];
     o3.enumerable = o3.enumerable || false, o3.configurable = true, "value" in o3 && (o3.writable = true), Object.defineProperty(e4, _toPropertyKey(o3.key), o3);
   }
 }
-function _createClass(e4, r4, t4) {
-  return r4 && _defineProperties(e4.prototype, r4), t4 && _defineProperties(e4, t4), Object.defineProperty(e4, "prototype", {
+function _createClass(e4, r5, t4) {
+  return r5 && _defineProperties(e4.prototype, r5), t4 && _defineProperties(e4, t4), Object.defineProperty(e4, "prototype", {
     writable: false
   }), e4;
 }
-function _createForOfIteratorHelper(r4, e4) {
-  var t4 = "undefined" != typeof Symbol && r4[Symbol.iterator] || r4["@@iterator"];
+function _createForOfIteratorHelper(r5, e4) {
+  var t4 = "undefined" != typeof Symbol && r5[Symbol.iterator] || r5["@@iterator"];
   if (!t4) {
-    if (Array.isArray(r4) || (t4 = _unsupportedIterableToArray(r4)) || e4 && r4 && "number" == typeof r4.length) {
-      t4 && (r4 = t4);
+    if (Array.isArray(r5) || (t4 = _unsupportedIterableToArray(r5)) || e4 && r5 && "number" == typeof r5.length) {
+      t4 && (r5 = t4);
       var n3 = 0, F3 = function() {
       };
       return {
         s: F3,
         n: function() {
-          return n3 >= r4.length ? {
+          return n3 >= r5.length ? {
             done: true
           } : {
             done: false,
-            value: r4[n3++]
+            value: r5[n3++]
           };
         },
-        e: function(r5) {
-          throw r5;
+        e: function(r6) {
+          throw r6;
         },
         f: F3
       };
@@ -7310,14 +10708,14 @@ function _createForOfIteratorHelper(r4, e4) {
   var o3, a3 = true, u3 = false;
   return {
     s: function() {
-      t4 = t4.call(r4);
+      t4 = t4.call(r5);
     },
     n: function() {
-      var r5 = t4.next();
-      return a3 = r5.done, r5;
+      var r6 = t4.next();
+      return a3 = r6.done, r6;
     },
-    e: function(r5) {
-      u3 = true, o3 = r5;
+    e: function(r6) {
+      u3 = true, o3 = r6;
     },
     f: function() {
       try {
@@ -7328,28 +10726,28 @@ function _createForOfIteratorHelper(r4, e4) {
     }
   };
 }
-function _defineProperty(e4, r4, t4) {
-  return (r4 = _toPropertyKey(r4)) in e4 ? Object.defineProperty(e4, r4, {
+function _defineProperty(e4, r5, t4) {
+  return (r5 = _toPropertyKey(r5)) in e4 ? Object.defineProperty(e4, r5, {
     value: t4,
     enumerable: true,
     configurable: true,
     writable: true
-  }) : e4[r4] = t4, e4;
+  }) : e4[r5] = t4, e4;
 }
-function _iterableToArray(r4) {
-  if ("undefined" != typeof Symbol && null != r4[Symbol.iterator] || null != r4["@@iterator"]) return Array.from(r4);
+function _iterableToArray(r5) {
+  if ("undefined" != typeof Symbol && null != r5[Symbol.iterator] || null != r5["@@iterator"]) return Array.from(r5);
 }
-function _iterableToArrayLimit(r4, l3) {
-  var t4 = null == r4 ? null : "undefined" != typeof Symbol && r4[Symbol.iterator] || r4["@@iterator"];
+function _iterableToArrayLimit(r5, l3) {
+  var t4 = null == r5 ? null : "undefined" != typeof Symbol && r5[Symbol.iterator] || r5["@@iterator"];
   if (null != t4) {
     var e4, n3, i3, u3, a3 = [], f3 = true, o3 = false;
     try {
-      if (i3 = (t4 = t4.call(r4)).next, 0 === l3) {
+      if (i3 = (t4 = t4.call(r5)).next, 0 === l3) {
         if (Object(t4) !== t4) return;
         f3 = false;
       } else for (; !(f3 = (e4 = i3.call(t4)).done) && (a3.push(e4.value), a3.length !== l3); f3 = true) ;
-    } catch (r5) {
-      o3 = true, n3 = r5;
+    } catch (r6) {
+      o3 = true, n3 = r6;
     } finally {
       try {
         if (!f3 && null != t4.return && (u3 = t4.return(), Object(u3) !== u3)) return;
@@ -7366,42 +10764,42 @@ function _nonIterableRest() {
 function _nonIterableSpread() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-function ownKeys(e4, r4) {
+function ownKeys(e4, r5) {
   var t4 = Object.keys(e4);
   if (Object.getOwnPropertySymbols) {
     var o3 = Object.getOwnPropertySymbols(e4);
-    r4 && (o3 = o3.filter(function(r5) {
-      return Object.getOwnPropertyDescriptor(e4, r5).enumerable;
+    r5 && (o3 = o3.filter(function(r6) {
+      return Object.getOwnPropertyDescriptor(e4, r6).enumerable;
     })), t4.push.apply(t4, o3);
   }
   return t4;
 }
 function _objectSpread2(e4) {
-  for (var r4 = 1; r4 < arguments.length; r4++) {
-    var t4 = null != arguments[r4] ? arguments[r4] : {};
-    r4 % 2 ? ownKeys(Object(t4), true).forEach(function(r5) {
-      _defineProperty(e4, r5, t4[r5]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e4, Object.getOwnPropertyDescriptors(t4)) : ownKeys(Object(t4)).forEach(function(r5) {
-      Object.defineProperty(e4, r5, Object.getOwnPropertyDescriptor(t4, r5));
+  for (var r5 = 1; r5 < arguments.length; r5++) {
+    var t4 = null != arguments[r5] ? arguments[r5] : {};
+    r5 % 2 ? ownKeys(Object(t4), true).forEach(function(r6) {
+      _defineProperty(e4, r6, t4[r6]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e4, Object.getOwnPropertyDescriptors(t4)) : ownKeys(Object(t4)).forEach(function(r6) {
+      Object.defineProperty(e4, r6, Object.getOwnPropertyDescriptor(t4, r6));
     });
   }
   return e4;
 }
-function _slicedToArray(r4, e4) {
-  return _arrayWithHoles(r4) || _iterableToArrayLimit(r4, e4) || _unsupportedIterableToArray(r4, e4) || _nonIterableRest();
+function _slicedToArray(r5, e4) {
+  return _arrayWithHoles(r5) || _iterableToArrayLimit(r5, e4) || _unsupportedIterableToArray(r5, e4) || _nonIterableRest();
 }
-function _toConsumableArray(r4) {
-  return _arrayWithoutHoles(r4) || _iterableToArray(r4) || _unsupportedIterableToArray(r4) || _nonIterableSpread();
+function _toConsumableArray(r5) {
+  return _arrayWithoutHoles(r5) || _iterableToArray(r5) || _unsupportedIterableToArray(r5) || _nonIterableSpread();
 }
-function _toPrimitive(t4, r4) {
+function _toPrimitive(t4, r5) {
   if ("object" != typeof t4 || !t4) return t4;
   var e4 = t4[Symbol.toPrimitive];
   if (void 0 !== e4) {
-    var i3 = e4.call(t4, r4 || "default");
+    var i3 = e4.call(t4, r5 || "default");
     if ("object" != typeof i3) return i3;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-  return ("string" === r4 ? String : Number)(t4);
+  return ("string" === r5 ? String : Number)(t4);
 }
 function _toPropertyKey(t4) {
   var i3 = _toPrimitive(t4, "string");
@@ -7415,11 +10813,11 @@ function _typeof(o3) {
     return o4 && "function" == typeof Symbol && o4.constructor === Symbol && o4 !== Symbol.prototype ? "symbol" : typeof o4;
   }, _typeof(o3);
 }
-function _unsupportedIterableToArray(r4, a3) {
-  if (r4) {
-    if ("string" == typeof r4) return _arrayLikeToArray(r4, a3);
-    var t4 = {}.toString.call(r4).slice(8, -1);
-    return "Object" === t4 && r4.constructor && (t4 = r4.constructor.name), "Map" === t4 || "Set" === t4 ? Array.from(r4) : "Arguments" === t4 || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t4) ? _arrayLikeToArray(r4, a3) : void 0;
+function _unsupportedIterableToArray(r5, a3) {
+  if (r5) {
+    if ("string" == typeof r5) return _arrayLikeToArray(r5, a3);
+    var t4 = {}.toString.call(r5).slice(8, -1);
+    return "Object" === t4 && r5.constructor && (t4 = r5.constructor.name), "Map" === t4 || "Set" === t4 ? Array.from(r5) : "Arguments" === t4 || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t4) ? _arrayLikeToArray(r5, a3) : void 0;
   }
 }
 var noop = function noop2() {
@@ -7605,7 +11003,7 @@ var c = "slab";
 var o = "slab-duo";
 var I = "slab-press";
 var a = "slab-press-duo";
-var r = "thumbprint";
+var r2 = "thumbprint";
 var v = "utility";
 var i = "utility-duo";
 var F = "utility-fill";
@@ -7635,8 +11033,8 @@ var z = "Utility Duo";
 var O = "Utility Fill";
 var Y = "Vellum";
 var q = "Whiteboard";
-var xl = [u, l, h, t, g, n, m, p, s, y, w, x, e, b, c, o, I, a, r, v, i, F, d, S];
-var cl = (_cl = {}, _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, u, A), l, P), h, j), t, B), g, N), n, D), m, k), p, T), s, C), y, W), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, w, R), x, K), e, L), b, U), c, J), o, _), I, M), a, E), r, G), v, V), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, i, z), F, O), d, Y), S, q));
+var xl = [u, l, h, t, g, n, m, p, s, y, w, x, e, b, c, o, I, a, r2, v, i, F, d, S];
+var cl = (_cl = {}, _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, u, A), l, P), h, j), t, B), g, N), n, D), m, k), p, T), s, C), y, W), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, w, R), x, K), e, L), b, U), c, J), o, _), I, M), a, E), r2, G), v, V), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_cl, i, z), F, O), d, Y), S, q));
 var Al = {
   classic: {
     900: "fas",
@@ -10697,7 +14095,7 @@ var layer = api.layer;
 var text = api.text;
 var counter = api.counter;
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime-host.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/runtime/jsx-runtime-host.js
 import * as React from "react";
 function build4(type, props, key) {
   const { children, ...rest } = props ?? {};
@@ -11105,29 +14503,18 @@ var FontAwesomeIcon = React2.forwardRef((props, ref) => {
 FontAwesomeIcon.displayName = "FontAwesomeIcon";
 var DEFAULT_CLASSNAMES = `${LAYER_CLASSES.default} ${STYLE_CLASSES.fixedWidth}`;
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
-function FaIcon({ icon: icon3, className = "h-3.5 w-3.5", title }) {
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/FaIcon/index.js
+function FaIcon({ icon: icon3, className = "h-3.5 w-3.5", title, ...props }) {
   return createElement(FontAwesomeIcon, {
+    ...props,
     icon: icon3,
-    className,
+    className: cn("hc-fa-icon", className),
     title,
     "aria-hidden": title ? void 0 : true
   });
 }
 
-// node_modules/.pnpm/@fortawesome+free-solid-svg-icons@7.3.0/node_modules/@fortawesome/free-solid-svg-icons/index.mjs
-var faXmark = {
-  prefix: "fas",
-  iconName: "xmark",
-  icon: [384, 512, [128473, 10005, 10006, 10060, 215, "close", "multiply", "remove", "times"], "f00d", "M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"]
-};
-var faBars = {
-  prefix: "fas",
-  iconName: "bars",
-  icon: [448, 512, ["navicon"], "f0c9", "M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"]
-};
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Badge/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/Badge/index.js
 function variantClasses(variant) {
   switch (variant) {
     case "success":
@@ -11136,15 +14523,15 @@ function variantClasses(variant) {
       return "bg-danger/20 text-danger";
     case "accent":
       return "bg-accent/20 text-accent";
+    case "warning":
+      return "bg-warning/20 text-warning";
     case "muted":
     default:
       return "bg-control text-muted";
   }
 }
-function Badge({ children, variant = "muted", className }) {
-  const base2 = `inline-flex shrink-0 items-center rounded px-1.5 py-0.5 text-[14px] ${variantClasses(variant)}`;
-  const classes = className ? `${base2} ${className}` : base2;
-  return jsx("span", { className: classes, children });
+function Badge({ children, variant = "muted", className, ...props }) {
+  return jsx("span", { ...props, className: cn("hc-badge inline-flex shrink-0 items-center rounded px-1.5 py-0.5 text-[14px]", variantClasses(variant), className), children });
 }
 
 // node_modules/.pnpm/@marijn+find-cluster-break@1.0.3/node_modules/@marijn/find-cluster-break/src/index.js
@@ -12508,7 +15895,7 @@ var EditorSelection = class _EditorSelection {
   map(change, assoc = -1) {
     if (change.empty)
       return this;
-    return _EditorSelection.create(this.ranges.map((r4) => r4.map(change, assoc)), this.mainIndex);
+    return _EditorSelection.create(this.ranges.map((r5) => r5.map(change, assoc)), this.mainIndex);
   }
   /**
   Compare this selection to another selection. By default, ranges
@@ -12559,7 +15946,7 @@ var EditorSelection = class _EditorSelection {
   JSON.
   */
   toJSON() {
-    return { ranges: this.ranges.map((r4) => r4.toJSON()), main: this.mainIndex };
+    return { ranges: this.ranges.map((r5) => r5.toJSON()), main: this.mainIndex };
   }
   /**
   Create a selection from a JSON representation.
@@ -12567,7 +15954,7 @@ var EditorSelection = class _EditorSelection {
   static fromJSON(json2) {
     if (!json2 || !Array.isArray(json2.ranges) || typeof json2.main != "number" || json2.main >= json2.ranges.length)
       throw new RangeError("Invalid JSON representation for EditorSelection");
-    return new _EditorSelection(json2.ranges.map((r4) => SelectionRange.fromJSON(r4)), json2.main);
+    return new _EditorSelection(json2.ranges.map((r5) => SelectionRange.fromJSON(r5)), json2.main);
   }
   /**
   Create a selection holding a single range.
@@ -15606,9 +18993,9 @@ var ArabicTypes = /* @__PURE__ */ dec("44444488266272889999999999922222222222222
 var Brackets = /* @__PURE__ */ Object.create(null);
 var BracketStack = [];
 for (let p3 of ["()", "[]", "{}"]) {
-  let l3 = /* @__PURE__ */ p3.charCodeAt(0), r4 = /* @__PURE__ */ p3.charCodeAt(1);
-  Brackets[l3] = r4;
-  Brackets[r4] = -l3;
+  let l3 = /* @__PURE__ */ p3.charCodeAt(0), r5 = /* @__PURE__ */ p3.charCodeAt(1);
+  Brackets[l3] = r5;
+  Brackets[r5] = -l3;
 }
 function charType(ch) {
   return ch <= 247 ? LowTypes[ch] : 1424 <= ch && ch <= 1524 ? 2 : 1536 <= ch && ch <= 1785 ? ArabicTypes[ch - 1536] : 1774 <= ch && ch <= 2220 ? 4 : 8192 <= ch && ch <= 8204 ? 256 : 64336 <= ch && ch <= 65023 ? 4 : 1;
@@ -16693,7 +20080,7 @@ var TextTile = class _TextTile extends Tile {
       return null;
     let rect = rects[(flatten2 ? flatten2 < 0 : side >= 0) ? 0 : rects.length - 1];
     if (browser.safari && !flatten2 && rect.width == 0)
-      rect = Array.prototype.find.call(rects, (r4) => r4.width) || rect;
+      rect = Array.prototype.find.call(rects, (r5) => r5.width) || rect;
     return flatten2 ? flattenRect(rect, flatten2 < 0) : rect || null;
   }
   static of(text2, dom2) {
@@ -17557,7 +20944,7 @@ var DocView = class {
     let blockDiff = findChangedWrappers(prevWrappers, this.blockWrappers, update.changes);
     if (blockDiff.length)
       changedRanges = ChangedRange.extendWithRanges(changedRanges, blockDiff);
-    if (composition && !changedRanges.some((r4) => r4.fromA <= composition.range.fromA && r4.toA >= composition.range.toA))
+    if (composition && !changedRanges.some((r5) => r5.fromA <= composition.range.fromA && r5.toA >= composition.range.toA))
       changedRanges = composition.range.addToSet(changedRanges.slice());
     if (this.tile.flags & 2 && changedRanges.length == 0) {
       return false;
@@ -18025,9 +21412,9 @@ var DocView = class {
   }
 };
 function destroyDropped(tile, reused) {
-  let r4 = reused === null || reused === void 0 ? void 0 : reused.get(tile);
-  if (r4 != 1) {
-    if (r4 == null)
+  let r5 = reused === null || reused === void 0 ? void 0 : reused.get(tile);
+  if (r5 != 1) {
+    if (r5 == null)
       tile.destroy();
     for (let ch of tile.children)
       destroyDropped(ch, reused);
@@ -19286,7 +22673,7 @@ function doPaste(view, input) {
   input = textFilter(view.state, clipboardInputFilter, input);
   let { state } = view, changes, i3 = 1, text2 = state.toText(input);
   let byLine = text2.lines == state.selection.ranges.length;
-  let linewise = lastLinewiseCopy != null && state.selection.ranges.every((r4) => r4.empty) && lastLinewiseCopy == text2.toString();
+  let linewise = lastLinewiseCopy != null && state.selection.ranges.every((r5) => r5.empty) && lastLinewiseCopy == text2.toString();
   if (linewise) {
     let lastLine = -1;
     changes = state.changeByRange((range) => {
@@ -19655,8 +23042,8 @@ handlers.beforeinput = (view, event) => {
   if (event.inputType == "insertReplacementText" && view.observer.editContext) {
     let text2 = (_a2 = event.dataTransfer) === null || _a2 === void 0 ? void 0 : _a2.getData("text/plain"), ranges = event.getTargetRanges();
     if (text2 && ranges.length) {
-      let r4 = ranges[0];
-      let from = view.posAtDOM(r4.startContainer, r4.startOffset), to = view.posAtDOM(r4.endContainer, r4.endOffset);
+      let r5 = ranges[0];
+      let from = view.posAtDOM(r5.startContainer, r5.startOffset), to = view.posAtDOM(r5.endContainer, r5.endOffset);
       applyDOMChangeInner(view, { from, to, insert: view.state.toText(text2) }, null);
       return true;
     }
@@ -20787,7 +24174,7 @@ var ViewState = class {
       }
       let gap = find(current, (gap2) => gap2.from >= line.from && gap2.to <= line.to && Math.abs(gap2.from - from) < halfMargin && Math.abs(gap2.to - to) < halfMargin && !avoid.some((pos) => gap2.from < pos && gap2.to > pos));
       if (!gap) {
-        if (to < line.to && mayMeasure && wrapping && mayMeasure.visibleRanges.some((r4) => r4.from <= to && r4.to >= to)) {
+        if (to < line.to && mayMeasure && wrapping && mayMeasure.visibleRanges.some((r5) => r5.from <= to && r5.to >= to)) {
           let lineStart = mayMeasure.moveToLineBoundary(EditorSelection.cursor(to), false, true).head;
           if (lineStart > from)
             to = lineStart;
@@ -23305,9 +26692,9 @@ function rectanglesForRange(view, className, range) {
         horizontal.push(!ltr && toOpen ? leftSide : toCoords.left, !ltr && fromOpen ? rightSide : fromCoords.right);
     }
     let start = from2 !== null && from2 !== void 0 ? from2 : line.from, end3 = to2 !== null && to2 !== void 0 ? to2 : line.to;
-    for (let r4 of view.visibleRanges)
-      if (r4.to > start && r4.from < end3) {
-        for (let pos = Math.max(r4.from, start), endPos = Math.min(r4.to, end3); ; ) {
+    for (let r5 of view.visibleRanges)
+      if (r5.to > start && r5.from < end3) {
+        for (let pos = Math.max(r5.from, start), endPos = Math.min(r5.to, end3); ; ) {
           let docLine = view.state.doc.lineAt(pos);
           for (let span of view.bidiSpans(docLine)) {
             let spanFrom = span.from + docLine.from, spanTo = span.to + docLine.from;
@@ -23446,11 +26833,11 @@ var cursorLayer = /* @__PURE__ */ layer2({
   markers(view) {
     let { state } = view, conf = state.facet(selectionConfig);
     let cursors = [];
-    for (let r4 of state.selection.ranges) {
-      let prim = r4 == state.selection.main;
-      if (r4.empty || conf.drawRangeCursor && !(prim && browser.ios && conf.iosSelectionHandles)) {
+    for (let r5 of state.selection.ranges) {
+      let prim = r5 == state.selection.main;
+      if (r5.empty || conf.drawRangeCursor && !(prim && browser.ios && conf.iosSelectionHandles)) {
         let className = prim ? "cm-cursor cm-cursor-primary" : "cm-cursor cm-cursor-secondary";
-        let cursor2 = r4.empty ? r4 : EditorSelection.cursor(r4.head, r4.assoc);
+        let cursor2 = r5.empty ? r5 : EditorSelection.cursor(r5.head, r5.assoc);
         for (let piece of RectangleMarker.forRange(view, className, cursor2))
           cursors.push(piece);
       }
@@ -23477,9 +26864,9 @@ var selectionLayer = /* @__PURE__ */ layer2({
   above: false,
   markers(view) {
     let markers = [], { main, ranges } = view.state.selection;
-    for (let r4 of ranges)
-      if (!r4.empty) {
-        for (let marker of RectangleMarker.forRange(view, "cm-selectionBackground", r4))
+    for (let r5 of ranges)
+      if (!r5.empty) {
+        for (let marker of RectangleMarker.forRange(view, "cm-selectionBackground", r5))
           markers.push(marker);
       }
     if (browser.ios && !main.empty && view.state.facet(selectionConfig).iosSelectionHandles) {
@@ -23681,11 +27068,11 @@ var MatchDecorator = class {
     return deco;
   }
   updateRange(view, deco, updateFrom, updateTo) {
-    for (let r4 of view.visibleRanges) {
-      let from = Math.max(r4.from, updateFrom), to = Math.min(r4.to, updateTo);
+    for (let r5 of view.visibleRanges) {
+      let from = Math.max(r5.from, updateFrom), to = Math.min(r5.to, updateTo);
       if (to >= from) {
         let fromLine = view.state.doc.lineAt(from), toLine = fromLine.to < to ? view.state.doc.lineAt(to) : fromLine;
-        let start = Math.max(r4.from, fromLine.from), end3 = Math.min(r4.to, toLine.to);
+        let start = Math.max(r5.from, fromLine.from), end3 = Math.min(r5.to, toLine.to);
         if (this.boundary) {
           for (; from > fromLine.from; from--)
             if (this.boundary.test(fromLine.text[from - 1 - fromLine.from])) {
@@ -23872,8 +27259,8 @@ var activeLineHighlighter = /* @__PURE__ */ ViewPlugin.fromClass(class {
   }
   getDeco(view) {
     let lastLineStart = -1, deco = [];
-    for (let r4 of view.state.selection.ranges) {
-      let line = view.lineBlockAt(r4.head);
+    for (let r5 of view.state.selection.ranges) {
+      let line = view.lineBlockAt(r5.head);
       if (line.from > lastLineStart) {
         deco.push(lineDeco.range(line.from));
         lastLineStart = line.from;
@@ -24303,9 +27690,9 @@ var tooltipPlugin = /* @__PURE__ */ ViewPlugin.fromClass(class {
       let top2 = above ? pos.top - height - arrowHeight - offset.y : pos.bottom + arrowHeight + offset.y;
       let right = left + width;
       if (tView.overlap !== true) {
-        for (let r4 of others)
-          if (r4.left < right && r4.right > left && r4.top < top2 + height && r4.bottom > top2)
-            top2 = above ? r4.top - height - 2 - arrowHeight : r4.bottom + arrowHeight + 2;
+        for (let r5 of others)
+          if (r5.left < right && r5.right > left && r5.top < top2 + height && r5.bottom > top2)
+            top2 = above ? r5.top - height - 2 - arrowHeight : r5.bottom + arrowHeight + 2;
       }
       if (this.position == "absolute") {
         dom2.style.top = (top2 - measured.parent.top) / scaleY + "px";
@@ -24885,7 +28272,7 @@ var showPanel = /* @__PURE__ */ Facet.define({
 });
 function showDialog(view, config16) {
   let resolve;
-  let promise = new Promise((r4) => resolve = r4);
+  let promise = new Promise((r5) => resolve = r5);
   let panelCtor = (view2) => createDialog(view2, config16, resolve);
   if (view.state.field(dialogField, false)) {
     view.dispatch({ effects: openDialogEffect.of(panelCtor) });
@@ -25983,8 +29370,8 @@ var BaseNode = class {
     return new TreeCursor(this, mode);
   }
   getChild(type, before = null, after = null) {
-    let r4 = getChildren(this, type, before, after);
-    return r4.length ? r4[0] : null;
+    let r5 = getChildren(this, type, before, after);
+    return r5.length ? r5[0] : null;
   }
   getChildren(type, before = null, after = null) {
     return getChildren(this, type, before, after);
@@ -27097,7 +30484,7 @@ var Parser = class {
   startParse(input, fragments, ranges) {
     if (typeof input == "string")
       input = new StringInput(input);
-    ranges = !ranges ? [new Range2(0, input.length)] : ranges.length ? ranges.map((r4) => new Range2(r4.from, r4.to)) : [new Range2(0, 0)];
+    ranges = !ranges ? [new Range2(0, input.length)] : ranges.length ? ranges.map((r5) => new Range2(r5.from, r5.to)) : [new Range2(0, 0)];
     return this.createParse(input, fragments || [], ranges);
   }
   /**
@@ -27926,8 +31313,8 @@ var Language = class {
       if (mount) {
         if (mount.tree.prop(languageDataProp) == this.data) {
           if (mount.overlay)
-            for (let r4 of mount.overlay)
-              result.push({ from: r4.from + from, to: r4.to + from });
+            for (let r5 of mount.overlay)
+              result.push({ from: r5.from + from, to: r5.to + from });
           else
             result.push({ from, to: from + tree.length });
           return;
@@ -28115,8 +31502,8 @@ var ParseContext = class _ParseContext {
     }
   }
   withoutTempSkipped(fragments) {
-    for (let r4; r4 = this.tempSkipped.pop(); )
-      fragments = cutFragments(fragments, r4.from, r4.to);
+    for (let r5; r5 = this.tempSkipped.pop(); )
+      fragments = cutFragments(fragments, r5.from, r5.to);
     return fragments;
   }
   /**
@@ -28134,8 +31521,8 @@ var ParseContext = class _ParseContext {
       viewport = { from: changes.mapPos(viewport.from, -1), to: changes.mapPos(viewport.to, 1) };
       if (this.skipped.length) {
         skipped = [];
-        for (let r4 of this.skipped) {
-          let from = changes.mapPos(r4.from, 1), to = changes.mapPos(r4.to, -1);
+        for (let r5 of this.skipped) {
+          let from = changes.mapPos(r5.from, 1), to = changes.mapPos(r5.to, -1);
           if (from < to)
             skipped.push({ from, to });
         }
@@ -28198,8 +31585,8 @@ var ParseContext = class _ParseContext {
           advance() {
             let cx = currentContext;
             if (cx) {
-              for (let r4 of ranges)
-                cx.tempSkipped.push(r4);
+              for (let r5 of ranges)
+                cx.tempSkipped.push(r5);
               if (until)
                 cx.scheduleOn = cx.scheduleOn ? Promise.all([cx.scheduleOn, until]) : until;
             }
@@ -28663,7 +32050,7 @@ function indentOnInput() {
     if (head > line.from + DontIndentBeyond)
       return tr;
     let lineStart = doc2.sliceString(line.from, head);
-    if (!rules.some((r4) => r4.test(lineStart)))
+    if (!rules.some((r5) => r5.test(lineStart)))
       return tr;
     let { state } = tr, last = -1, changes = [];
     for (let { head: head2 } of state.selection.ranges) {
@@ -29673,7 +33060,7 @@ var Parse = class {
       this.chunks.push(tree.children[i3]);
       this.chunkPos.push(tree.positions[i3]);
     }
-    if (context && this.parsedPos < context.viewport.from - 1e5 && ranges.some((r4) => r4.from <= context.viewport.from && r4.to >= context.viewport.from)) {
+    if (context && this.parsedPos < context.viewport.from - 1e5 && ranges.some((r5) => r5.from <= context.viewport.from && r5.to >= context.viewport.from)) {
       this.state = this.lang.streamParser.startState(getIndentUnit(context.state));
       context.skipUntilInView(this.parsedPos, context.viewport.from);
       this.parsedPos = context.viewport.from;
@@ -31015,7 +34402,7 @@ var completionPlugin = /* @__PURE__ */ ViewPlugin.fromClass(class {
     this.pendingStart = false;
     let { state } = this.view, cState = state.field(completionState);
     for (let active of cState.active) {
-      if (active.isPending && !this.running.some((r4) => r4.active.source == active.source))
+      if (active.isPending && !this.running.some((r5) => r5.active.source == active.source))
         this.startQuery(active);
     }
     if (this.running.length && cState.open && cState.open.disabled)
@@ -31349,12 +34736,12 @@ var ActiveSnippet = class _ActiveSnippet {
   constructor(ranges, active) {
     this.ranges = ranges;
     this.active = active;
-    this.deco = Decoration.set(ranges.map((r4) => (r4.from == r4.to ? fieldMarker : fieldRange).range(r4.from, r4.to)), true);
+    this.deco = Decoration.set(ranges.map((r5) => (r5.from == r5.to ? fieldMarker : fieldRange).range(r5.from, r5.to)), true);
   }
   map(changes) {
     let ranges = [];
-    for (let r4 of this.ranges) {
-      let mapped = r4.map(changes);
+    for (let r5 of this.ranges) {
+      let mapped = r5.map(changes);
       if (!mapped)
         return null;
       ranges.push(mapped);
@@ -31362,7 +34749,7 @@ var ActiveSnippet = class _ActiveSnippet {
     return new _ActiveSnippet(ranges, this.active);
   }
   selectionInsideField(sel) {
-    return sel.ranges.every((range) => this.ranges.some((r4) => r4.field == this.active && r4.from <= range.from && r4.to >= range.to));
+    return sel.ranges.every((range) => this.ranges.some((r5) => r5.field == this.active && r5.from <= range.from && r5.to >= range.to));
   }
 };
 var setActive = /* @__PURE__ */ StateEffect.define({
@@ -31391,7 +34778,7 @@ var snippetState = /* @__PURE__ */ StateField.define({
   provide: (f3) => EditorView.decorations.from(f3, (val) => val ? val.deco : Decoration.none)
 });
 function fieldSelection(ranges, field2) {
-  return EditorSelection.create(ranges.filter((r4) => r4.field == field2).map((r4) => EditorSelection.range(r4.from, r4.to)));
+  return EditorSelection.create(ranges.filter((r5) => r5.field == field2).map((r5) => EditorSelection.range(r5.from, r5.to)));
 }
 function snippet(template) {
   let snippet2 = Snippet.parse(template);
@@ -31405,7 +34792,7 @@ function snippet(template) {
     };
     if (ranges.length)
       spec.selection = fieldSelection(ranges, 0);
-    if (ranges.some((r4) => r4.field > 0)) {
+    if (ranges.some((r5) => r5.field > 0)) {
       let active = new ActiveSnippet(ranges, 0);
       let effects = spec.effects = [setActive.of(active)];
       if (editor.state.field(snippetState, false) === void 0)
@@ -31419,7 +34806,7 @@ function moveField(dir) {
     let active = state.field(snippetState, false);
     if (!active || dir < 0 && active.active == 0)
       return false;
-    let next = active.active + dir, last = dir > 0 && !active.ranges.some((r4) => r4.field == next + dir);
+    let next = active.active + dir, last = dir > 0 && !active.ranges.some((r5) => r5.field == next + dir);
     dispatch(state.update({
       selection: fieldSelection(active.ranges, next),
       effects: setActive.of(last ? null : new ActiveSnippet(active.ranges, next)),
@@ -31455,12 +34842,12 @@ var snippetPointerHandler = /* @__PURE__ */ EditorView.domEventHandlers({
     let active = view.state.field(snippetState, false), pos;
     if (!active || (pos = view.posAtCoords({ x: event.clientX, y: event.clientY })) == null)
       return false;
-    let match = active.ranges.find((r4) => r4.from <= pos && r4.to >= pos);
+    let match = active.ranges.find((r5) => r5.from <= pos && r5.to >= pos);
     if (!match || match.field == active.active)
       return false;
     view.dispatch({
       selection: fieldSelection(active.ranges, match.field),
-      effects: setActive.of(active.ranges.some((r4) => r4.field > match.field) ? new ActiveSnippet(active.ranges, match.field) : null),
+      effects: setActive.of(active.ranges.some((r5) => r5.field > match.field) ? new ActiveSnippet(active.ranges, match.field) : null),
       scrollIntoView: true
     });
     return true;
@@ -32513,11 +35900,11 @@ var InputStream = class {
     if (from >= this.range.from && to <= this.range.to)
       return this.input.read(from, to);
     let result = "";
-    for (let r4 of this.ranges) {
-      if (r4.from >= to)
+    for (let r5 of this.ranges) {
+      if (r5.from >= to)
         break;
-      if (r4.to > from)
-        result += this.input.read(Math.max(r4.from, from), Math.min(r4.to, to));
+      if (r5.to > from)
+        result += this.input.read(Math.max(r5.from, from), Math.min(r5.to, to));
     }
     return result;
   }
@@ -33171,7 +36558,7 @@ var LRParser = class _LRParser extends Parser {
     this.minRepeatTerm = nodeNames.length;
     for (let i3 = 0; i3 < spec.repeatNodeCount; i3++)
       nodeNames.push("");
-    let topTerms = Object.keys(spec.topRules).map((r4) => spec.topRules[r4][1]);
+    let topTerms = Object.keys(spec.topRules).map((r5) => spec.topRules[r5][1]);
     let nodeProps = [];
     for (let i3 = 0; i3 < nodeNames.length; i3++)
       nodeProps.push([]);
@@ -33367,13 +36754,13 @@ var LRParser = class _LRParser extends Parser {
     }
     if (config16.tokenizers)
       copy.tokenizers = this.tokenizers.map((t4) => {
-        let found = config16.tokenizers.find((r4) => r4.from == t4);
+        let found = config16.tokenizers.find((r5) => r5.from == t4);
         return found ? found.to : t4;
       });
     if (config16.specializers) {
       copy.specializers = this.specializers.slice();
       copy.specializerSpecs = this.specializerSpecs.map((s3, i3) => {
-        let found = config16.specializers.find((r4) => r4.from == s3.external);
+        let found = config16.specializers.find((r5) => r5.from == s3.external);
         if (!found)
           return s3;
         let spec = Object.assign(Object.assign({}, s3), { external: found.to });
@@ -34037,6 +37424,30 @@ var parser2 = LRParser.deserialize({
 });
 
 // node_modules/.pnpm/@codemirror+lang-json@6.0.2/node_modules/@codemirror/lang-json/dist/index.js
+var jsonParseLinter = () => (view) => {
+  try {
+    JSON.parse(view.state.doc.toString());
+  } catch (e4) {
+    if (!(e4 instanceof SyntaxError))
+      throw e4;
+    const pos = getErrorPosition(e4, view.state.doc);
+    return [{
+      from: pos,
+      message: e4.message,
+      severity: "error",
+      to: pos
+    }];
+  }
+  return [];
+};
+function getErrorPosition(error, doc2) {
+  let m3;
+  if (m3 = error.message.match(/at position (\d+)/))
+    return Math.min(+m3[1], doc2.length);
+  if (m3 = error.message.match(/at line (\d+) column (\d+)/))
+    return Math.min(doc2.line(+m3[1]).from + +m3[2] - 1, doc2.length);
+  return 0;
+}
 var jsonLanguage = /* @__PURE__ */ LRLanguage.define({
   name: "json",
   parser: /* @__PURE__ */ parser2.configure({
@@ -34285,19 +37696,19 @@ function _extends() {
   return _extends = Object.assign ? Object.assign.bind() : function(n3) {
     for (var e4 = 1; e4 < arguments.length; e4++) {
       var t4 = arguments[e4];
-      for (var r4 in t4) ({}).hasOwnProperty.call(t4, r4) && (n3[r4] = t4[r4]);
+      for (var r5 in t4) ({}).hasOwnProperty.call(t4, r5) && (n3[r5] = t4[r5]);
     }
     return n3;
   }, _extends.apply(null, arguments);
 }
 
 // node_modules/.pnpm/@babel+runtime@8.0.0/node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js
-function _objectWithoutPropertiesLoose(r4, e4) {
-  if (null == r4) return {};
+function _objectWithoutPropertiesLoose(r5, e4) {
+  if (null == r5) return {};
   var t4 = {};
-  for (var n3 in r4) if ({}.hasOwnProperty.call(r4, n3)) {
+  for (var n3 in r5) if ({}.hasOwnProperty.call(r5, n3)) {
     if (-1 !== e4.indexOf(n3)) continue;
-    t4[n3] = r4[n3];
+    t4[n3] = r5[n3];
   }
   return t4;
 }
@@ -34380,11 +37791,11 @@ function findBlockComment(state, { open, close }, from, to) {
 }
 function selectedLineRanges(state) {
   let ranges = [];
-  for (let r4 of state.selection.ranges) {
-    let fromLine = state.doc.lineAt(r4.from);
-    let toLine = r4.to <= fromLine.to ? fromLine : state.doc.lineAt(r4.to);
-    if (toLine.from > fromLine.from && toLine.from == r4.to)
-      toLine = r4.to == fromLine.to + 1 ? fromLine : state.doc.lineAt(r4.to - 1);
+  for (let r5 of state.selection.ranges) {
+    let fromLine = state.doc.lineAt(r5.from);
+    let toLine = r5.to <= fromLine.to ? fromLine : state.doc.lineAt(r5.to);
+    if (toLine.from > fromLine.from && toLine.from == r5.to)
+      toLine = r5.to == fromLine.to + 1 ? fromLine : state.doc.lineAt(r5.to - 1);
     let last = ranges.length - 1;
     if (last >= 0 && ranges[last].to > fromLine.from)
       ranges[last].to = toLine.to;
@@ -34394,10 +37805,10 @@ function selectedLineRanges(state) {
   return ranges;
 }
 function changeBlockComment(option, state, ranges = state.selection.ranges) {
-  let tokens = ranges.map((r4) => getConfig(state, r4.from).block);
+  let tokens = ranges.map((r5) => getConfig(state, r5.from).block);
   if (!tokens.every((c3) => c3))
     return null;
-  let comments = ranges.map((r4, i3) => findBlockComment(state, tokens[i3], r4.from, r4.to));
+  let comments = ranges.map((r5, i3) => findBlockComment(state, tokens[i3], r5.from, r5.to));
   if (option != 2 && !comments.every((c3) => c3)) {
     return { changes: state.changes(ranges.map((range, i3) => {
       if (comments[i3])
@@ -34613,7 +38024,7 @@ function isAdjacent(a3, b3) {
   return isAdjacent2;
 }
 function eqSelectionShape(a3, b3) {
-  return a3.ranges.length == b3.ranges.length && a3.ranges.filter((r4, i3) => r4.empty != b3.ranges[i3].empty).length === 0;
+  return a3.ranges.length == b3.ranges.length && a3.ranges.filter((r5, i3) => r5.empty != b3.ranges[i3].empty).length === 0;
 }
 function conc(a3, b3) {
   return !a3.length ? b3 : !b3.length ? a3 : a3.concat(b3);
@@ -34978,7 +38389,7 @@ function addCursorVertically(view, forward) {
       for (let cur2 = range; ; ) {
         let next = view.moveVertically(cur2, forward);
         if (next.head < line.from || next.head > line.to) {
-          if (!ranges.some((r4) => r4.head == next.head))
+          if (!ranges.some((r5) => r5.head == next.head))
             ranges.push(next);
           break;
         } else if (next.head == cur2.head) {
@@ -35160,12 +38571,12 @@ function moveLine(state, dispatch, forward) {
     let size = nextLine.length + 1;
     if (forward) {
       changes.push({ from: block.to, to: nextLine.to }, { from: block.from, insert: nextLine.text + state.lineBreak });
-      for (let r4 of block.ranges)
-        ranges.push(EditorSelection.range(Math.min(state.doc.length, r4.anchor + size), Math.min(state.doc.length, r4.head + size)));
+      for (let r5 of block.ranges)
+        ranges.push(EditorSelection.range(Math.min(state.doc.length, r5.anchor + size), Math.min(state.doc.length, r5.head + size)));
     } else {
       changes.push({ from: nextLine.from, to: block.from }, { from: block.to, insert: state.lineBreak + nextLine.text });
-      for (let r4 of block.ranges)
-        ranges.push(EditorSelection.range(r4.anchor - size, r4.head - size));
+      for (let r5 of block.ranges)
+        ranges.push(EditorSelection.range(r5.anchor - size, r5.head - size));
     }
   }
   if (!changes.length)
@@ -35822,7 +39233,7 @@ function findNextOccurrence(state, query) {
       cursor2 = new SearchCursor(state.doc, query, 0, Math.max(0, ranges[ranges.length - 1].from - 1));
       cycled = true;
     } else {
-      if (cycled && ranges.some((r4) => r4.from == cursor2.value.from))
+      if (cycled && ranges.some((r5) => r5.from == cursor2.value.from))
         continue;
       if (fullWord) {
         let word2 = state.wordAt(cursor2.value.from);
@@ -35838,7 +39249,7 @@ var selectNextOccurrence = ({ state, dispatch }) => {
   if (ranges.some((sel) => sel.from === sel.to))
     return selectWord({ state, dispatch });
   let searchedText = state.sliceDoc(ranges[0].from, ranges[0].to);
-  if (state.selection.ranges.some((r4) => state.sliceDoc(r4.from, r4.to) != searchedText))
+  if (state.selection.ranges.some((r5) => state.sliceDoc(r5.from, r5.to) != searchedText))
     return false;
   let range = findNextOccurrence(state, searchedText);
   if (!range)
@@ -36113,7 +39524,7 @@ var searchHighlighter = /* @__PURE__ */ ViewPlugin.fromClass(class {
       while (i3 < l3 - 1 && to > ranges[i3 + 1].from - 2 * 250)
         to = ranges[++i3].to;
       query.highlight(view.state, from, to, (from2, to2) => {
-        let selected = view.state.selection.ranges.some((r4) => r4.from == from2 && r4.to == to2);
+        let selected = view.state.selection.ranges.some((r5) => r5.from == from2 && r5.to == to2);
         builder.add(from2, to2, selected ? selectedMatchMark : matchMark);
       });
     }
@@ -36163,7 +39574,7 @@ var selectMatches = /* @__PURE__ */ searchCommand((view, { query }) => {
   if (!ranges || !ranges.length)
     return false;
   view.dispatch({
-    selection: EditorSelection.create(ranges.map((r4) => EditorSelection.range(r4.from, r4.to))),
+    selection: EditorSelection.create(ranges.map((r5) => EditorSelection.range(r5.from, r5.to))),
     userEvent: "select.search.matches"
   });
   return true;
@@ -36606,6 +40017,11 @@ function hideTooltip(tr, tooltip) {
 function maybeEnableLint(state, effects) {
   return state.field(lintState, false) ? effects : effects.concat(StateEffect.appendConfig.of(lintExtensions));
 }
+function setDiagnostics(state, diagnostics) {
+  return {
+    effects: maybeEnableLint(state, [setDiagnosticsEffect.of(diagnostics)])
+  };
+}
 var setDiagnosticsEffect = /* @__PURE__ */ StateEffect.define();
 var togglePanel2 = /* @__PURE__ */ StateEffect.define();
 var movePanelSelection = /* @__PURE__ */ StateEffect.define();
@@ -36707,6 +40123,65 @@ var lintKeymap = [
   { key: "Mod-Shift-m", run: openLintPanel, preventDefault: true },
   { key: "F8", run: nextDiagnostic }
 ];
+var lintPlugin = /* @__PURE__ */ ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.view = view;
+    this.timeout = -1;
+    this.set = true;
+    let { delay } = view.state.facet(lintConfig);
+    this.lintTime = Date.now() + delay;
+    this.run = this.run.bind(this);
+    this.timeout = setTimeout(this.run, delay);
+  }
+  run() {
+    clearTimeout(this.timeout);
+    let now = Date.now();
+    if (now < this.lintTime - 10) {
+      this.timeout = setTimeout(this.run, this.lintTime - now);
+    } else {
+      this.set = false;
+      let { state } = this.view, { sources } = state.facet(lintConfig);
+      if (sources.length)
+        batchResults(sources.map((s3) => Promise.resolve(s3(this.view))), (annotations) => {
+          if (this.view.state.doc == state.doc)
+            this.view.dispatch(setDiagnostics(this.view.state, annotations.reduce((a3, b3) => a3.concat(b3))));
+        }, (error) => {
+          logException(this.view.state, error);
+        });
+    }
+  }
+  update(update) {
+    let config16 = update.state.facet(lintConfig);
+    if (update.docChanged || config16 != update.startState.facet(lintConfig) || config16.needsRefresh && config16.needsRefresh(update)) {
+      this.lintTime = Date.now() + config16.delay;
+      if (!this.set) {
+        this.set = true;
+        this.timeout = setTimeout(this.run, config16.delay);
+      }
+    }
+  }
+  force() {
+    if (this.set) {
+      this.lintTime = Date.now();
+      this.run();
+    }
+  }
+  destroy() {
+    clearTimeout(this.timeout);
+  }
+});
+function batchResults(promises, sink, error) {
+  let collected = [], timeout = -1;
+  for (let p3 of promises)
+    p3.then((value) => {
+      collected.push(value);
+      clearTimeout(timeout);
+      if (collected.length == promises.length)
+        sink(collected);
+      else
+        timeout = setTimeout(() => sink(collected), 200);
+    }, error);
+}
 var lintConfig = /* @__PURE__ */ Facet.define({
   combine(input) {
     return {
@@ -36730,6 +40205,13 @@ var lintConfig = /* @__PURE__ */ Facet.define({
 });
 function combineFilter(a3, b3) {
   return !a3 ? b3 : !b3 ? a3 : (d3, s3) => b3(a3(d3, s3), s3);
+}
+function linter(source, config16 = {}) {
+  return [
+    lintConfig.of({ source, config: config16 }),
+    lintPlugin,
+    lintExtensions
+  ];
 }
 function assignKeys(actions) {
   let assigned = [];
@@ -37354,8 +40836,8 @@ var getStatistics = (view) => {
     selectionAsSingle: view.state.selection.asSingle().main,
     ranges: view.state.selection.ranges,
     selectionCode: view.state.sliceDoc(view.state.selection.main.from, view.state.selection.main.to),
-    selections: view.state.selection.ranges.map((r4) => view.state.sliceDoc(r4.from, r4.to)),
-    selectedText: view.state.selection.ranges.some((r4) => !r4.empty)
+    selections: view.state.selection.ranges.map((r5) => view.state.sliceDoc(r5.from, r5.to)),
+    selectedText: view.state.selection.ranges.some((r5) => !r5.empty)
   };
 };
 
@@ -37649,6 +41131,42 @@ var ReactCodeMirror = /* @__PURE__ */ forwardRef2((props, ref) => {
 ReactCodeMirror.displayName = "CodeMirror";
 var esm_default = ReactCodeMirror;
 
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
+var DEFAULT_CODE_EDITOR_FONT_SIZE = "16px";
+var MIN_CODE_EDITOR_FONT_SIZE_PX = 14;
+var DEFAULT_CODE_EDITOR_SETUP = {
+  lineNumbers: true,
+  foldGutter: true,
+  highlightActiveLine: true,
+  highlightActiveLineGutter: true
+};
+function normalizeCodeEditorFontSize(value) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const clamped = Math.max(MIN_CODE_EDITOR_FONT_SIZE_PX, Math.round(value));
+    return `${clamped}px`;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    const pxMatch = trimmed.match(/^(\d+(?:\.\d+)?)px$/i);
+    if (pxMatch) {
+      const parsed = Number(pxMatch[1]);
+      if (Number.isFinite(parsed)) {
+        const clamped = Math.max(MIN_CODE_EDITOR_FONT_SIZE_PX, Math.round(parsed));
+        return `${clamped}px`;
+      }
+    }
+    const integerMatch = trimmed.match(/^(\d+)$/);
+    if (integerMatch) {
+      const parsed = Number(integerMatch[1]);
+      if (Number.isFinite(parsed)) {
+        const clamped = Math.max(MIN_CODE_EDITOR_FONT_SIZE_PX, parsed);
+        return `${clamped}px`;
+      }
+    }
+  }
+  return DEFAULT_CODE_EDITOR_FONT_SIZE;
+}
+
 // node_modules/.pnpm/@faker-js+faker@10.5.0/node_modules/@faker-js/faker/dist/base-DzmKJ9Qc.js
 var e2 = class extends Error {
 };
@@ -37656,11 +41174,11 @@ var t3 = Symbol(`FakerLocaleProxy`);
 var n2 = () => {
   throw new e2(`You cannot edit the locale data on the faker instance`);
 };
-function r2(e4) {
+function r3(e4) {
   return typeof e4 == `object` && !!e4 && e4?.[t3] === true;
 }
 function i2(e4) {
-  if (r2(e4)) return e4;
+  if (r3(e4)) return e4;
   let i3 = { raw: e4 };
   return new Proxy(e4, { has() {
     return true;
@@ -37680,15 +41198,15 @@ function o2(e4, t4 = {}) {
   return new Proxy(t4, { has(e5, t5) {
     return e5[t5] != null;
   }, get(t5, n3) {
-    let r4 = t5[n3];
-    return typeof n3 == `symbol` || n3 === `nodeType` || a2(r4, e4, n3.toString()), r4;
+    let r5 = t5[n3];
+    return typeof n3 == `symbol` || n3 === `nodeType` || a2(r5, e4, n3.toString()), r5;
   }, set: n2, deleteProperty: n2 });
 }
 function s2(e4) {
   let t4 = {};
   for (let n3 of e4) for (let e5 in n3) {
-    let r4 = n3[e5];
-    t4[e5] === void 0 ? t4[e5] = { ...r4 } : t4[e5] = { ...r4, ...t4[e5] };
+    let r5 = n3[e5];
+    t4[e5] === void 0 ? t4[e5] = { ...r5 } : t4[e5] = { ...r5, ...t4[e5] };
   }
   return t4;
 }
@@ -37706,10 +41224,10 @@ function m2(e4) {
   return t4;
 }
 function h2(e4) {
-  let t4 = m2(19650218), n3 = 1, r4 = 0;
+  let t4 = m2(19650218), n3 = 1, r5 = 0;
   for (let i3 = Math.max(624, e4.length); i3 !== 0; --i3) {
     let i4 = t4[n3 - 1] ^ t4[n3 - 1] >>> 30;
-    t4[n3] = f2((t4[n3] ^ d2(i4, 1664525)) + e4[r4] + r4), n3++, r4++, n3 >= 624 && (t4[0] = t4[623], n3 = 1), r4 >= e4.length && (r4 = 0);
+    t4[n3] = f2((t4[n3] ^ d2(i4, 1664525)) + e4[r5] + r5), n3++, r5++, n3 >= 624 && (t4[0] = t4[623], n3 = 1), r5 >= e4.length && (r5 = 0);
   }
   for (let e5 = 623; e5 !== 0; e5--) t4[n3] = f2((t4[n3] ^ d2(t4[n3 - 1] ^ t4[n3 - 1] >>> 30, 1566083941)) - n3), n3++, n3 >= 624 && (t4[0] = t4[623], n3 = 1);
   return t4[0] = 2147483648, t4;
@@ -37762,8 +41280,8 @@ function y2(e4 = v2()) {
   } };
 }
 function te(e4 = {}) {
-  let { locale: t4 = {}, randomizer: n3 = y2(), config: r4 = {}, seed: a3 } = e4;
-  return n3 != null && a3 != null && n3.seed(a3), { locale: i2(Array.isArray(t4) ? s2(t4) : t4), randomizer: n3, config: r4 };
+  let { locale: t4 = {}, randomizer: n3 = y2(), config: r5 = {}, seed: a3 } = e4;
+  return n3 != null && a3 != null && n3.seed(a3), { locale: i2(Array.isArray(t4) ? s2(t4) : t4), randomizer: n3, config: r5 };
 }
 function b2() {
   return ne;
@@ -37806,19 +41324,19 @@ var ce = class extends S2 {
     return this.faker.helpers.arrayElement(this.faker.definitions.airline.airplane);
   }
   recordLocator(e4 = {}) {
-    let { allowNumerics: t4 = false, allowVisuallySimilarCharacters: n3 = false } = e4, r4 = [];
-    return t4 || r4.push(...ie3), n3 || r4.push(...ae), this.faker.string.alphanumeric({ length: 6, casing: `upper`, exclude: r4 });
+    let { allowNumerics: t4 = false, allowVisuallySimilarCharacters: n3 = false } = e4, r5 = [];
+    return t4 || r5.push(...ie3), n3 || r5.push(...ae), this.faker.string.alphanumeric({ length: 6, casing: `upper`, exclude: r5 });
   }
   seat(e4 = {}) {
-    let { aircraftType: t4 = `narrowbody` } = e4, n3 = oe[t4], r4 = se[t4];
-    return `${this.faker.number.int({ min: 1, max: n3 })}${this.faker.helpers.arrayElement(r4)}`;
+    let { aircraftType: t4 = `narrowbody` } = e4, n3 = oe[t4], r5 = se[t4];
+    return `${this.faker.number.int({ min: 1, max: n3 })}${this.faker.helpers.arrayElement(r5)}`;
   }
   aircraftType() {
     return this.faker.helpers.enumValue(C3);
   }
   flightNumber(e4 = {}) {
-    let { length: t4 = { min: 1, max: 4 }, addLeadingZeros: n3 = false } = e4, r4 = this.faker.string.numeric({ length: t4, allowLeadingZeros: false });
-    return n3 ? r4.padStart(4, `0`) : r4;
+    let { length: t4 = { min: 1, max: 4 }, addLeadingZeros: n3 = false } = e4, r5 = this.faker.string.numeric({ length: t4, allowLeadingZeros: false });
+    return n3 ? r5.padStart(4, `0`) : r5;
   }
 };
 var le = class extends S2 {
@@ -37898,8 +41416,8 @@ var T2 = (function(e4) {
   return e4.RGB = `rgb`, e4.RGBA = `rgba`, e4.HSL = `hsl`, e4.HSLA = `hsla`, e4.HWB = `hwb`, e4.CMYK = `cmyk`, e4.LAB = `lab`, e4.LCH = `lch`, e4.COLOR = `color`, e4;
 })({});
 function de(e4, t4) {
-  let { prefix: n3, casing: r4 } = t4;
-  switch (r4) {
+  let { prefix: n3, casing: r5 } = t4;
+  switch (r5) {
     case `upper`:
       e4 = e4.toUpperCase();
       break;
@@ -37944,10 +41462,10 @@ function fe(e4, t4 = `rgb`, n3 = `sRGB`) {
       return `rgb(${e4[0]}, ${e4[1]}, ${e4[2]})`;
   }
 }
-function O2(e4, t4, n3 = `rgb`, r4 = `sRGB`) {
+function O2(e4, t4, n3 = `rgb`, r5 = `sRGB`) {
   switch (t4) {
     case `css`:
-      return fe(e4, n3, r4);
+      return fe(e4, n3, r5);
     case `binary`:
       return E2(e4);
     case `decimal`:
@@ -37968,17 +41486,17 @@ var pe = class extends S2 {
     return this.faker.helpers.enumValue(w2);
   }
   rgb(e4 = {}) {
-    let { format: t4 = `hex`, includeAlpha: n3 = false, prefix: r4 = `#`, casing: i3 = `lower` } = e4, a3, o3 = `rgb`;
-    return t4 === `hex` ? (a3 = this.faker.string.hexadecimal({ length: n3 ? 8 : 6, prefix: `` }), a3 = de(a3, { prefix: r4, casing: i3 }), a3) : (a3 = Array.from({ length: 3 }, () => this.faker.number.int(255)), n3 && (a3.push(this.faker.number.float({ multipleOf: 0.01 })), o3 = `rgba`), O2(a3, t4, o3));
+    let { format: t4 = `hex`, includeAlpha: n3 = false, prefix: r5 = `#`, casing: i3 = `lower` } = e4, a3, o3 = `rgb`;
+    return t4 === `hex` ? (a3 = this.faker.string.hexadecimal({ length: n3 ? 8 : 6, prefix: `` }), a3 = de(a3, { prefix: r5, casing: i3 }), a3) : (a3 = Array.from({ length: 3 }, () => this.faker.number.int(255)), n3 && (a3.push(this.faker.number.float({ multipleOf: 0.01 })), o3 = `rgba`), O2(a3, t4, o3));
   }
   cmyk(e4 = {}) {
     let { format: t4 = `decimal` } = e4;
     return O2(Array.from({ length: 4 }, () => this.faker.number.float({ multipleOf: 0.01 })), t4, `cmyk`);
   }
   hsl(e4 = {}) {
-    let { format: t4 = `decimal`, includeAlpha: n3 = false } = e4, r4 = [this.faker.number.int(360)];
-    for (let t5 = 0; t5 < (e4?.includeAlpha ? 3 : 2); t5++) r4.push(this.faker.number.float({ multipleOf: 0.01 }));
-    return O2(r4, t4, n3 ? `hsla` : `hsl`);
+    let { format: t4 = `decimal`, includeAlpha: n3 = false } = e4, r5 = [this.faker.number.int(360)];
+    for (let t5 = 0; t5 < (e4?.includeAlpha ? 3 : 2); t5++) r5.push(this.faker.number.float({ multipleOf: 0.01 }));
+    return O2(r5, t4, n3 ? `hsla` : `hsl`);
   }
   hwb(e4 = {}) {
     let { format: t4 = `decimal` } = e4, n3 = [this.faker.number.int(360)];
@@ -38002,8 +41520,8 @@ var pe = class extends S2 {
 };
 function me(t4) {
   if (!/^\d{11}$/.test(t4)) throw new e2(`calculateUPCCheckDigit expects exactly 11 numeric digits`);
-  let n3 = 0, r4 = 0;
-  for (let e4 of t4) n3 += Number.parseInt(e4, 10) * (r4 % 2 == 0 ? 3 : 1), r4++;
+  let n3 = 0, r5 = 0;
+  for (let e4 of t4) n3 += Number.parseInt(e4, 10) * (r5 % 2 == 0 ? 3 : 1), r5++;
   return (10 - n3 % 10) % 10;
 }
 var he = { 0: [[1999999, 2], [2279999, 3], [2289999, 4], [3689999, 3], [3699999, 4], [6389999, 3], [6397999, 4], [6399999, 7], [6449999, 3], [6459999, 7], [6479999, 3], [6489999, 7], [6549999, 3], [6559999, 4], [6999999, 3], [8499999, 4], [8999999, 5], [9499999, 6], [9999999, 7]], 1: [[99999, 3], [299999, 2], [349999, 3], [399999, 4], [499999, 3], [699999, 2], [999999, 4], [3979999, 3], [5499999, 4], [6499999, 5], [6799999, 4], [6859999, 5], [7139999, 4], [7169999, 3], [7319999, 4], [7399999, 7], [7749999, 5], [7753999, 7], [7763999, 5], [7764999, 7], [7769999, 5], [7782999, 7], [7899999, 5], [7999999, 4], [8004999, 5], [8049999, 5], [8379999, 5], [8384999, 7], [8671999, 5], [8675999, 4], [8697999, 5], [9159999, 6], [9165059, 7], [9168699, 6], [9169079, 7], [9195999, 6], [9196549, 7], [9729999, 6], [9877999, 4], [9911499, 6], [9911999, 7], [9989899, 6], [9999999, 7]] };
@@ -38016,13 +41534,13 @@ var ge = class extends S2 {
     return this.faker.helpers.fake(e4);
   }
   price(e4 = {}) {
-    let { dec: t4 = 2, max: n3 = 1e3, min: r4 = 1, symbol: i3 = `` } = e4;
-    if (r4 < 0 || n3 < 0) return `${i3}0`;
-    if (r4 === n3) return `${i3}${r4.toFixed(t4)}`;
-    let a3 = this.faker.number.float({ min: r4, max: n3, fractionDigits: t4 });
+    let { dec: t4 = 2, max: n3 = 1e3, min: r5 = 1, symbol: i3 = `` } = e4;
+    if (r5 < 0 || n3 < 0) return `${i3}0`;
+    if (r5 === n3) return `${i3}${r5.toFixed(t4)}`;
+    let a3 = this.faker.number.float({ min: r5, max: n3, fractionDigits: t4 });
     if (t4 === 0) return `${i3}${a3.toFixed(t4)}`;
     let o3 = a3 * 10 ** t4 % 10, s3 = this.faker.helpers.weightedArrayElement([{ weight: 5, value: 9 }, { weight: 3, value: 5 }, { weight: 1, value: 0 }, { weight: 1, value: this.faker.number.int({ min: 0, max: 9 }) }]), c3 = (1 / 10) ** t4, l3 = o3 * c3, u3 = s3 * c3, d3 = a3 - l3 + u3;
-    return r4 <= d3 && d3 <= n3 ? `${i3}${d3.toFixed(t4)}` : `${i3}${a3.toFixed(t4)}`;
+    return r5 <= d3 && d3 <= n3 ? `${i3}${d3.toFixed(t4)}` : `${i3}${a3.toFixed(t4)}`;
   }
   productAdjective() {
     return this.faker.helpers.arrayElement(this.faker.definitions.commerce.product_name.adjective);
@@ -38038,7 +41556,7 @@ var ge = class extends S2 {
   }
   isbn(t4 = {}) {
     typeof t4 == `number` && (t4 = { variant: t4 });
-    let { variant: n3 = 13, separator: r4 = `-` } = t4, [i3, a3] = this.faker.helpers.objectEntry(he), o3 = this.faker.string.numeric(8), s3 = Number.parseInt(o3.slice(0, -1)), c3 = a3.find(([e4]) => s3 <= e4)?.[1];
+    let { variant: n3 = 13, separator: r5 = `-` } = t4, [i3, a3] = this.faker.helpers.objectEntry(he), o3 = this.faker.string.numeric(8), s3 = Number.parseInt(o3.slice(0, -1)), c3 = a3.find(([e4]) => s3 <= e4)?.[1];
     if (!c3) throw new e2(`Unable to find a registrant length for the group ${i3}`);
     let l3 = [`978`, i3, o3.slice(0, c3), o3.slice(c3)];
     n3 === 10 && l3.shift();
@@ -38047,13 +41565,13 @@ var ge = class extends S2 {
       let t5 = n3 === 10 ? e4 + 1 : e4 % 2 ? 3 : 1;
       d3 += t5 * Number.parseInt(u3[e4]);
     }
-    return d3 = n3 === 10 ? d3 % 11 : (10 - d3 % 10) % 10, l3.push(d3 === 10 ? `X` : d3.toString()), l3.join(r4);
+    return d3 = n3 === 10 ? d3 % 11 : (10 - d3 % 10) % 10, l3.push(d3 === 10 ? `X` : d3.toString()), l3.join(r5);
   }
   upc(t4 = {}) {
     let { prefix: n3 = `` } = t4;
     if (n3 && /\D/.test(n3)) throw new e2(`Prefix must contain only numeric digits`);
     if (n3.length > 11) throw new e2(`Prefix must be at most 11 numeric digits`);
-    let r4 = 11 - n3.length, i3 = `${n3}${this.faker.string.numeric({ length: r4, allowLeadingZeros: true })}`;
+    let r5 = 11 - n3.length, i3 = `${n3}${this.faker.string.numeric({ length: r5, allowLeadingZeros: true })}`;
     return `${i3}${me(i3)}`;
   }
 };
@@ -38104,9 +41622,9 @@ var ve = class extends S2 {
   }
 };
 function k2(t4, n3 = `refDate`) {
-  let r4 = new Date(t4);
-  if (Number.isNaN(r4.valueOf())) throw new e2(`Invalid ${n3} date: ${t4.toString()}`);
-  return r4;
+  let r5 = new Date(t4);
+  if (Number.isNaN(r5.valueOf())) throw new e2(`Invalid ${n3} date: ${t4.toString()}`);
+  return r5;
 }
 var A2 = class extends x2 {
   anytime(e4 = {}) {
@@ -38114,61 +41632,61 @@ var A2 = class extends x2 {
     return this.between({ from: n3 - 1e3 * 60 * 60 * 24 * 365, to: n3 + 1e3 * 60 * 60 * 24 * 365 });
   }
   past(t4 = {}) {
-    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { years: r4 = 1 } = t4;
-    if (typeof r4 == `number` && (r4 = { min: 0, max: r4 }), r4.max <= 0) throw new e2(`Years must be greater than 0.`);
-    if (r4.min >= r4.max) throw new e2(`The maximum amount of years must be greater than the minimum amount of years.`);
+    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { years: r5 = 1 } = t4;
+    if (typeof r5 == `number` && (r5 = { min: 0, max: r5 }), r5.max <= 0) throw new e2(`Years must be greater than 0.`);
+    if (r5.min >= r5.max) throw new e2(`The maximum amount of years must be greater than the minimum amount of years.`);
     let i3 = k2(n3), a3 = new Date(i3);
-    a3.setUTCFullYear(a3.getUTCFullYear() - r4.max);
+    a3.setUTCFullYear(a3.getUTCFullYear() - r5.max);
     let o3 = new Date(i3);
-    return o3.setUTCFullYear(o3.getUTCFullYear() - r4.min), this.between({ from: a3, to: o3.getTime() - 1e3 });
+    return o3.setUTCFullYear(o3.getUTCFullYear() - r5.min), this.between({ from: a3, to: o3.getTime() - 1e3 });
   }
   future(t4 = {}) {
-    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { years: r4 = 1 } = t4;
-    if (typeof r4 == `number` && (r4 = { min: 0, max: r4 }), r4.max <= 0) throw new e2(`Years must be greater than 0.`);
-    if (r4.min >= r4.max) throw new e2(`The maximum amount of years must be greater than the minimum amount of years.`);
+    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { years: r5 = 1 } = t4;
+    if (typeof r5 == `number` && (r5 = { min: 0, max: r5 }), r5.max <= 0) throw new e2(`Years must be greater than 0.`);
+    if (r5.min >= r5.max) throw new e2(`The maximum amount of years must be greater than the minimum amount of years.`);
     let i3 = k2(n3), a3 = new Date(i3);
-    a3.setUTCFullYear(a3.getUTCFullYear() + r4.min);
+    a3.setUTCFullYear(a3.getUTCFullYear() + r5.min);
     let o3 = new Date(i3);
-    return o3.setUTCFullYear(o3.getUTCFullYear() + r4.max), this.between({ from: a3.getTime() + 1e3, to: o3 });
+    return o3.setUTCFullYear(o3.getUTCFullYear() + r5.max), this.between({ from: a3.getTime() + 1e3, to: o3 });
   }
   between(t4) {
-    let { from: n3, to: r4 } = t4, i3 = k2(n3, `from`).getTime(), a3 = k2(r4, `to`).getTime();
+    let { from: n3, to: r5 } = t4, i3 = k2(n3, `from`).getTime(), a3 = k2(r5, `to`).getTime();
     if (i3 > a3) throw new e2("`from` date must be before `to` date.");
     return new Date(this.faker.number.int({ min: i3, max: a3 }));
   }
   betweens(e4) {
-    let { from: t4, to: n3, count: r4 = 3 } = e4;
-    return this.faker.helpers.multiple(() => this.between({ from: t4, to: n3 }), { count: r4 }).toSorted((e5, t5) => e5.getTime() - t5.getTime());
+    let { from: t4, to: n3, count: r5 = 3 } = e4;
+    return this.faker.helpers.multiple(() => this.between({ from: t4, to: n3 }), { count: r5 }).toSorted((e5, t5) => e5.getTime() - t5.getTime());
   }
   recent(t4 = {}) {
-    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { days: r4 = 1 } = t4;
-    if (typeof r4 == `number` && (r4 = { min: 0, max: r4 }), r4.max <= 0) throw new e2(`Days must be greater than 0.`);
-    if (r4.min >= r4.max) throw new e2(`The maximum amount of days must be greater than the minimum amount of days.`);
+    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { days: r5 = 1 } = t4;
+    if (typeof r5 == `number` && (r5 = { min: 0, max: r5 }), r5.max <= 0) throw new e2(`Days must be greater than 0.`);
+    if (r5.min >= r5.max) throw new e2(`The maximum amount of days must be greater than the minimum amount of days.`);
     let i3 = k2(n3), a3 = new Date(i3);
-    a3.setUTCDate(a3.getUTCDate() - r4.max);
+    a3.setUTCDate(a3.getUTCDate() - r5.max);
     let o3 = new Date(i3);
-    return o3.setUTCDate(o3.getUTCDate() - r4.min), this.between({ from: a3, to: o3.getTime() - 1e3 });
+    return o3.setUTCDate(o3.getUTCDate() - r5.min), this.between({ from: a3, to: o3.getTime() - 1e3 });
   }
   soon(t4 = {}) {
-    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { days: r4 = 1 } = t4;
-    if (typeof r4 == `number` && (r4 = { min: 0, max: r4 }), r4.max <= 0) throw new e2(`Days must be greater than 0.`);
-    if (r4.min >= r4.max) throw new e2(`The maximum amount of days must be greater than the minimum amount of days.`);
+    let { refDate: n3 = this.faker.defaultRefDate() } = t4, { days: r5 = 1 } = t4;
+    if (typeof r5 == `number` && (r5 = { min: 0, max: r5 }), r5.max <= 0) throw new e2(`Days must be greater than 0.`);
+    if (r5.min >= r5.max) throw new e2(`The maximum amount of days must be greater than the minimum amount of days.`);
     let i3 = k2(n3), a3 = new Date(i3);
-    a3.setUTCDate(a3.getUTCDate() + r4.min);
+    a3.setUTCDate(a3.getUTCDate() + r5.min);
     let o3 = new Date(i3);
-    return o3.setUTCDate(o3.getUTCDate() + r4.max), this.between({ from: a3.getTime() + 1e3, to: o3 });
+    return o3.setUTCDate(o3.getUTCDate() + r5.max), this.between({ from: a3.getTime() + 1e3, to: o3 });
   }
   birthdate(t4 = {}) {
-    let { mode: n3 = `age`, min: r4 = 18, max: i3 = 80, refDate: a3 = this.faker.defaultRefDate() } = t4, o3 = k2(a3), s3 = o3.getUTCFullYear();
+    let { mode: n3 = `age`, min: r5 = 18, max: i3 = 80, refDate: a3 = this.faker.defaultRefDate() } = t4, o3 = k2(a3), s3 = o3.getUTCFullYear();
     switch (n3) {
       case `age`: {
-        let t5 = new Date(o3).setUTCFullYear(s3 - i3 - 1) + 1440 * 60 * 1e3, n4 = new Date(o3).setUTCFullYear(s3 - r4);
-        if (t5 > n4) throw new e2(`Max age ${i3} should be greater than or equal to min age ${r4}.`);
+        let t5 = new Date(o3).setUTCFullYear(s3 - i3 - 1) + 1440 * 60 * 1e3, n4 = new Date(o3).setUTCFullYear(s3 - r5);
+        if (t5 > n4) throw new e2(`Max age ${i3} should be greater than or equal to min age ${r5}.`);
         return this.between({ from: t5, to: n4 });
       }
       case `year`: {
-        let t5 = new Date(Date.UTC(0, 0, 2)).setUTCFullYear(r4), n4 = new Date(Date.UTC(0, 11, 30)).setUTCFullYear(i3);
-        if (t5 > n4) throw new e2(`Max year ${i3} should be greater than or equal to min year ${r4}.`);
+        let t5 = new Date(Date.UTC(0, 0, 2)).setUTCFullYear(r5), n4 = new Date(Date.UTC(0, 11, 30)).setUTCFullYear(i3);
+        if (t5 > n4) throw new e2(`Max year ${i3} should be greater than or equal to min year ${r5}.`);
         return this.between({ from: t5, to: n4 });
       }
     }
@@ -38180,15 +41698,15 @@ var ye = class extends A2 {
     super(e4), this.faker = e4;
   }
   month(e4 = {}) {
-    let { abbreviated: t4 = false, context: n3 = false } = e4, r4 = this.faker.definitions.date.month, i3;
-    i3 = t4 ? n3 && r4.abbr_context != null ? `abbr_context` : `abbr` : n3 && r4.wide_context != null ? `wide_context` : `wide`;
-    let o3 = r4[i3];
+    let { abbreviated: t4 = false, context: n3 = false } = e4, r5 = this.faker.definitions.date.month, i3;
+    i3 = t4 ? n3 && r5.abbr_context != null ? `abbr_context` : `abbr` : n3 && r5.wide_context != null ? `wide_context` : `wide`;
+    let o3 = r5[i3];
     return a2(o3, `date.month`, i3), this.faker.helpers.arrayElement(o3);
   }
   weekday(e4 = {}) {
-    let { abbreviated: t4 = false, context: n3 = false } = e4, r4 = this.faker.definitions.date.weekday, i3;
-    i3 = t4 ? n3 && r4.abbr_context != null ? `abbr_context` : `abbr` : n3 && r4.wide_context != null ? `wide_context` : `wide`;
-    let o3 = r4[i3];
+    let { abbreviated: t4 = false, context: n3 = false } = e4, r5 = this.faker.definitions.date.weekday, i3;
+    i3 = t4 ? n3 && r5.abbr_context != null ? `abbr_context` : `abbr` : n3 && r5.wide_context != null ? `wide_context` : `wide`;
+    let o3 = r5[i3];
     return a2(o3, `date.weekday`, i3), this.faker.helpers.arrayElement(o3);
   }
   timeZone() {
@@ -38227,7 +41745,7 @@ var Ce = class extends S2 {
     return `${e4}${Math.ceil(t4 / 10) * 10 - t4}`;
   }
   amount(e4 = {}) {
-    let { autoFormat: t4 = false, dec: n3 = 2, max: r4 = 1e3, min: i3 = 0, symbol: a3 = `` } = e4, o3 = this.faker.number.float({ max: r4, min: i3, fractionDigits: n3 });
+    let { autoFormat: t4 = false, dec: n3 = 2, max: r5 = 1e3, min: i3 = 0, symbol: a3 = `` } = e4, o3 = this.faker.number.float({ max: r5, min: i3, fractionDigits: n3 });
     return a3 + (t4 ? o3.toLocaleString(void 0, { minimumFractionDigits: n3 }) : o3.toFixed(n3));
   }
   transactionType() {
@@ -38253,8 +41771,8 @@ var Ce = class extends S2 {
     return this.currency().numericCode;
   }
   bitcoinAddress(e4 = {}) {
-    let { type: t4 = this.faker.helpers.enumValue(j2), network: n3 = `mainnet` } = e4, r4 = xe[t4], i3 = r4.prefix[n3], a3 = this.faker.number.int(r4.length);
-    return i3 + this.faker.string.alphanumeric({ length: a3 - i3.length, casing: r4.casing, exclude: r4.exclude });
+    let { type: t4 = this.faker.helpers.enumValue(j2), network: n3 = `mainnet` } = e4, r5 = xe[t4], i3 = r5.prefix[n3], a3 = this.faker.number.int(r5.length);
+    return i3 + this.faker.string.alphanumeric({ length: a3 - i3.length, casing: r5.casing, exclude: r5.exclude });
   }
   litecoinAddress() {
     let e4 = this.faker.number.int({ min: 26, max: 33 });
@@ -38262,11 +41780,11 @@ var Ce = class extends S2 {
   }
   creditCardNumber(e4 = {}) {
     typeof e4 == `string` && (e4 = { issuer: e4 });
-    let { issuer: t4 = `` } = e4, n3, r4 = this.faker.definitions.finance.credit_card, i3 = t4.toLowerCase();
-    if (i3 in r4) n3 = this.faker.helpers.arrayElement(r4[i3]);
+    let { issuer: t4 = `` } = e4, n3, r5 = this.faker.definitions.finance.credit_card, i3 = t4.toLowerCase();
+    if (i3 in r5) n3 = this.faker.helpers.arrayElement(r5[i3]);
     else if (t4.includes(`#`)) n3 = t4;
     else {
-      let e5 = this.faker.helpers.objectValue(r4);
+      let e5 = this.faker.helpers.objectValue(r5);
       n3 = this.faker.helpers.arrayElement(e5);
     }
     return n3 = n3.replaceAll(`/`, ``), this.faker.helpers.replaceCreditCardSymbols(n3);
@@ -38287,7 +41805,7 @@ var Ce = class extends S2 {
     return this.faker.string.hexadecimal({ length: 40, casing: `lower` });
   }
   iban(t4 = {}) {
-    let { countryCode: n3, formatted: r4 = false } = t4, i3 = n3 ? M2.formats.find((e4) => e4.country === n3) : this.faker.helpers.arrayElement(M2.formats);
+    let { countryCode: n3, formatted: r5 = false } = t4, i3 = n3 ? M2.formats.find((e4) => e4.country === n3) : this.faker.helpers.arrayElement(M2.formats);
     if (!i3) throw new e2(`Country code ${n3} not supported.`);
     let a3 = ``, o3 = 0;
     for (let e4 of i3.bban) {
@@ -38298,7 +41816,7 @@ var Ce = class extends S2 {
     let s3 = 98 - M2.mod97(M2.toDigitString(`${a3}${i3.country}00`));
     s3 < 10 && (s3 = `0${s3}`);
     let c3 = `${i3.country}${s3}${a3}`;
-    return r4 ? Se(c3) : c3;
+    return r5 ? Se(c3) : c3;
   }
   bic(e4 = {}) {
     let { includeBranchCode: t4 = this.faker.datatype.boolean() } = e4;
@@ -38345,10 +41863,10 @@ var Te = class extends S2 {
     return `${this.faker.hacker.noun().replace(` `, `-`)}-${this.faker.hacker.verb().replace(` `, `-`)}`;
   }
   commitEntry(e4 = {}) {
-    let { merge: t4 = this.faker.datatype.boolean({ probability: 0.2 }), eol: n3 = `CRLF`, refDate: r4 } = e4, i3 = [`commit ${this.faker.git.commitSha()}`];
+    let { merge: t4 = this.faker.datatype.boolean({ probability: 0.2 }), eol: n3 = `CRLF`, refDate: r5 } = e4, i3 = [`commit ${this.faker.git.commitSha()}`];
     t4 && i3.push(`Merge: ${this.commitSha({ length: 7 })} ${this.commitSha({ length: 7 })}`);
     let a3 = this.faker.person.firstName(), o3 = this.faker.person.lastName(), s3 = this.faker.person.fullName({ firstName: a3, lastName: o3 }), c3 = this.faker.internet.username({ firstName: a3, lastName: o3 }), l3 = this.faker.helpers.arrayElement([s3, c3]), u3 = this.faker.internet.email({ firstName: a3, lastName: o3 });
-    l3 = l3.replaceAll(/^[.,:;"\\']|[<>\n]|[.,:;"\\']$/g, ``), i3.push(`Author: ${l3} <${u3}>`, `Date: ${this.commitDate({ refDate: r4 })}`, ``, `${`\xA0`.repeat(4)}${this.commitMessage()}`, ``);
+    l3 = l3.replaceAll(/^[.,:;"\\']|[<>\n]|[.,:;"\\']$/g, ``), i3.push(`Author: ${l3} <${u3}>`, `Date: ${this.commitDate({ refDate: r5 })}`, ``, `${`\xA0`.repeat(4)}${this.commitMessage()}`, ``);
     let d3 = n3 === `CRLF` ? `\r
 ` : `
 `;
@@ -38358,7 +41876,7 @@ var Te = class extends S2 {
     return `${this.faker.hacker.verb()} ${this.faker.hacker.adjective()} ${this.faker.hacker.noun()}`;
   }
   commitDate(e4 = {}) {
-    let { refDate: t4 = this.faker.defaultRefDate() } = e4, n3 = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`], r4 = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`], i3 = this.faker.date.recent({ days: 1, refDate: t4 }), a3 = n3[i3.getUTCDay()], o3 = r4[i3.getUTCMonth()], s3 = i3.getUTCDate(), c3 = i3.getUTCHours().toString().padStart(2, `0`), l3 = i3.getUTCMinutes().toString().padStart(2, `0`), u3 = i3.getUTCSeconds().toString().padStart(2, `0`), d3 = i3.getUTCFullYear(), f3 = this.faker.number.int({ min: -11, max: 12 }), p3 = Math.abs(f3).toString().padStart(2, `0`);
+    let { refDate: t4 = this.faker.defaultRefDate() } = e4, n3 = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`], r5 = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`], i3 = this.faker.date.recent({ days: 1, refDate: t4 }), a3 = n3[i3.getUTCDay()], o3 = r5[i3.getUTCMonth()], s3 = i3.getUTCDate(), c3 = i3.getUTCHours().toString().padStart(2, `0`), l3 = i3.getUTCMinutes().toString().padStart(2, `0`), u3 = i3.getUTCSeconds().toString().padStart(2, `0`), d3 = i3.getUTCFullYear(), f3 = this.faker.number.int({ min: -11, max: 12 }), p3 = Math.abs(f3).toString().padStart(2, `0`);
     return `${a3} ${o3} ${s3} ${c3}:${l3}:${u3} ${d3} ${f3 >= 0 ? `+` : `-`}${p3}00`;
   }
   commitSha(e4 = {}) {
@@ -38387,10 +41905,10 @@ var Ee = class extends S2 {
   }
 };
 var De = /\.|\(/;
-function Oe(t4, n3, r4 = [n3, n3.definitions.raw]) {
+function Oe(t4, n3, r5 = [n3, n3.definitions.raw]) {
   if (t4.length === 0) throw new e2(`Eval expression cannot be empty.`);
-  if (r4.length === 0) throw new e2(`Eval entrypoints cannot be empty.`);
-  let i3 = r4, a3 = t4;
+  if (r5.length === 0) throw new e2(`Eval entrypoints cannot be empty.`);
+  let i3 = r5, a3 = t4;
   do {
     let e4;
     a3.startsWith(`(`) ? [e4, i3] = ke(a3, i3) : [e4, i3] = je(a3, i3), a3 = a3.substring(e4), i3 = i3.filter((e5) => e5 != null).map((e5) => Array.isArray(e5) ? n3.helpers.arrayElement(e5) : e5);
@@ -38400,7 +41918,7 @@ function Oe(t4, n3, r4 = [n3, n3.definitions.raw]) {
   return typeof o3 == `function` ? o3() : o3;
 }
 function ke(t4, n3) {
-  let [r4, i3] = Ae(t4), a3 = t4[r4 + 1];
+  let [r5, i3] = Ae(t4), a3 = t4[r5 + 1];
   switch (a3) {
     case `.`:
     case `(`:
@@ -38409,7 +41927,7 @@ function ke(t4, n3) {
     default:
       throw new e2(`Expected dot ('.'), open parenthesis ('('), or nothing after function call but got '${a3}'`);
   }
-  return [r4 + (a3 === `.` ? 2 : 1), n3.map((e4) => typeof e4 == `function` ? e4(...i3) : void 0)];
+  return [r5 + (a3 === `.` ? 2 : 1), n3.map((e4) => typeof e4 == `function` ? e4(...i3) : void 0)];
 }
 function Ae(t4) {
   let n3 = t4.indexOf(`)`, 1);
@@ -38427,11 +41945,11 @@ function Ae(t4) {
     n3 = t4.indexOf(`)`, n3 + 1);
   }
   n3 = t4.lastIndexOf(`)`);
-  let r4 = t4.substring(1, n3);
-  return [n3, [r4]];
+  let r5 = t4.substring(1, n3);
+  return [n3, [r5]];
 }
 function je(t4, n3) {
-  let r4 = De.exec(t4), i3 = (r4?.[0] ?? ``) === `.`, a3 = r4?.index ?? t4.length, o3 = t4.substring(0, a3);
+  let r5 = De.exec(t4), i3 = (r5?.[0] ?? ``) === `.`, a3 = r5?.index ?? t4.length, o3 = t4.substring(0, a3);
   if (o3.length === 0) throw new e2(`Expression parts cannot be empty in '${t4}'`);
   let s3 = t4[a3 + 1];
   if (i3 && (s3 == null || s3 === `.` || s3 === `(`)) throw new e2(`Found dot without property name in '${t4}'`);
@@ -38459,13 +41977,13 @@ function Me(e4) {
 function Ne(e4) {
   e4 = e4.replaceAll(/[\s-]/g, ``);
   let t4 = 0, n3 = false;
-  for (let r4 = e4.length - 1; r4 >= 0; r4--) {
-    let i3 = Number.parseInt(e4[r4]);
+  for (let r5 = e4.length - 1; r5 >= 0; r5--) {
+    let i3 = Number.parseInt(e4[r5]);
     n3 && (i3 *= 2, i3 > 9 && (i3 = i3 % 10 + 1)), t4 += i3, n3 = !n3;
   }
   return t4 % 10;
 }
-function F2(t4, n3, r4, i3) {
+function F2(t4, n3, r5, i3) {
   let a3 = 1;
   if (n3) switch (n3) {
     case `?`:
@@ -38486,49 +42004,49 @@ function F2(t4, n3, r4, i3) {
     default:
       throw new e2(`Unknown quantifier symbol provided.`);
   }
-  else r4 != null && i3 != null ? a3 = t4.number.int({ min: Number.parseInt(r4), max: Number.parseInt(i3) }) : r4 != null && i3 == null && (a3 = Number.parseInt(r4));
+  else r5 != null && i3 != null ? a3 = t4.number.int({ min: Number.parseInt(r5), max: Number.parseInt(i3) }) : r5 != null && i3 == null && (a3 = Number.parseInt(r5));
   return a3;
 }
 function Pe(e4, t4 = ``) {
-  let n3 = /(.)\{(\d+),(\d+)\}/, r4 = /(.)\{(\d+)\}/, i3 = /\[(\d+)-(\d+)\]/, a3, o3, s3, c3, l3 = n3.exec(t4);
+  let n3 = /(.)\{(\d+),(\d+)\}/, r5 = /(.)\{(\d+)\}/, i3 = /\[(\d+)-(\d+)\]/, a3, o3, s3, c3, l3 = n3.exec(t4);
   for (; l3 != null; ) a3 = Number.parseInt(l3[2]), o3 = Number.parseInt(l3[3]), a3 > o3 && (s3 = o3, o3 = a3, a3 = s3), c3 = e4.number.int({ min: a3, max: o3 }), t4 = t4.slice(0, l3.index) + l3[1].repeat(c3) + t4.slice(l3.index + l3[0].length), l3 = n3.exec(t4);
-  for (l3 = r4.exec(t4); l3 != null; ) c3 = Number.parseInt(l3[2]), t4 = t4.slice(0, l3.index) + l3[1].repeat(c3) + t4.slice(l3.index + l3[0].length), l3 = r4.exec(t4);
+  for (l3 = r5.exec(t4); l3 != null; ) c3 = Number.parseInt(l3[2]), t4 = t4.slice(0, l3.index) + l3[1].repeat(c3) + t4.slice(l3.index + l3[0].length), l3 = r5.exec(t4);
   for (l3 = i3.exec(t4); l3 != null; ) a3 = Number.parseInt(l3[1]), o3 = Number.parseInt(l3[2]), a3 > o3 && (s3 = o3, o3 = a3, a3 = s3), t4 = t4.slice(0, l3.index) + e4.number.int({ min: a3, max: o3 }).toString() + t4.slice(l3.index + l3[0].length), l3 = i3.exec(t4);
   return t4;
 }
 function Fe(e4, t4, n3) {
-  let r4 = ``, i3 = false;
+  let r5 = ``, i3 = false;
   for (let a3 = 0; a3 < t4.length; a3++) {
     let o3 = t4[a3];
     if (o3 === `\\`) {
-      r4 += o3, a3 + 1 < t4.length && (r4 += t4[++a3]);
+      r5 += o3, a3 + 1 < t4.length && (r5 += t4[++a3]);
       continue;
     }
     if (o3 === `[`) {
-      i3 = true, r4 += o3;
+      i3 = true, r5 += o3;
       continue;
     }
     if (o3 === `]`) {
-      i3 = false, r4 += o3;
+      i3 = false, r5 += o3;
       continue;
     }
     let s3 = t4[a3 + 1], c3 = [`?`, `*`, `+`, `{`].includes(s3);
     if (!i3 && !c3 && o3 === `.`) {
-      r4 += e4.string.alphanumeric();
+      r5 += e4.string.alphanumeric();
       continue;
     }
     if (!i3 && !c3 && n3 && /^[a-z]$/i.test(o3)) {
-      r4 += e4.string.fromCharacters([o3.toLowerCase(), o3.toUpperCase()]);
+      r5 += e4.string.fromCharacters([o3.toLowerCase(), o3.toUpperCase()]);
       continue;
     }
-    r4 += o3;
+    r5 += o3;
   }
-  return r4;
+  return r5;
 }
 function I2(e4, t4 = ``, n3 = `#`) {
-  let r4 = ``;
-  for (let i3 = 0; i3 < t4.length; i3++) t4.charAt(i3) === n3 ? r4 += e4.number.int(9) : t4.charAt(i3) === `!` ? r4 += e4.number.int({ min: 2, max: 9 }) : r4 += t4.charAt(i3);
-  return r4;
+  let r5 = ``;
+  for (let i3 = 0; i3 < t4.length; i3++) t4.charAt(i3) === n3 ? r5 += e4.number.int(9) : t4.charAt(i3) === `!` ? r5 += e4.number.int({ min: 2, max: 9 }) : r5 += t4.charAt(i3);
+  return r5;
 }
 var L2 = class extends x2 {
   slugify(e4 = ``) {
@@ -38536,7 +42054,7 @@ var L2 = class extends x2 {
   }
   replaceSymbols(e4 = ``) {
     let t4 = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`.split(``), n3 = ``;
-    for (let r4 = 0; r4 < e4.length; r4++) e4.charAt(r4) === `#` ? n3 += this.faker.number.int(9) : e4.charAt(r4) === `?` ? n3 += this.arrayElement(t4) : e4.charAt(r4) === `*` ? n3 += this.faker.datatype.boolean() ? this.arrayElement(t4) : this.faker.number.int(9) : n3 += e4.charAt(r4);
+    for (let r5 = 0; r5 < e4.length; r5++) e4.charAt(r5) === `#` ? n3 += this.faker.number.int(9) : e4.charAt(r5) === `?` ? n3 += this.arrayElement(t4) : e4.charAt(r5) === `*` ? n3 += this.faker.datatype.boolean() ? this.arrayElement(t4) : this.faker.number.int(9) : n3 += e4.charAt(r5);
     return n3;
   }
   replaceCreditCardSymbols(e4 = `6453-####-####-####-###L`, t4 = `#`) {
@@ -38549,10 +42067,10 @@ var L2 = class extends x2 {
     if (t4 instanceof RegExp && (n3 = t4.flags.includes(`i`), t4 = t4.source.replace(/^\^+/, ``).replace(/\$+$/, ``)), t4 === `.`) return this.faker.string.alphanumeric();
     if (n3 && /^[a-z]$/i.test(t4)) return this.faker.string.fromCharacters([t4.toLowerCase(), t4.toUpperCase()]);
     t4 = Fe(this.faker, t4, n3);
-    let r4, i3, a3, o3 = /([.A-Za-z0-9])(?:\{(\d+)(?:,(\d+)|)\}|(\?|\*|\+))(?![^[]*]|[^{]*})/, s3 = o3.exec(t4);
+    let r5, i3, a3, o3 = /([.A-Za-z0-9])(?:\{(\d+)(?:,(\d+)|)\}|(\?|\*|\+))(?![^[]*]|[^{]*})/, s3 = o3.exec(t4);
     for (; s3 != null; ) {
-      let e4 = s3[2], r5 = s3[3], i4 = s3[4];
-      a3 = F2(this.faker, i4, e4, r5);
+      let e4 = s3[2], r6 = s3[3], i4 = s3[4];
+      a3 = F2(this.faker, i4, e4, r6);
       let c4;
       c4 = s3[1] === `.` ? this.faker.string.alphanumeric(a3) : n3 ? this.faker.string.fromCharacters([s3[1].toLowerCase(), s3[1].toUpperCase()], a3) : s3[1].repeat(a3), t4 = t4.slice(0, s3.index) + c4 + t4.slice(s3.index + s3[0].length), s3 = o3.exec(t4);
     }
@@ -38562,8 +42080,8 @@ var L2 = class extends x2 {
       for (u4 && m3.push(45); g3 != null; ) {
         if (g3[0].includes(`-`)) {
           let t5 = g3[0].split(`-`).map((e4) => e4.codePointAt(0) ?? NaN);
-          if (r4 = t5[0], i3 = t5[1], r4 > i3) throw new e2(`Character range provided is out of order.`);
-          for (let e4 = r4; e4 <= i3; e4++) if (n3 && Number.isNaN(Number(String.fromCodePoint(e4)))) {
+          if (r5 = t5[0], i3 = t5[1], r5 > i3) throw new e2(`Character range provided is out of order.`);
+          for (let e4 = r5; e4 <= i3; e4++) if (n3 && Number.isNaN(Number(String.fromCodePoint(e4)))) {
             let t6 = String.fromCodePoint(e4);
             m3.push(t6.toUpperCase().codePointAt(0) ?? NaN, t6.toLowerCase().codePointAt(0) ?? NaN);
           } else m3.push(e4);
@@ -38599,8 +42117,8 @@ var L2 = class extends x2 {
     }
     let u3 = /(.)\{(\d+),(\d+)\}/;
     for (s3 = u3.exec(t4); s3 != null; ) {
-      if (r4 = Number.parseInt(s3[2]), i3 = Number.parseInt(s3[3]), r4 > i3) throw new e2(`Numbers out of order in {} quantifier.`);
-      a3 = this.faker.number.int({ min: r4, max: i3 }), t4 = t4.slice(0, s3.index) + s3[1].repeat(a3) + t4.slice(s3.index + s3[0].length), s3 = u3.exec(t4);
+      if (r5 = Number.parseInt(s3[2]), i3 = Number.parseInt(s3[3]), r5 > i3) throw new e2(`Numbers out of order in {} quantifier.`);
+      a3 = this.faker.number.int({ min: r5, max: i3 }), t4 = t4.slice(0, s3.index) + s3[1].repeat(a3) + t4.slice(s3.index + s3[0].length), s3 = u3.exec(t4);
     }
     let d3 = /(.)\{(\d+)\}/;
     for (s3 = d3.exec(t4); s3 != null; ) a3 = Number.parseInt(s3[2]), t4 = t4.slice(0, s3.index) + s3[1].repeat(a3) + t4.slice(s3.index + s3[0].length), s3 = d3.exec(t4);
@@ -38623,8 +42141,8 @@ var L2 = class extends x2 {
     let n3 = /* @__PURE__ */ new Set();
     try {
       if (typeof e4 == `function`) {
-        let r4 = 1e3 * t4, i3 = 0;
-        for (; n3.size < t4 && i3 < r4; ) n3.add(e4()), i3++;
+        let r5 = 1e3 * t4, i3 = 0;
+        for (; n3.size < t4 && i3 < r5; ) n3.add(e4()), i3++;
       }
     } catch {
     }
@@ -38633,8 +42151,8 @@ var L2 = class extends x2 {
   mustache(e4, t4) {
     if (e4 == null) return ``;
     for (let n3 in t4) {
-      let r4 = RegExp(`{{${n3}}}`, `g`), i3 = t4[n3];
-      typeof i3 == `string` && (i3 = i3.replaceAll(`$`, `$$$$`)), e4 = e4.replace(r4, i3);
+      let r5 = RegExp(`{{${n3}}}`, `g`), i3 = t4[n3];
+      typeof i3 == `string` && (i3 = i3.replaceAll(`$`, `$$$$`)), e4 = e4.replace(r5, i3);
     }
     return e4;
   }
@@ -38659,8 +42177,8 @@ var L2 = class extends x2 {
   weightedArrayElement(t4) {
     if (t4.length === 0) throw new e2(`weightedArrayElement expects an array with at least one element`);
     if (!t4.every((e4) => e4.weight > 0)) throw new e2(`weightedArrayElement expects an array of { weight, value } objects where weight is a positive number`);
-    let n3 = t4.reduce((e4, { weight: t5 }) => e4 + t5, 0), r4 = this.faker.number.float({ min: 0, max: n3 }), i3 = 0;
-    for (let { weight: e4, value: n4 } of t4) if (i3 += e4, r4 < i3) return n4;
+    let n3 = t4.reduce((e4, { weight: t5 }) => e4 + t5, 0), r5 = this.faker.number.float({ min: 0, max: n3 }), i3 = 0;
+    for (let { weight: e4, value: n4 } of t4) if (i3 += e4, r5 < i3) return n4;
     return t4.at(-1).value;
   }
   arrayElements(e4, t4) {
@@ -38668,9 +42186,9 @@ var L2 = class extends x2 {
     let n3 = this.rangeToNumber(t4 ?? { min: 1, max: e4.length });
     if (n3 >= e4.length) return this.shuffle(e4);
     if (n3 <= 0) return [];
-    let r4 = [...e4], i3 = e4.length, a3 = i3 - n3, o3, s3;
-    for (; i3-- > a3; ) s3 = this.faker.number.int(i3), o3 = r4[s3], r4[s3] = r4[i3], r4[i3] = o3;
-    return r4.slice(a3);
+    let r5 = [...e4], i3 = e4.length, a3 = i3 - n3, o3, s3;
+    for (; i3-- > a3; ) s3 = this.faker.number.int(i3), o3 = r5[s3], r5[s3] = r5[i3], r5[i3] = o3;
+    return r5.slice(a3);
   }
   enumValue(e4) {
     let t4 = Object.keys(e4).filter((e5) => Number.isNaN(Number(e5)));
@@ -38693,7 +42211,7 @@ var Ie = class extends L2 {
     e4 = typeof e4 == `string` ? e4 : this.arrayElement(e4);
     let t4 = e4.search(/{{[a-z]/), n3 = e4.indexOf(`}}`, t4);
     if (t4 === -1 || n3 === -1) return e4;
-    let r4 = Oe(e4.substring(t4 + 2, n3 + 2).replace(`}}`, ``).replace(`{{`, ``), this.faker), i3 = String(r4), a3 = e4.substring(0, t4) + i3 + e4.substring(n3 + 2);
+    let r5 = Oe(e4.substring(t4 + 2, n3 + 2).replace(`}}`, ``).replace(`{{`, ``), this.faker), i3 = String(r5), a3 = e4.substring(0, t4) + i3 + e4.substring(n3 + 2);
     return this.fake(a3);
   }
 };
@@ -38710,8 +42228,8 @@ function B2(e4) {
   }
 }
 function Le(e4) {
-  let { deprecated: t4, since: n3, until: r4, proposed: i3 } = e4, a3 = `[@faker-js/faker]: ${t4} is deprecated`;
-  n3 && (a3 += ` since v${n3}`), r4 && (a3 += ` and will be removed in v${r4}`), i3 && (a3 += `. Please use ${i3} instead`), console.warn(`${a3}.`);
+  let { deprecated: t4, since: n3, until: r5, proposed: i3 } = e4, a3 = `[@faker-js/faker]: ${t4} is deprecated`;
+  n3 && (a3 += ` since v${n3}`), r5 && (a3 += ` and will be removed in v${r5}`), i3 && (a3 += `. Please use ${i3} instead`), console.warn(`${a3}.`);
 }
 var Re = class extends S2 {
   avatar() {
@@ -38730,15 +42248,15 @@ var Re = class extends S2 {
   }
   urlLoremFlickr(e4 = {}) {
     Le({ deprecated: `faker.image.urlLoremFlickr()`, proposed: `faker.image.url()`, since: `10.1.0`, until: `11.0.0` });
-    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), category: r4 } = e4;
-    return `https://loremflickr.com/${t4}/${n3}${r4 == null ? `` : `/${r4}`}?lock=${this.faker.number.int()}`;
+    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), category: r5 } = e4;
+    return `https://loremflickr.com/${t4}/${n3}${r5 == null ? `` : `/${r5}`}?lock=${this.faker.number.int()}`;
   }
   urlPicsumPhotos(e4 = {}) {
-    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), grayscale: r4 = this.faker.datatype.boolean(), blur: i3 = this.faker.number.int({ max: 10 }) } = e4, a3 = `https://picsum.photos/seed/${this.faker.string.alphanumeric({ length: { min: 5, max: 10 } })}/${t4}/${n3}`, o3 = typeof i3 == `number` && i3 >= 1 && i3 <= 10;
-    return (r4 || o3) && (a3 += `?`, r4 && (a3 += `grayscale`), r4 && o3 && (a3 += `&`), o3 && (a3 += `blur=${i3}`)), a3;
+    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), grayscale: r5 = this.faker.datatype.boolean(), blur: i3 = this.faker.number.int({ max: 10 }) } = e4, a3 = `https://picsum.photos/seed/${this.faker.string.alphanumeric({ length: { min: 5, max: 10 } })}/${t4}/${n3}`, o3 = typeof i3 == `number` && i3 >= 1 && i3 <= 10;
+    return (r5 || o3) && (a3 += `?`, r5 && (a3 += `grayscale`), r5 && o3 && (a3 += `&`), o3 && (a3 += `blur=${i3}`)), a3;
   }
   dataUri(e4 = {}) {
-    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), color: r4 = this.faker.color.rgb(), type: i3 = this.faker.helpers.arrayElement([`svg-uri`, `svg-base64`]) } = e4, a3 = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" width="${t4}" height="${n3}"><rect width="100%" height="100%" fill="${r4}"/><text x="${t4 / 2}" y="${n3 / 2}" font-size="20" alignment-baseline="middle" text-anchor="middle" fill="white">${t4}x${n3}</text></svg>`;
+    let { width: t4 = this.faker.number.int({ min: 1, max: 3999 }), height: n3 = this.faker.number.int({ min: 1, max: 3999 }), color: r5 = this.faker.color.rgb(), type: i3 = this.faker.helpers.arrayElement([`svg-uri`, `svg-base64`]) } = e4, a3 = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" width="${t4}" height="${n3}"><rect width="100%" height="100%" fill="${r5}"/><text x="${t4 / 2}" y="${n3 / 2}" font-size="20" alignment-baseline="middle" text-anchor="middle" fill="white">${t4}x${n3}</text></svg>`;
     return i3 === `svg-uri` ? `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(a3)}` : `data:image/svg+xml;base64,${R2(a3)}`;
   }
 };
@@ -38759,25 +42277,25 @@ function H2(e4) {
 function U2(e4, t4) {
   let n3 = e4.helpers.slugify(t4);
   if (H2(n3)) return n3;
-  let r4 = e4.helpers.slugify(e4.lorem.word());
-  return H2(r4) ? r4 : e4.string.alpha({ casing: `lower`, length: e4.number.int({ min: 4, max: 8 }) });
+  let r5 = e4.helpers.slugify(e4.lorem.word());
+  return H2(r5) ? r5 : e4.string.alpha({ casing: `lower`, length: e4.number.int({ min: 4, max: 8 }) });
 }
 var qe = class extends S2 {
   email(e4 = {}) {
-    let { firstName: t4, lastName: n3, provider: r4 = this.faker.helpers.arrayElement(this.faker.definitions.internet.free_email), allowSpecialCharacters: i3 = false } = e4, a3 = this.username({ firstName: t4, lastName: n3 });
+    let { firstName: t4, lastName: n3, provider: r5 = this.faker.helpers.arrayElement(this.faker.definitions.internet.free_email), allowSpecialCharacters: i3 = false } = e4, a3 = this.username({ firstName: t4, lastName: n3 });
     if (a3 = a3.replaceAll(/[^A-Za-z0-9._+-]+/g, ``), a3 = a3.substring(0, 50), i3) {
       let e5 = [...`._-`], t5 = [...".!#$%&'*+-/=?^_`{|}~"];
       a3 = a3.replace(this.faker.helpers.arrayElement(e5), this.faker.helpers.arrayElement(t5));
     }
-    return a3 = a3.replaceAll(/\.{2,}/g, `.`), a3 = a3.replace(/^\./, ``), a3 = a3.replace(/\.$/, ``), `${a3}@${r4}`;
+    return a3 = a3.replaceAll(/\.{2,}/g, `.`), a3 = a3.replace(/^\./, ``), a3 = a3.replace(/\.$/, ``), `${a3}@${r5}`;
   }
   exampleEmail(e4 = {}) {
-    let { firstName: t4, lastName: n3, allowSpecialCharacters: r4 = false } = e4, i3 = this.faker.helpers.arrayElement(this.faker.definitions.internet.example_email);
-    return this.email({ firstName: t4, lastName: n3, provider: i3, allowSpecialCharacters: r4 });
+    let { firstName: t4, lastName: n3, allowSpecialCharacters: r5 = false } = e4, i3 = this.faker.helpers.arrayElement(this.faker.definitions.internet.example_email);
+    return this.email({ firstName: t4, lastName: n3, provider: i3, allowSpecialCharacters: r5 });
   }
   username(e4 = {}) {
-    let { firstName: t4 = this.faker.person.firstName(), lastName: n3 = this.faker.person.lastName(), lastName: r4 } = e4, i3 = this.faker.helpers.arrayElement([`.`, `_`]), a3 = this.faker.number.int(99), o3 = [() => `${t4}${i3}${n3}${a3}`, () => `${t4}${i3}${n3}`];
-    r4 || o3.push(() => `${t4}${a3}`);
+    let { firstName: t4 = this.faker.person.firstName(), lastName: n3 = this.faker.person.lastName(), lastName: r5 } = e4, i3 = this.faker.helpers.arrayElement([`.`, `_`]), a3 = this.faker.number.int(99), o3 = [() => `${t4}${i3}${n3}${a3}`, () => `${t4}${i3}${n3}`];
+    r5 || o3.push(() => `${t4}${a3}`);
     let s3 = this.faker.helpers.arrayElement(o3)();
     return s3 = s3.normalize(`NFKD`).replaceAll(/[\u0300-\u036F]/g, ``), s3 = [...s3].map((e5) => {
       if (V2[e5]) return V2[e5];
@@ -38786,7 +42304,7 @@ var qe = class extends S2 {
     }).join(``), s3 = s3.replaceAll(`'`, ``), s3 = s3.replaceAll(` `, ``), s3;
   }
   displayName(e4 = {}) {
-    let { firstName: t4 = this.faker.person.firstName(), lastName: n3 = this.faker.person.lastName() } = e4, r4 = this.faker.helpers.arrayElement([`.`, `_`]), i3 = this.faker.number.int(99), a3 = this.faker.helpers.arrayElement([() => `${t4}${i3}`, () => `${t4}${r4}${n3}`, () => `${t4}${r4}${n3}${i3}`])();
+    let { firstName: t4 = this.faker.person.firstName(), lastName: n3 = this.faker.person.lastName() } = e4, r5 = this.faker.helpers.arrayElement([`.`, `_`]), i3 = this.faker.number.int(99), a3 = this.faker.helpers.arrayElement([() => `${t4}${i3}`, () => `${t4}${r5}${n3}`, () => `${t4}${r5}${n3}${i3}`])();
     return a3 = a3.replaceAll(`'`, ``), a3 = a3.replaceAll(` `, ``), a3;
   }
   protocol() {
@@ -38816,9 +42334,9 @@ var qe = class extends S2 {
     return this.faker.datatype.boolean() ? this.ipv4() : this.ipv6();
   }
   ipv4(t4 = {}) {
-    let { network: n3 = `any`, cidrBlock: r4 = Ke[n3] } = t4;
-    if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(r4)) throw new e2(`Invalid CIDR block provided: ${r4}. Must be in the format x.x.x.x/y.`);
-    let [i3, a3] = r4.split(`/`), o3 = 4294967295 >>> Number.parseInt(a3), [s3, c3, l3, u3] = i3.split(`.`).map(Number), d3 = (s3 << 24 | c3 << 16 | l3 << 8 | u3) & ~o3 | this.faker.number.int(o3);
+    let { network: n3 = `any`, cidrBlock: r5 = Ke[n3] } = t4;
+    if (!/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/.test(r5)) throw new e2(`Invalid CIDR block provided: ${r5}. Must be in the format x.x.x.x/y.`);
+    let [i3, a3] = r5.split(`/`), o3 = 4294967295 >>> Number.parseInt(a3), [s3, c3, l3, u3] = i3.split(`.`).map(Number), d3 = (s3 << 24 | c3 << 16 | l3 << 8 | u3) & ~o3 | this.faker.number.int(o3);
     return [d3 >>> 24 & 255, d3 >>> 16 & 255, d3 >>> 8 & 255, d3 & 255].join(`.`);
   }
   ipv6() {
@@ -38832,18 +42350,18 @@ var qe = class extends S2 {
   }
   mac(e4 = {}) {
     typeof e4 == `string` && (e4 = { separator: e4 });
-    let { separator: t4 = `:` } = e4, n3, r4 = ``;
-    for ([`:`, `-`, ``].includes(t4) || (t4 = `:`), n3 = 0; n3 < 12; n3++) r4 += this.faker.number.hex(15), n3 % 2 == 1 && n3 !== 11 && (r4 += t4);
-    return r4;
+    let { separator: t4 = `:` } = e4, n3, r5 = ``;
+    for ([`:`, `-`, ``].includes(t4) || (t4 = `:`), n3 = 0; n3 < 12; n3++) r5 += this.faker.number.hex(15), n3 % 2 == 1 && n3 !== 11 && (r5 += t4);
+    return r5;
   }
   password(e4 = {}) {
-    let t4 = /[aeiouAEIOU]$/, n3 = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]$/, r4 = (e5, i4, a4, o4) => {
+    let t4 = /[aeiouAEIOU]$/, n3 = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]$/, r5 = (e5, i4, a4, o4) => {
       if (o4.length >= e5) return o4;
       i4 && (a4 = n3.test(o4) ? t4 : n3);
       let s4 = this.faker.number.int(94) + 33, c3 = String.fromCodePoint(s4);
-      return i4 && (c3 = c3.toLowerCase()), a4.test(c3) ? r4(e5, i4, a4, o4 + c3) : r4(e5, i4, a4, o4);
+      return i4 && (c3 = c3.toLowerCase()), a4.test(c3) ? r5(e5, i4, a4, o4 + c3) : r5(e5, i4, a4, o4);
     }, { length: i3 = 15, memorable: a3 = false, pattern: o3 = /\w/, prefix: s3 = `` } = e4;
-    return r4(i3, a3, o3, s3);
+    return r5(i3, a3, o3, s3);
   }
   emoji(e4 = {}) {
     let { types: t4 = Object.keys(this.faker.definitions.internet.emoji) } = e4, n3 = this.faker.helpers.arrayElement(t4);
@@ -38853,23 +42371,23 @@ var qe = class extends S2 {
     return this.faker.helpers.arrayElement(this.faker.definitions.internet.jwt_algorithm);
   }
   jwt(e4 = {}) {
-    let { refDate: t4 = this.faker.defaultRefDate() } = e4, n3 = this.faker.date.recent({ refDate: t4 }), { header: r4 = { alg: this.jwtAlgorithm(), typ: `JWT` }, payload: i3 = { iat: Math.round(n3.valueOf() / 1e3), exp: Math.round(this.faker.date.soon({ refDate: n3 }).valueOf() / 1e3), nbf: Math.round(this.faker.date.anytime({ refDate: t4 }).valueOf() / 1e3), iss: this.faker.company.name(), sub: this.faker.string.uuid(), aud: this.faker.string.uuid(), jti: this.faker.string.uuid() } } = e4;
-    return `${z2(JSON.stringify(r4))}.${z2(JSON.stringify(i3))}.${this.faker.string.alphanumeric(64)}`;
+    let { refDate: t4 = this.faker.defaultRefDate() } = e4, n3 = this.faker.date.recent({ refDate: t4 }), { header: r5 = { alg: this.jwtAlgorithm(), typ: `JWT` }, payload: i3 = { iat: Math.round(n3.valueOf() / 1e3), exp: Math.round(this.faker.date.soon({ refDate: n3 }).valueOf() / 1e3), nbf: Math.round(this.faker.date.anytime({ refDate: t4 }).valueOf() / 1e3), iss: this.faker.company.name(), sub: this.faker.string.uuid(), aud: this.faker.string.uuid(), jti: this.faker.string.uuid() } } = e4;
+    return `${z2(JSON.stringify(r5))}.${z2(JSON.stringify(i3))}.${this.faker.string.alphanumeric(64)}`;
   }
 };
 var W2 = class extends x2 {
   latitude(e4 = {}) {
-    let { max: t4 = 90, min: n3 = -90, precision: r4 = 4 } = e4;
-    return this.faker.number.float({ min: n3, max: t4, fractionDigits: r4 });
+    let { max: t4 = 90, min: n3 = -90, precision: r5 = 4 } = e4;
+    return this.faker.number.float({ min: n3, max: t4, fractionDigits: r5 });
   }
   longitude(e4 = {}) {
-    let { max: t4 = 180, min: n3 = -180, precision: r4 = 4 } = e4;
-    return this.faker.number.float({ max: t4, min: n3, fractionDigits: r4 });
+    let { max: t4 = 180, min: n3 = -180, precision: r5 = 4 } = e4;
+    return this.faker.number.float({ max: t4, min: n3, fractionDigits: r5 });
   }
   nearbyGPSCoordinate(e4 = {}) {
-    let { origin: t4, radius: n3 = 10, isMetric: r4 = false } = e4;
+    let { origin: t4, radius: n3 = 10, isMetric: r5 = false } = e4;
     if (t4 == null) return [this.latitude(), this.longitude()];
-    let i3 = this.faker.number.float({ max: 2 * Math.PI, fractionDigits: 5 }), a3 = r4 ? n3 : n3 * 1.60934, o3 = this.faker.number.float({ max: a3, fractionDigits: 3 }) * 0.995 / (4e4 / 360), s3 = [t4[0] + Math.sin(i3) * o3, t4[1] + Math.cos(i3) * o3];
+    let i3 = this.faker.number.float({ max: 2 * Math.PI, fractionDigits: 5 }), a3 = r5 ? n3 : n3 * 1.60934, o3 = this.faker.number.float({ max: a3, fractionDigits: 3 }) * 0.995 / (4e4 / 360), s3 = [t4[0] + Math.sin(i3) * o3, t4[1] + Math.cos(i3) * o3];
     return s3[0] %= 180, Math.abs(s3[0]) > 90 && (s3[0] = Math.sign(s3[0]) * 180 - s3[0], s3[1] += 180), s3[1] = (s3[1] % 360 + 540) % 360 - 180, [s3[0], s3[1]];
   }
 };
@@ -38886,8 +42404,8 @@ var Je = class extends W2 {
       if (t5 == null) throw new e2(`No zip code definition found for state "${n3}"`);
       return this.faker.helpers.fake(t5);
     }
-    let { format: r4 = this.faker.definitions.location.postcode } = t4;
-    return typeof r4 == `string` && (r4 = [r4]), r4 = this.faker.helpers.arrayElement(r4), this.faker.helpers.replaceSymbols(r4);
+    let { format: r5 = this.faker.definitions.location.postcode } = t4;
+    return typeof r5 == `string` && (r5 = [r5]), r5 = this.faker.helpers.arrayElement(r5), this.faker.helpers.replaceSymbols(r5);
   }
   city() {
     return this.faker.helpers.fake(this.faker.definitions.location.city_pattern);
@@ -38937,16 +42455,16 @@ var Je = class extends W2 {
     return this.faker.helpers.arrayElement(n3);
   }
   direction(e4 = {}) {
-    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r4 = t4 ? [...n3.cardinal_abbr, ...n3.ordinal_abbr] : [...n3.cardinal, ...n3.ordinal];
-    return this.faker.helpers.arrayElement(r4);
+    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r5 = t4 ? [...n3.cardinal_abbr, ...n3.ordinal_abbr] : [...n3.cardinal, ...n3.ordinal];
+    return this.faker.helpers.arrayElement(r5);
   }
   cardinalDirection(e4 = {}) {
-    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r4 = t4 ? n3.cardinal_abbr : n3.cardinal;
-    return this.faker.helpers.arrayElement(r4);
+    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r5 = t4 ? n3.cardinal_abbr : n3.cardinal;
+    return this.faker.helpers.arrayElement(r5);
   }
   ordinalDirection(e4 = {}) {
-    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r4 = t4 ? n3.ordinal_abbr : n3.ordinal;
-    return this.faker.helpers.arrayElement(r4);
+    let { abbreviated: t4 = false } = e4, n3 = this.faker.definitions.location.direction, r5 = t4 ? n3.ordinal_abbr : n3.ordinal;
+    return this.faker.helpers.arrayElement(r5);
   }
   timeZone() {
     return this.faker.helpers.arrayElement(this.faker.definitions.location.time_zone);
@@ -38956,17 +42474,17 @@ var Je = class extends W2 {
   }
 };
 function Ye(e4, t4, n3 = (e5) => e5) {
-  let r4 = {};
+  let r5 = {};
   for (let i3 of e4) {
     let e5 = t4(i3);
-    r4[e5] === void 0 && (r4[e5] = []), r4[e5].push(n3(i3));
+    r5[e5] === void 0 && (r5[e5] = []), r5[e5].push(n3(i3));
   }
-  return r4;
+  return r5;
 }
 var G2 = { fail: () => {
   throw new e2(`No words found that match the given length.`);
 }, closest: (e4, t4) => {
-  let n3 = Ye(e4, (e5) => e5.length), r4 = Object.keys(n3).map(Number), i3 = Math.min(...r4), a3 = Math.max(...r4), o3 = Math.min(t4.min - i3, a3 - t4.max);
+  let n3 = Ye(e4, (e5) => e5.length), r5 = Object.keys(n3).map(Number), i3 = Math.min(...r5), a3 = Math.max(...r5), o3 = Math.min(t4.min - i3, a3 - t4.max);
   return e4.filter((e5) => e5.length === t4.min - o3 || e5.length === t4.max + o3);
 }, shortest: (e4) => {
   let t4 = Math.min(...e4.map((e5) => e5.length));
@@ -38976,11 +42494,11 @@ var G2 = { fail: () => {
   return e4.filter((e5) => e5.length === t4);
 }, "any-length": (e4) => [...e4] };
 function K2(e4) {
-  let { wordList: t4, length: n3, strategy: r4 = `fail` } = e4;
+  let { wordList: t4, length: n3, strategy: r5 = `fail` } = e4;
   if (n3 != null) {
     let e5 = typeof n3 == `number` ? (e6) => e6.length === n3 : (e6) => e6.length >= n3.min && e6.length <= n3.max, i3 = t4.filter(e5);
-    return i3.length > 0 ? i3 : typeof n3 == `number` ? G2[r4](t4, { min: n3, max: n3 }) : G2[r4](t4, n3);
-  } else if (r4 === `shortest` || r4 === `longest`) return G2[r4](t4);
+    return i3.length > 0 ? i3 : typeof n3 == `number` ? G2[r5](t4, { min: n3, max: n3 }) : G2[r5](t4, n3);
+  } else if (r5 === `shortest` || r5 === `longest`) return G2[r5](t4);
   return [...t4];
 }
 var Xe = class extends S2 {
@@ -39035,10 +42553,10 @@ var q2 = (function(e4) {
   return e4.Female = `female`, e4.Generic = `generic`, e4.Male = `male`, e4;
 })({});
 function J2(e4, t4 = e4.person.sexType(), n3) {
-  let { generic: r4, female: i3, male: a3 } = n3;
-  if (t4 === `generic`) return r4 ?? e4.helpers.arrayElement([i3, a3]) ?? [];
+  let { generic: r5, female: i3, male: a3 } = n3;
+  if (t4 === `generic`) return r5 ?? e4.helpers.arrayElement([i3, a3]) ?? [];
   let o3 = t4 === `female` ? i3 : a3;
-  return o3 == null ? r4 ?? [] : r4 == null ? o3 : e4.helpers.weightedArrayElement([{ weight: 3 * Math.sqrt(o3.length), value: o3 }, { weight: Math.sqrt(r4.length), value: r4 }]);
+  return o3 == null ? r5 ?? [] : r5 == null ? o3 : e4.helpers.weightedArrayElement([{ weight: 3 * Math.sqrt(o3.length), value: o3 }, { weight: Math.sqrt(r5.length), value: r5 }]);
 }
 var Qe = class extends S2 {
   firstName(e4) {
@@ -39056,8 +42574,8 @@ var Qe = class extends S2 {
     return this.faker.helpers.arrayElement(J2(this.faker, e4, this.faker.definitions.person.middle_name));
   }
   fullName(e4 = {}) {
-    let { sex: t4 = this.faker.helpers.arrayElement([`female`, `male`]), firstName: n3 = this.firstName(t4), lastName: r4 = this.lastName(t4) } = e4, i3 = this.faker.helpers.weightedArrayElement(this.faker.definitions.person.name);
-    return this.faker.helpers.mustache(i3, { "person.prefix": () => this.prefix(t4), "person.firstName": () => n3, "person.middleName": () => this.middleName(t4), "person.lastName": () => r4, "person.suffix": () => this.suffix() });
+    let { sex: t4 = this.faker.helpers.arrayElement([`female`, `male`]), firstName: n3 = this.firstName(t4), lastName: r5 = this.lastName(t4) } = e4, i3 = this.faker.helpers.weightedArrayElement(this.faker.definitions.person.name);
+    return this.faker.helpers.mustache(i3, { "person.prefix": () => this.prefix(t4), "person.firstName": () => n3, "person.middleName": () => this.middleName(t4), "person.lastName": () => r5, "person.suffix": () => this.suffix() });
   }
   gender() {
     return this.faker.helpers.arrayElement(this.faker.definitions.person.gender);
@@ -39098,8 +42616,8 @@ var $e = class extends S2 {
   number(e4 = {}) {
     let { style: t4 = `human` } = e4, n3 = this.faker.definitions.phone_number.format[t4];
     if (!n3) throw Error(`No definitions for ${t4} in this locale`);
-    let r4 = this.faker.helpers.arrayElement(n3);
-    return I2(this.faker, r4);
+    let r5 = this.faker.helpers.arrayElement(n3);
+    return I2(this.faker, r5);
   }
   imei() {
     return this.faker.helpers.replaceCreditCardSymbols(`##-######-######-L`, `#`);
@@ -39120,8 +42638,8 @@ var Y2 = { index: `o`, slot: `s`, mac: `x`, pci: `p` };
 var it2 = [`SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT`];
 var at2 = class extends S2 {
   fileName(e4 = {}) {
-    let { extensionCount: t4 = 1 } = e4, n3 = this.faker.word.words().toLowerCase().replaceAll(/\W/g, `_`), r4 = this.faker.helpers.multiple(() => this.fileExt(), { count: t4 }).join(`.`);
-    return r4.length === 0 ? n3 : `${n3}.${r4}`;
+    let { extensionCount: t4 = 1 } = e4, n3 = this.faker.word.words().toLowerCase().replaceAll(/\W/g, `_`), r5 = this.faker.helpers.multiple(() => this.fileExt(), { count: t4 }).join(`.`);
+    return r5.length === 0 ? n3 : `${n3}.${r5}`;
   }
   commonFileName(e4) {
     return `${this.fileName({ extensionCount: 0 })}.${e4 || this.commonFileExt()}`;
@@ -39143,12 +42661,12 @@ var at2 = class extends S2 {
   fileExt(t4) {
     let n3 = this.faker.definitions.system.mime_type;
     if (typeof t4 == `string`) {
-      let r5 = n3[t4];
-      if (r5 == null) throw new e2(`MIME type ${t4} is not supported.`);
-      return this.faker.helpers.arrayElement(r5.extensions);
+      let r6 = n3[t4];
+      if (r6 == null) throw new e2(`MIME type ${t4} is not supported.`);
+      return this.faker.helpers.arrayElement(r6.extensions);
     }
-    let r4 = new Set(Object.values(n3).flatMap(({ extensions: e4 }) => e4));
-    return this.faker.helpers.arrayElement([...r4]);
+    let r5 = new Set(Object.values(n3).flatMap(({ extensions: e4 }) => e4));
+    return this.faker.helpers.arrayElement([...r5]);
   }
   directoryPath() {
     let e4 = this.faker.definitions.system.directory_path;
@@ -39161,25 +42679,25 @@ var at2 = class extends S2 {
     return [this.faker.number.int(9), this.faker.number.int(20), this.faker.number.int(20)].join(`.`);
   }
   networkInterface(e4 = {}) {
-    let { interfaceType: t4 = this.faker.helpers.arrayElement(rt2), interfaceSchema: n3 = this.faker.helpers.objectKey(Y2) } = e4, r4, i3 = ``;
+    let { interfaceType: t4 = this.faker.helpers.arrayElement(rt2), interfaceSchema: n3 = this.faker.helpers.objectKey(Y2) } = e4, r5, i3 = ``;
     switch (n3) {
       case `index`:
-        r4 = this.faker.string.numeric();
+        r5 = this.faker.string.numeric();
         break;
       case `slot`:
-        r4 = `${this.faker.string.numeric()}${this.faker.helpers.maybe(() => `f${this.faker.string.numeric()}`) ?? ``}${this.faker.helpers.maybe(() => `d${this.faker.string.numeric()}`) ?? ``}`;
+        r5 = `${this.faker.string.numeric()}${this.faker.helpers.maybe(() => `f${this.faker.string.numeric()}`) ?? ``}${this.faker.helpers.maybe(() => `d${this.faker.string.numeric()}`) ?? ``}`;
         break;
       case `mac`:
-        r4 = this.faker.internet.mac(``);
+        r5 = this.faker.internet.mac(``);
         break;
       case `pci`:
-        i3 = this.faker.helpers.maybe(() => `P${this.faker.string.numeric()}`) ?? ``, r4 = `${this.faker.string.numeric()}s${this.faker.string.numeric()}${this.faker.helpers.maybe(() => `f${this.faker.string.numeric()}`) ?? ``}${this.faker.helpers.maybe(() => `d${this.faker.string.numeric()}`) ?? ``}`;
+        i3 = this.faker.helpers.maybe(() => `P${this.faker.string.numeric()}`) ?? ``, r5 = `${this.faker.string.numeric()}s${this.faker.string.numeric()}${this.faker.helpers.maybe(() => `f${this.faker.string.numeric()}`) ?? ``}${this.faker.helpers.maybe(() => `d${this.faker.string.numeric()}`) ?? ``}`;
         break;
     }
-    return `${i3}${t4}${Y2[n3]}${r4}`;
+    return `${i3}${t4}${Y2[n3]}${r5}`;
   }
   cron(e4 = {}) {
-    let { includeYear: t4 = false, includeNonStandard: n3 = false } = e4, r4 = [this.faker.number.int(59), `*`], i3 = [this.faker.number.int(23), `*`], a3 = [this.faker.number.int({ min: 1, max: 31 }), `*`, `?`], o3 = [this.faker.number.int({ min: 1, max: 12 }), `*`], s3 = [this.faker.number.int(6), this.faker.helpers.arrayElement(it2), `*`, `?`], c3 = [this.faker.number.int({ min: 1970, max: 2099 }), `*`], l3 = this.faker.helpers.arrayElement(r4), u3 = this.faker.helpers.arrayElement(i3), d3 = this.faker.helpers.arrayElement(a3), f3 = this.faker.helpers.arrayElement(o3), p3 = this.faker.helpers.arrayElement(s3), m3 = this.faker.helpers.arrayElement(c3), h3 = `${l3} ${u3} ${d3} ${f3} ${p3}`;
+    let { includeYear: t4 = false, includeNonStandard: n3 = false } = e4, r5 = [this.faker.number.int(59), `*`], i3 = [this.faker.number.int(23), `*`], a3 = [this.faker.number.int({ min: 1, max: 31 }), `*`, `?`], o3 = [this.faker.number.int({ min: 1, max: 12 }), `*`], s3 = [this.faker.number.int(6), this.faker.helpers.arrayElement(it2), `*`, `?`], c3 = [this.faker.number.int({ min: 1970, max: 2099 }), `*`], l3 = this.faker.helpers.arrayElement(r5), u3 = this.faker.helpers.arrayElement(i3), d3 = this.faker.helpers.arrayElement(a3), f3 = this.faker.helpers.arrayElement(o3), p3 = this.faker.helpers.arrayElement(s3), m3 = this.faker.helpers.arrayElement(c3), h3 = `${l3} ${u3} ${d3} ${f3} ${p3}`;
     return t4 && (h3 += ` ${m3}`), !n3 || this.faker.datatype.boolean() ? h3 : this.faker.helpers.arrayElement([`@annually`, `@daily`, `@hourly`, `@monthly`, `@reboot`, `@weekly`, `@yearly`]);
   }
 };
@@ -39260,19 +42778,19 @@ var ct2 = class extends x2 {
 var lt2 = class extends x2 {
   int(t4 = {}) {
     typeof t4 == `number` && (t4 = { max: t4 });
-    let { min: n3 = 0, max: r4 = 2 ** 53 - 1, multipleOf: i3 = 1, distributor: a3 = b2() } = t4;
+    let { min: n3 = 0, max: r5 = 2 ** 53 - 1, multipleOf: i3 = 1, distributor: a3 = b2() } = t4;
     if (!Number.isInteger(i3)) throw new e2(`multipleOf should be an integer.`);
     if (i3 <= 0) throw new e2(`multipleOf should be greater than 0.`);
-    let o3 = Math.ceil(n3 / i3), s3 = Math.floor(r4 / i3);
+    let o3 = Math.ceil(n3 / i3), s3 = Math.floor(r5 / i3);
     if (o3 === s3) return o3 * i3;
-    if (s3 < o3) throw r4 >= n3 ? new e2(`No suitable integer value between ${n3} and ${r4} found.`) : new e2(`Max ${r4} should be greater than min ${n3}.`);
+    if (s3 < o3) throw r5 >= n3 ? new e2(`No suitable integer value between ${n3} and ${r5} found.`) : new e2(`Max ${r5} should be greater than min ${n3}.`);
     let c3 = a3(this.faker.fakerCore.randomizer), l3 = s3 - o3 + 1;
     return Math.floor(c3 * l3 + o3) * i3;
   }
   float(t4 = {}) {
     typeof t4 == `number` && (t4 = { max: t4 });
-    let { min: n3 = 0, max: r4 = 1, fractionDigits: i3, multipleOf: a3, multipleOf: o3 = i3 == null ? void 0 : 10 ** -i3, distributor: s3 = b2() } = t4;
-    if (r4 < n3) throw new e2(`Max ${r4} should be greater than min ${n3}.`);
+    let { min: n3 = 0, max: r5 = 1, fractionDigits: i3, multipleOf: a3, multipleOf: o3 = i3 == null ? void 0 : 10 ** -i3, distributor: s3 = b2() } = t4;
+    if (r5 < n3) throw new e2(`Max ${r5} should be greater than min ${n3}.`);
     if (i3 != null) {
       if (a3 != null) throw new e2(`multipleOf and fractionDigits cannot be set at the same time.`);
       if (!Number.isInteger(i3)) throw new e2(`fractionDigits should be an integer.`);
@@ -39281,9 +42799,9 @@ var lt2 = class extends x2 {
     if (o3 != null) {
       if (o3 <= 0) throw new e2(`multipleOf should be greater than 0.`);
       let t5 = Math.log10(o3), i4 = o3 < 1 && Number.isInteger(t5) ? 10 ** -t5 : 1 / o3;
-      return this.int({ min: n3 * i4, max: r4 * i4, distributor: s3 }) / i4;
+      return this.int({ min: n3 * i4, max: r5 * i4, distributor: s3 }) / i4;
     }
-    return s3(this.faker.fakerCore.randomizer) * (r4 - n3) + n3;
+    return s3(this.faker.fakerCore.randomizer) * (r5 - n3) + n3;
   }
   binary(e4 = {}) {
     typeof e4 == `number` && (e4 = { max: e4 });
@@ -39302,22 +42820,22 @@ var lt2 = class extends x2 {
   }
   bigInt(t4 = {}) {
     (typeof t4 == `bigint` || typeof t4 == `number` || typeof t4 == `string` || typeof t4 == `boolean`) && (t4 = { max: t4 });
-    let n3 = BigInt(t4.min ?? 0), r4 = BigInt(t4.max ?? n3 + BigInt(999999999999999)), i3 = BigInt(t4.multipleOf ?? 1);
-    if (r4 < n3) throw new e2(`Max ${r4} should be larger than min ${n3}.`);
+    let n3 = BigInt(t4.min ?? 0), r5 = BigInt(t4.max ?? n3 + BigInt(999999999999999)), i3 = BigInt(t4.multipleOf ?? 1);
+    if (r5 < n3) throw new e2(`Max ${r5} should be larger than min ${n3}.`);
     if (i3 <= BigInt(0)) throw new e2(`multipleOf should be greater than 0.`);
-    let a3 = n3 / i3 + (n3 % i3 > 0n ? 1n : 0n), o3 = r4 / i3 - (r4 % i3 < 0n ? 1n : 0n);
+    let a3 = n3 / i3 + (n3 % i3 > 0n ? 1n : 0n), o3 = r5 / i3 - (r5 % i3 < 0n ? 1n : 0n);
     if (a3 === o3) return a3 * i3;
-    if (o3 < a3) throw new e2(`No suitable bigint value between ${n3} and ${r4} found.`);
+    if (o3 < a3) throw new e2(`No suitable bigint value between ${n3} and ${r5} found.`);
     let s3 = o3 - a3 + 1n;
     return (a3 + BigInt(this.faker.string.numeric({ length: s3.toString(10).length, allowLeadingZeros: true })) % s3) * i3;
   }
   romanNumeral(t4 = {}) {
     let n3 = 3999;
     typeof t4 == `number` && (t4 = { max: t4 });
-    let { min: r4 = 1, max: i3 = n3 } = t4;
-    if (r4 < 1) throw new e2(`Min value ${r4} should be 1 or greater.`);
+    let { min: r5 = 1, max: i3 = n3 } = t4;
+    if (r5 < 1) throw new e2(`Min value ${r5} should be 1 or greater.`);
     if (i3 > n3) throw new e2(`Max value ${i3} should be ${n3} or less.`);
-    let a3 = this.int({ min: r4, max: i3 }), o3 = [[`M`, 1e3], [`CM`, 900], [`D`, 500], [`CD`, 400], [`C`, 100], [`XC`, 90], [`L`, 50], [`XL`, 40], [`X`, 10], [`IX`, 9], [`V`, 5], [`IV`, 4], [`I`, 1]], s3 = ``;
+    let a3 = this.int({ min: r5, max: i3 }), o3 = [[`M`, 1e3], [`CM`, 900], [`D`, 500], [`CD`, 400], [`C`, 100], [`XC`, 90], [`L`, 50], [`XL`, 40], [`X`, 10], [`IX`, 9], [`V`, 5], [`IV`, 4], [`I`, 1]], s3 = ``;
     for (let [e4, t5] of o3) s3 += e4.repeat(Math.floor(a3 / t5)), a3 %= t5;
     return s3;
   }
@@ -39335,8 +42853,8 @@ function dt(e4) {
   return `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replaceAll(`x`, () => e4.number.hex({ min: 0, max: 15 })).replaceAll(`y`, () => e4.number.hex({ min: 8, max: 11 }));
 }
 function ft(e4, t4) {
-  let n3 = t4.valueOf(), r4 = Math.max(n3, 0).toString(16).padStart(12, `0`).slice(-12);
-  return `${[r4.substring(0, 8), r4.substring(8)].join(`-`)}-${`7xxx-yxxx-xxxxxxxxxxxx`.replaceAll(`x`, () => e4.number.hex({ min: 0, max: 15 })).replaceAll(`y`, () => e4.number.hex({ min: 8, max: 11 }))}`;
+  let n3 = t4.valueOf(), r5 = Math.max(n3, 0).toString(16).padStart(12, `0`).slice(-12);
+  return `${[r5.substring(0, 8), r5.substring(8)].join(`-`)}-${`7xxx-yxxx-xxxxxxxxxxxx`.replaceAll(`x`, () => e4.number.hex({ min: 0, max: 15 })).replaceAll(`y`, () => e4.number.hex({ min: 8, max: 11 }))}`;
 }
 var Z2 = [...`ABCDEFGHIJKLMNOPQRSTUVWXYZ`];
 var Q2 = [...`abcdefghijklmnopqrstuvwxyz`];
@@ -39351,8 +42869,8 @@ var mt2 = class extends x2 {
     typeof e4 == `number` && (e4 = { length: e4 });
     let t4 = this.faker.helpers.rangeToNumber(e4.length ?? 1);
     if (t4 <= 0) return ``;
-    let { casing: n3 = `mixed` } = e4, { exclude: r4 = [] } = e4;
-    typeof r4 == `string` && (r4 = [...r4]);
+    let { casing: n3 = `mixed` } = e4, { exclude: r5 = [] } = e4;
+    typeof r5 == `string` && (r5 = [...r5]);
     let i3;
     switch (n3) {
       case `upper`:
@@ -39365,14 +42883,14 @@ var mt2 = class extends x2 {
         i3 = [...Q2, ...Z2];
         break;
     }
-    return i3 = i3.filter((e5) => !r4.includes(e5)), this.fromCharacters(i3, t4);
+    return i3 = i3.filter((e5) => !r5.includes(e5)), this.fromCharacters(i3, t4);
   }
   alphanumeric(e4 = {}) {
     typeof e4 == `number` && (e4 = { length: e4 });
     let t4 = this.faker.helpers.rangeToNumber(e4.length ?? 1);
     if (t4 <= 0) return ``;
-    let { casing: n3 = `mixed` } = e4, { exclude: r4 = [] } = e4;
-    typeof r4 == `string` && (r4 = [...r4]);
+    let { casing: n3 = `mixed` } = e4, { exclude: r5 = [] } = e4;
+    typeof r5 == `string` && (r5 = [...r5]);
     let i3 = [...pt];
     switch (n3) {
       case `upper`:
@@ -39385,7 +42903,7 @@ var mt2 = class extends x2 {
         i3.push(...Q2, ...Z2);
         break;
     }
-    return i3 = i3.filter((e5) => !r4.includes(e5)), this.fromCharacters(i3, t4);
+    return i3 = i3.filter((e5) => !r5.includes(e5)), this.fromCharacters(i3, t4);
   }
   binary(e4 = {}) {
     let { prefix: t4 = `0b` } = e4, n3 = t4;
@@ -39396,21 +42914,21 @@ var mt2 = class extends x2 {
     return n3 += this.fromCharacters([`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`], e4.length ?? 1), n3;
   }
   hexadecimal(e4 = {}) {
-    let { casing: t4 = `mixed`, prefix: n3 = `0x` } = e4, r4 = this.faker.helpers.rangeToNumber(e4.length ?? 1);
-    if (r4 <= 0) return n3;
-    let i3 = this.fromCharacters([`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `a`, `b`, `c`, `d`, `e`, `f`, `A`, `B`, `C`, `D`, `E`, `F`], r4);
+    let { casing: t4 = `mixed`, prefix: n3 = `0x` } = e4, r5 = this.faker.helpers.rangeToNumber(e4.length ?? 1);
+    if (r5 <= 0) return n3;
+    let i3 = this.fromCharacters([`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `a`, `b`, `c`, `d`, `e`, `f`, `A`, `B`, `C`, `D`, `E`, `F`], r5);
     return t4 === `upper` ? i3 = i3.toUpperCase() : t4 === `lower` && (i3 = i3.toLowerCase()), `${n3}${i3}`;
   }
   numeric(t4 = {}) {
     typeof t4 == `number` && (t4 = { length: t4 });
     let n3 = this.faker.helpers.rangeToNumber(t4.length ?? 1);
     if (n3 <= 0) return ``;
-    let { allowLeadingZeros: r4 = true } = t4, { exclude: i3 = [] } = t4;
+    let { allowLeadingZeros: r5 = true } = t4, { exclude: i3 = [] } = t4;
     typeof i3 == `string` && (i3 = [...i3]);
     let a3 = pt.filter((e4) => !i3.includes(e4));
-    if (a3.length === 0 || a3.length === 1 && !r4 && a3[0] === `0`) throw new e2(`Unable to generate numeric string, because all possible digits are excluded.`);
+    if (a3.length === 0 || a3.length === 1 && !r5 && a3[0] === `0`) throw new e2(`Unable to generate numeric string, because all possible digits are excluded.`);
     let o3 = ``;
-    return !r4 && !i3.includes(`0`) && (o3 += this.faker.helpers.arrayElement(a3.filter((e4) => e4 !== `0`))), o3 += this.fromCharacters(a3, n3 - o3.length), o3;
+    return !r5 && !i3.includes(`0`) && (o3 += this.faker.helpers.arrayElement(a3.filter((e4) => e4 !== `0`))), o3 += this.fromCharacters(a3, n3 - o3.length), o3;
   }
   sample(e4 = 10) {
     e4 = this.faker.helpers.rangeToNumber(e4);
@@ -39529,17 +43047,17 @@ var e3 = { airline: { airline: [{ name: `Aegean Airlines`, iataCode: `A3` }, { n
 {{location.zipCode}}`], postcode: [`#####`, `#####-####`], secondary_address: [`Apt. ###`, `Suite ###`], state: `Alabama.Alaska.Arizona.Arkansas.California.Colorado.Connecticut.Delaware.Florida.Georgia.Hawaii.Idaho.Illinois.Indiana.Iowa.Kansas.Kentucky.Louisiana.Maine.Maryland.Massachusetts.Michigan.Minnesota.Mississippi.Missouri.Montana.Nebraska.Nevada.New Hampshire.New Jersey.New Mexico.New York.North Carolina.North Dakota.Ohio.Oklahoma.Oregon.Pennsylvania.Rhode Island.South Carolina.South Dakota.Tennessee.Texas.Utah.Vermont.Virginia.Washington.West Virginia.Wisconsin.Wyoming`.split(`.`), state_abbr: `AL.AK.AZ.AR.CA.CO.CT.DE.FL.GA.HI.ID.IL.IN.IA.KS.KY.LA.ME.MD.MA.MI.MN.MS.MO.MT.NE.NV.NH.NJ.NM.NY.NC.ND.OH.OK.OR.PA.RI.SC.SD.TN.TX.UT.VT.VA.WA.WV.WI.WY`.split(`.`), street_address: { normal: `{{location.buildingNumber}} {{location.street}}`, full: `{{location.buildingNumber}} {{location.street}} {{location.secondaryAddress}}` }, street_name: `10th Street.11th Street.12th Street.13th Street.14th Street.15th Street.16th Street.1st Avenue.1st Street.2nd Avenue.2nd Street.3rd Avenue.3rd Street.4th Avenue.4th Street.5th Avenue.5th Street.6th Avenue.6th Street.7th Avenue.7th Street.8th Avenue.8th Street.9th Street.A Street.Abbey Road.Adams Avenue.Adams Street.Airport Road.Albany Road.Albert Road.Albion Street.Alexandra Road.Alfred Street.Alma Street.Ash Close.Ash Grove.Ash Road.Ash Street.Aspen Close.Atlantic Avenue.Avenue Road.Back Lane.Baker Street.Balmoral Road.Barn Close.Barton Road.Bath Road.Bath Street.Bay Street.Beach Road.Bedford Road.Beech Close.Beech Drive.Beech Grove.Beech Road.Beechwood Avenue.Bell Lane.Belmont Road.Birch Avenue.Birch Close.Birch Grove.Birch Road.Blind Lane.Bluebell Close.Boundary Road.Bramble Close.Bramley Close.Bridge Road.Bridge Street.Broad Lane.Broad Street.Broadway.Broadway Avenue.Broadway Street.Brook Lane.Brook Road.Brook Street.Brookside.Buckingham Road.Cambridge Street.Canal Street.Castle Close.Castle Lane.Castle Road.Castle Street.Cavendish Road.Cedar Avenue.Cedar Close.Cedar Grove.Cedar Road.Cedar Street.Cemetery Road.Center Avenue.Center Road.Center Street.Central Avenue.Central Street.Chapel Close.Chapel Hill.Chapel Road.Chapel Street.Charles Street.Cherry Close.Cherry Street.Cherry Tree Close.Chester Road.Chestnut Close.Chestnut Drive.Chestnut Grove.Chestnut Street.Church Avenue.Church Close.Church Hill.Church Lane.Church Path.Church Road.Church Street.Church View.Church Walk.Claremont Road.Clarence Road.Clarence Street.Clarendon Road.Clark Street.Clay Lane.Cleveland Street.Cliff Road.Clifton Road.Clinton Street.College Avenue.College Street.Columbia Avenue.Commerce Street.Commercial Road.Commercial Street.Common Lane.Coronation Avenue.Coronation Road.County Line Road.County Road.Court Street.Cow Lane.Crescent Road.Cromwell Road.Cross Lane.Cross Street.Crown Street.Cumberland Street.Dale Street.Dark Lane.Davis Street.Depot Street.Derby Road.Derwent Close.Devonshire Road.Division Street.Douglas Road.Duke Street.E 10th Street.E 11th Street.E 12th Street.E 14th Street.E 1st Street.E 2nd Street.E 3rd Street.E 4th Avenue.E 4th Street.E 5th Street.E 6th Avenue.E 6th Street.E 7th Street.E 8th Street.E 9th Street.E Bridge Street.E Broad Street.E Broadway.E Broadway Street.E Cedar Street.E Center Street.E Central Avenue.E Church Street.E Elm Street.E Franklin Street.E Front Street.E Grand Avenue.E High Street.E Jackson Street.E Jefferson Street.E Main.E Main Street.E Maple Street.E Market Street.E North Street.E Oak Street.E Park Avenue.E Pine Street.E River Road.E South Street.E State Street.E Union Street.E Walnut Street.E Washington Avenue.E Washington Street.E Water Street.East Avenue.East Road.East Street.Edward Street.Elm Close.Elm Grove.Elm Road.Elm Street.Euclid Avenue.Fairfield Road.Farm Close.Ferry Road.Field Close.Field Lane.First Avenue.First Street.Fore Street.Forest Avenue.Forest Road.Fourth Avenue.Franklin Avenue.Franklin Road.Franklin Street.Front Street.Frontage Road.Garden Close.Garden Street.George Street.Gladstone Road.Glebe Close.Gloucester Road.Gordon Road.Gordon Street.Grand Avenue.Grange Avenue.Grange Close.Grange Road.Grant Street.Green Close.Green Lane.Green Street.Greenville Road.Greenway.Greenwood Road.Grove Lane.Grove Road.Grove Street.Hall Lane.Hall Street.Harrison Avenue.Harrison Street.Hawthorn Avenue.Hawthorn Close.Hazel Close.Hazel Grove.Heath Road.Heather Close.Henry Street.Heron Close.Hickory Street.High Road.High Street.Highfield Avenue.Highfield Close.Highfield Road.Highland Avenue.Hill Road.Hill Street.Hillside.Hillside Avenue.Hillside Close.Hillside Road.Holly Close.Honeysuckle Close.Howard Road.Howard Street.Jackson Avenue.Jackson Street.James Street.Jefferson Avenue.Jefferson Street.Johnson Street.Jubilee Close.Juniper Close.Kent Road.Kestrel Close.King Street.King's Road.Kingfisher Close.Kings Highway.Kingsway.Laburnum Grove.Lafayette Street.Lake Avenue.Lake Drive.Lake Road.Lake Street.Lancaster Road.Lansdowne Road.Larch Close.Laurel Close.Lawrence Street.Lee Street.Liberty Street.Lime Grove.Lincoln Avenue.Lincoln Highway.Lincoln Road.Lincoln Street.Locust Street.Lodge Close.Lodge Lane.London Road.Long Lane.Low Road.Madison Avenue.Madison Street.Main.Main Avenue.Main Road.Main Street.Main Street E.Main Street N.Main Street S.Main Street W.Manchester Road.Manor Close.Manor Drive.Manor Gardens.Manor Road.Manor Way.Maple Avenue.Maple Close.Maple Drive.Maple Road.Maple Street.Market Place.Market Square.Market Street.Marlborough Road.Marsh Lane.Martin Luther King Boulevard.Martin Luther King Drive.Martin Luther King Jr Boulevard.Mary Street.Mayfield Road.Meadow Close.Meadow Drive.Meadow Lane.Meadow View.Meadow Way.Memorial Drive.Middle Street.Mill Close.Mill Lane.Mill Road.Mill Street.Milton Road.Milton Street.Monroe Street.Moor Lane.Moss Lane.Mount Pleasant.Mount Street.Mulberry Street.N 1st Street.N 2nd Street.N 3rd Street.N 4th Street.N 5th Street.N 6th Street.N 7th Street.N 8th Street.N 9th Street.N Bridge Street.N Broad Street.N Broadway.N Broadway Street.N Cedar Street.N Center Street.N Central Avenue.N Chestnut Street.N Church Street.N College Street.N Court Street.N Division Street.N East Street.N Elm Street.N Franklin Street.N Front Street.N Harrison Street.N High Street.N Jackson Street.N Jefferson Street.N Lincoln Street.N Locust Street.N Main.N Main Avenue.N Main Street.N Maple Street.N Market Street.N Monroe Street.N Oak Street.N Park Street.N Pearl Street.N Pine Street.N Poplar Street.N Railroad Street.N State Street.N Union Street.N Walnut Street.N Washington Avenue.N Washington Street.N Water Street.Nelson Road.Nelson Street.New Lane.New Road.New Street.Newton Road.Nightingale Close.Norfolk Road.North Avenue.North Lane.North Road.North Street.Northfield Road.Oak Avenue.Oak Drive.Oak Lane.Oak Road.Oak Street.Oakfield Road.Oaklands.Old Lane.Old Military Road.Old Road.Old State Road.Orchard Drive.Orchard Lane.Orchard Road.Orchard Street.Oxford Road.Oxford Street.Park Avenue.Park Crescent.Park Drive.Park Lane.Park Place.Park Road.Park Street.Park View.Parkside.Pearl Street.Pennsylvania Avenue.Pine Close.Pine Grove.Pine Street.Pinfold Lane.Pleasant Street.Poplar Avenue.Poplar Close.Poplar Road.Poplar Street.Post Road.Pound Lane.Princes Street.Princess Street.Priory Close.Priory Road.Prospect Avenue.Prospect Place.Prospect Road.Prospect Street.Quarry Lane.Quarry Road.Queen's Road.Railroad Avenue.Railroad Street.Railway Street.Rectory Close.Rectory Lane.Richmond Close.Richmond Road.Ridge Road.River Road.River Street.Riverside.Riverside Avenue.Riverside Drive.Roman Road.Roman Way.Rowan Close.Russell Street.S 10th Street.S 14th Street.S 1st Avenue.S 1st Street.S 2nd Street.S 3rd Street.S 4th Street.S 5th Street.S 6th Street.S 7th Street.S 8th Street.S 9th Street.S Bridge Street.S Broad Street.S Broadway.S Broadway Street.S Center Street.S Central Avenue.S Chestnut Street.S Church Street.S College Street.S Division Street.S East Street.S Elm Street.S Franklin Street.S Front Street.S Grand Avenue.S High Street.S Jackson Street.S Jefferson Street.S Lincoln Street.S Main.S Main Avenue.S Main Street.S Maple Street.S Market Street.S Mill Street.S Monroe Street.S Oak Street.S Park Street.S Pine Street.S Railroad Street.S State Street.S Union Street.S Walnut Street.S Washington Avenue.S Washington Street.S Water Street.S West Street.Salisbury Road.Sandringham Road.Sandy Lane.School Close.School Lane.School Road.School Street.Second Avenue.Silver Street.Skyline Drive.Smith Street.Somerset Road.South Avenue.South Drive.South Road.South Street.South View.Spring Gardens.Spring Street.Springfield Close.Springfield Road.Spruce Street.St Andrew's Road.St Andrews Close.St George's Road.St John's Road.St Mary's Close.St Mary's Road.Stanley Road.Stanley Street.State Avenue.State Line Road.State Road.State Street.Station Road.Station Street.Stoney Lane.Sycamore Avenue.Sycamore Close.Sycamore Drive.Sycamore Street.Talbot Road.Tennyson Road.The Avenue.The Beeches.The Causeway.The Chase.The Coppice.The Copse.The Crescent.The Croft.The Dell.The Drive.The Fairway.The Glebe.The Grange.The Green.The Grove.The Hawthorns.The Lane.The Laurels.The Limes.The Maltings.The Meadows.The Mews.The Mount.The Oaks.The Orchard.The Oval.The Paddock.The Paddocks.The Poplars.The Ridgeway.The Ridings.The Rise.The Sidings.The Spinney.The Square.The Willows.The Woodlands.Third Avenue.Third Street.Tower Road.Trinity Road.Tudor Close.Union Avenue.Union Street.University Avenue.University Drive.Valley Road.Veterans Memorial Drive.Veterans Memorial Highway.Vicarage Close.Vicarage Lane.Vicarage Road.Victoria Place.Victoria Road.Victoria Street.Vine Street.W 10th Street.W 11th Street.W 12th Street.W 14th Street.W 1st Street.W 2nd Street.W 3rd Street.W 4th Avenue.W 4th Street.W 5th Street.W 6th Avenue.W 6th Street.W 7th Street.W 8th Street.W 9th Street.W Bridge Street.W Broad Street.W Broadway.W Broadway Avenue.W Broadway Street.W Center Street.W Central Avenue.W Chestnut Street.W Church Street.W Division Street.W Elm Street.W Franklin Street.W Front Street.W Grand Avenue.W High Street.W Jackson Street.W Jefferson Street.W Lake Street.W Main.W Main Street.W Maple Street.W Market Street.W Monroe Street.W North Street.W Oak Street.W Park Street.W Pine Street.W River Road.W South Street.W State Street.W Union Street.W Walnut Street.W Washington Avenue.W Washington Street.Walnut Close.Walnut Street.Warren Close.Warren Road.Washington Avenue.Washington Boulevard.Washington Road.Washington Street.Water Lane.Water Street.Waterloo Road.Waterside.Watery Lane.Waverley Road.Well Lane.Wellington Road.Wellington Street.West Avenue.West End.West Lane.West Road.West Street.West View.Western Avenue.Western Road.Westfield Road.Westgate.William Street.Willow Close.Willow Drive.Willow Grove.Willow Road.Willow Street.Windermere Road.Windmill Close.Windmill Lane.Windsor Avenue.Windsor Close.Windsor Drive.Wood Lane.Wood Street.Woodland Close.Woodland Road.Woodlands.Woodlands Avenue.Woodlands Close.Woodlands Road.Woodside.Woodside Road.Wren Close.Yew Tree Close.York Road.York Street`.split(`.`), street_pattern: [`{{person.firstName}} {{location.street_suffix}}`, `{{person.lastName}} {{location.street_suffix}}`, `{{location.street_name}}`], street_suffix: `Alley.Avenue.Branch.Bridge.Brook.Brooks.Burg.Burgs.Bypass.Camp.Canyon.Cape.Causeway.Center.Centers.Circle.Circles.Cliff.Cliffs.Club.Common.Corner.Corners.Course.Court.Courts.Cove.Coves.Creek.Crescent.Crest.Crossing.Crossroad.Curve.Dale.Dam.Divide.Drive.Drives.Estate.Estates.Expressway.Extension.Extensions.Fall.Falls.Ferry.Field.Fields.Flat.Flats.Ford.Fords.Forest.Forge.Forges.Fork.Forks.Fort.Freeway.Garden.Gardens.Gateway.Glen.Glens.Green.Greens.Grove.Groves.Harbor.Harbors.Haven.Heights.Highway.Hill.Hills.Hollow.Inlet.Island.Islands.Isle.Junction.Junctions.Key.Keys.Knoll.Knolls.Lake.Lakes.Land.Landing.Lane.Light.Lights.Loaf.Lock.Locks.Lodge.Loop.Mall.Manor.Manors.Meadow.Meadows.Mews.Mill.Mills.Mission.Motorway.Mount.Mountain.Mountains.Neck.Orchard.Oval.Overpass.Park.Parks.Parkway.Parkways.Pass.Passage.Path.Pike.Pine.Pines.Place.Plain.Plains.Plaza.Point.Points.Port.Ports.Prairie.Radial.Ramp.Ranch.Rapid.Rapids.Rest.Ridge.Ridges.River.Road.Roads.Route.Row.Rue.Run.Shoal.Shoals.Shore.Shores.Skyway.Spring.Springs.Spur.Spurs.Square.Squares.Station.Stravenue.Stream.Street.Streets.Summit.Terrace.Throughway.Trace.Track.Trafficway.Trail.Tunnel.Turnpike.Underpass.Union.Unions.Valley.Valleys.Via.Viaduct.View.Views.Village.Villages.Ville.Vista.Walk.Walks.Wall.Way.Ways.Well.Wells`.split(`.`) }, lorem: { word: `a.ab.abbas.abduco.abeo.abscido.absconditus.absens.absorbeo.absque.abstergo.absum.abundans.abutor.accedo.accendo.acceptus.accommodo.accusamus.accusantium.accusator.acer.acerbitas.acervus.acidus.acies.acquiro.acsi.ad.adamo.adaugeo.addo.adduco.ademptio.adeo.adeptio.adfectus.adfero.adficio.adflicto.adhaero.adhuc.adicio.adimpleo.adinventitias.adipisci.adipiscor.adiuvo.administratio.admiratio.admitto.admoneo.admoveo.adnuo.adopto.adsidue.adstringo.adsuesco.adsum.adulatio.adulescens.aduro.advenio.adversus.advoco.aedificium.aeger.aegre.aegrotatio.aegrus.aeneus.aequitas.aequus.aer.aestas.aestivus.aestus.aetas.aeternus.ager.aggero.aggredior.agnitio.agnosco.ago.ait.aiunt.alias.alienus.alii.alioqui.aliqua.aliquam.aliquid.alius.allatus.alo.alter.altus.alveus.amaritudo.ambitus.ambulo.amet.amicitia.amiculum.amissio.amita.amitto.amo.amor.amoveo.amplexus.amplitudo.amplus.ancilla.angelus.angulus.angustus.animadverto.animi.animus.annus.anser.ante.antea.antepono.antiquus.aperiam.aperio.aperte.apostolus.apparatus.appello.appono.appositus.approbo.apto.aptus.apud.aqua.ara.aranea.arbitro.arbor.arbustum.arca.arceo.arcesso.architecto.arcus.argentum.argumentum.arguo.arma.armarium.aro.ars.articulus.artificiose.arto.arx.ascisco.ascit.asper.asperiores.aspernatur.aspicio.asporto.assentator.assumenda.astrum.at.atavus.ater.atque.atqui.atrocitas.atrox.attero.attollo.attonbitus.auctor.auctus.audacia.audax.audentia.audeo.audio.auditor.aufero.aureus.aurum.aut.autem.autus.auxilium.avaritia.avarus.aveho.averto.baiulus.balbus.barba.bardus.basium.beatae.beatus.bellicus.bellum.bene.beneficium.benevolentia.benigne.bestia.bibo.bis.blandior.blanditiis.bonus.bos.brevis.cado.caecus.caelestis.caelum.calamitas.calcar.calco.calculus.callide.campana.candidus.canis.canonicus.canto.capillus.capio.capitulus.capto.caput.carbo.carcer.careo.caries.cariosus.caritas.carmen.carpo.carus.casso.caste.casus.catena.caterva.cattus.cauda.causa.caute.caveo.cavus.cedo.celebrer.celer.celo.cena.cenaculum.ceno.censura.centum.cerno.cernuus.certe.certus.cervus.cetera.charisma.chirographum.cibo.cibus.cicuta.cilicium.cimentarius.ciminatio.cinis.circumvenio.cito.civis.civitas.clam.clamo.claro.clarus.claudeo.claustrum.clementia.clibanus.coadunatio.coaegresco.coepi.coerceo.cogito.cognatus.cognomen.cogo.cohaero.cohibeo.cohors.colligo.collum.colo.color.coma.combibo.comburo.comedo.comes.cometes.comis.comitatus.commemoro.comminor.commodi.commodo.communis.comparo.compello.complectus.compono.comprehendo.comptus.conatus.concedo.concido.conculco.condico.conduco.confero.confido.conforto.confugo.congregatio.conicio.coniecto.conitor.coniuratio.conor.conqueror.conscendo.consectetur.consequatur.consequuntur.conservo.considero.conspergo.constans.consuasor.contabesco.contego.contigo.contra.conturbo.conventus.convoco.copia.copiose.cornu.corona.corporis.corpus.correptius.corrigo.corroboro.corrumpo.corrupti.coruscus.cotidie.crapula.cras.crastinus.creator.creber.crebro.credo.creo.creptio.crepusculum.cresco.creta.cribro.crinis.cruciamentum.crudelis.cruentus.crur.crustulum.crux.cubicularis.cubitum.cubo.cui.cuius.culpa.culpo.cultellus.cultura.cum.cumque.cunabula.cunae.cunctatio.cupiditas.cupiditate.cupio.cuppedia.cupressus.cur.cura.curatio.curia.curiositas.curis.curo.curriculum.currus.cursim.curso.cursus.curto.curtus.curvo.custodia.damnatio.damno.dapifer.debeo.debilito.debitis.decens.decerno.decet.decimus.decipio.decor.decretum.decumbo.dedecor.dedico.deduco.defaeco.defendo.defero.defessus.defetiscor.deficio.defleo.defluo.defungo.degenero.degero.degusto.deinde.delectatio.delectus.delego.deleniti.deleo.delibero.delicate.delinquo.deludo.demens.demergo.demitto.demo.demonstro.demoror.demulceo.demum.denego.denique.dens.denuncio.denuo.deorsum.depereo.depono.depopulo.deporto.depraedor.deprecator.deprimo.depromo.depulso.deputo.derelinquo.derideo.deripio.deserunt.desidero.desino.desipio.desolo.desparatus.despecto.dicta.dignissimos.distinctio.dolor.dolore.dolorem.doloremque.dolores.doloribus.dolorum.ducimus.ea.eaque.earum.eius.eligendi.enim.eos.error.esse.est.et.eum.eveniet.ex.excepturi.exercitationem.expedita.explicabo.facere.facilis.fuga.fugiat.fugit.harum.hic.id.illo.illum.impedit.in.incidunt.infit.inflammatio.inventore.ipsa.ipsam.ipsum.iste.itaque.iure.iusto.labore.laboriosam.laborum.laudantium.libero.magnam.magni.maiores.maxime.minima.minus.modi.molestiae.molestias.mollitia.nam.natus.necessitatibus.nemo.neque.nesciunt.nihil.nisi.nobis.non.nostrum.nulla.numquam.occaecati.ocer.odio.odit.officia.officiis.omnis.optio.paens.pariatur.patior.patria.patrocinor.patruus.pauci.paulatim.pauper.pax.peccatus.pecco.pecto.pectus.pecus.peior.pel.perferendis.perspiciatis.placeat.porro.possimus.praesentium.provident.quae.quaerat.quam.quas.quasi.qui.quia.quibusdam.quidem.quis.quisquam.quo.quod.quos.ratione.recusandae.reiciendis.rem.repellat.repellendus.reprehenderit.repudiandae.rerum.saepe.sapiente.sed.sequi.similique.sint.sit.socius.sodalitas.sol.soleo.solio.solitudo.solium.sollers.sollicito.solum.solus.soluta.solutio.solvo.somniculosus.somnus.sonitus.sono.sophismata.sopor.sordeo.sortitus.spargo.speciosus.spectaculum.speculum.sperno.spero.spes.spiculum.spiritus.spoliatio.sponte.stabilis.statim.statua.stella.stillicidium.stipes.stips.sto.strenuus.strues.studio.stultus.suadeo.suasoria.sub.subito.subiungo.sublime.subnecto.subseco.substantia.subvenio.succedo.succurro.sufficio.suffoco.suffragium.suggero.sui.sulum.sum.summa.summisse.summopere.sumo.sumptus.sunt.supellex.super.suppellex.supplanto.suppono.supra.surculus.surgo.sursum.suscipio.suscipit.suspendo.sustineo.suus.synagoga.tabella.tabernus.tabesco.tabgo.tabula.taceo.tactus.taedium.talio.talis.talus.tam.tamdiu.tamen.tametsi.tamisium.tamquam.tandem.tantillus.tantum.tardus.tego.temeritas.temperantia.templum.tempora.tempore.temporibus.temptatio.tempus.tenax.tendo.teneo.tener.tenetur.tenuis.tenus.tepesco.tepidus.ter.terebro.teres.terga.tergeo.tergiversatio.tergo.tergum.termes.terminatio.tero.terra.terreo.territo.terror.tersus.tertius.testimonium.texo.textilis.textor.textus.thalassinus.theatrum.theca.thema.theologus.thermae.thesaurus.thesis.thorax.thymbra.thymum.tibi.timidus.timor.titulus.tolero.tollo.tondeo.tonsor.torqueo.torrens.tot.totam.totidem.toties.totus.tracto.trado.traho.trans.tredecim.tremo.trepide.tres.tribuo.tricesimus.triduana.tripudio.tristis.triumphus.trucido.truculenter.tubineus.tui.tum.tumultus.tunc.turba.turbo.turpis.tutamen.tutis.tyrannus.uberrime.ubi.ulciscor.ullam.ullus.ulterius.ultio.ultra.umbra.umerus.umquam.una.unde.undique.universe.unus.urbanus.urbs.uredo.usitas.usque.ustilo.ustulo.usus.ut.uter.uterque.utilis.utique.utor.utpote.utrimque.utroque.utrum.uxor.vaco.vacuus.vado.vae.valde.valens.valeo.valetudo.validus.vallum.vapulus.varietas.varius.vehemens.vel.velit.velociter.velum.velut.venia.veniam.venio.ventito.ventosus.ventus.venustas.ver.verbera.verbum.vere.verecundia.vereor.vergo.veritas.veritatis.vero.versus.verto.verumtamen.verus.vesco.vesica.vesper.vespillo.vester.vestigium.vestrum.vetus.via.vicinus.vicissitudo.victoria.victus.videlicet.video.viduo.vigilo.vigor.vilicus.vilis.vilitas.villa.vinco.vinculum.vindico.vinitor.vinum.vir.virga.virgo.viridis.viriliter.virtus.vis.viscus.vita.vitae.vitiosus.vitium.vito.vivo.vix.vobis.vociferor.voco.volaticus.volo.volubilis.voluntarius.volup.voluptas.voluptate.voluptatem.voluptates.voluptatibus.voluptatum.volutabrum.volva.vomer.vomica.vomito.vorago.vorax.voro.vos.votum.voveo.vox.vulariter.vulgaris.vulgivagus.vulgo.vulgus.vulnero.vulnus.vulpes.vulticulus.xiphias`.split(`.`) }, metadata: { title: `English`, code: `en`, language: `en`, endonym: `English`, dir: `ltr`, script: `Latn` }, music: { album: [`"Awaken, My Love!"`, `(What's The Story) Morning Glory?`, `- Tragedy +`, `13 Reasons Why (Season 3)`, `21st Century Breakdown`, `30 De Febrero`, `432 Hz Deep Healing`, `5-Star`, `528 Hz Meditation Music`, `54+1`, `8 Mile`, `808s & Heartbreak`, `9 To 5 And Odd Jobs`, `A Beautiful Lie`, `A Day At The Races`, `A Day Without Rain`, `A Fever You Can't Sweat Out`, `A Gangsta's Pain`, `A Gift & A Curse`, `A Hard Day's Night`, `A Head Full Of Dreams`, `A Kind Of Magic`, `A Million Ways To Murder`, `A Moment Apart`, `A Song For Every Moon`, `A Thousand Suns`, `A Winter Romance`, `ABBA`, `AI YoungBoy`, `AJ Tracey`, `Act One`, `After Hours`, `Agent Provocateur`, `All About You`, `All I Know So Far: Setlist`, `All Or Nothing`, `All Out`, `All Over The Place`, `All Stand Together`, `All The Lost Souls`, `All The Things I Never Said`, `All Things Must Pass`, `Alleen`, `Alright, Still`, `Alta Suciedad`, `America`, `American Heartbreak`, `American Teen`, `And Justice For None`, `Animal Songs`, `Another Friday Night`, `Anything Goes`, `Ao Vivo Em S\xE3o Paulo`, `Ao Vivo No Ibirapuera`, `Apricot Princess`, `Aqui E Agora (Ao Vivo)`, `Arcane League Of Legends`, `Ardipithecus`, `Aretha Now`, `Around The Fur`, `Arrival`, `Artist 2.0`, `As She Pleases`, `Ascend`, `Ashlyn`, `Astro Lounge`, `At Night, Alone.`, `At. Long. Last. ASAP`, `Atlas`, `Audioslave`, `Aura`, `Austin`, `Awake`, `Away From The Sun`, `Ayayay!`, `Baby On Baby`, `Back For Everything`, `Back From The Edge`, `Back In Black`, `Back To Black`, `Back To The Game`, `Bad`, `Bah\xEDa Ducati`, `Baila`, `Barbie The Album`, `Battleground`, `Bayou Country`, `Bcos U Will Never B Free`, `Be`, `Be Here Now`, `Beautiful Mind`, `Beautiful Thugger Girls`, `Beautiful Trauma`, `Beauty And The Beast`, `Beggars Banquet`, `Being Funny In A Foreign Language`, `Berlin Lebt`, `Berry Is On Top`, `Best White Noise For Baby Sleep - Loopable With No Fade`, `Big Baby DRAM`, `Bigger, Better, Faster, More!`, `Billy Talent II`, `Black Star Elephant`, `Blackout`, `Blank Face LP`, `Bleach`, `Blizzard Of Ozz`, `Blonde`, `Blood Sugar Sex Magik`, `Bloom`, `Blowin' Your Mind!`, `Blu Celeste`, `Blue`, `Blue Banisters`, `Blue Hawaii`, `Blue Neighbourhood`, `Bluebird Days`, `Bobby Tarantino`, `Bobby Tarantino II`, `Bon Iver`, `Born Pink`, `Born To Run`, `Brand New Eyes`, `Break The Cycle`, `Breakfast In America`, `Breakthrough`, `Brett Young`, `Bridge Over Troubled Water`, `Bright: The Album`, `Brol`, `Buds`, `Buena Vista Social Club`, `Built On Glass`, `Bury Me At Makeout Creek`, `Busyhead`, `By The Way`, `CB6`, `CNCO`, `California Sunrise`, `Californication`, `Call Me Irresponsible`, `Calm`, `Camino Palmero`, `Camp`, `Caracal`, `Carbon Fiber Hits`, `Carnival`, `Carry On`, `Cartel De Santa`, `Certified Lover Boy`, `Chaaama`, `Chama Meu Nome`, `Chapter 1: Snake Oil`, `Chapter 2: Swamp Savant`, `Chapter One`, `Charlie's Angels`, `Cherry Bomb`, `Chief`, `Chocolate Factory`, `Chosen`, `Chris Brown`, `Christina Aguilera`, `Chromatica`, `Church`, `City Of Evil`, `Clandestino`, `Clouds`, `Coco`, `Collision Course`, `Colour Vision`, `Combat Rock`, `Come Around Sundown`, `Come Away With Me`, `Come Home The Kids Miss You`, `Come What(ever) May`, `Commando`, `Common Sense`, `Communion`, `Conditions`, `Confident`, `Confrontation`, `Control The Streets, Volume 2`, `Corinne Bailey Rae`, `Costello Music`, `Cottonwood`, `Covers, Vol. 2`, `Cozy Tapes Vol. 2: Too Cozy`, `Crash Talk`, `Crazy Love`, `Crazysexycool`, `Crowded House`, `Cruisin' With Junior H`, `Culture`, `Current Mood`, `DS2`, `Dale`, `Danger Days: The True Lives Of The Fabulous Killjoys`, `Dangerous Woman`, `Dangerous: The Double Album`, `Dark Horse`, `Day69`, `Daydream`, `De Fiesta`, `De Viaje`, `DeAnn`, `Death Race For Love`, `Delirium`, `Delta`, `Demidevil`, `Depression Cherry`, `Descendants`, `Desgenerados Mixtape`, `Destin`, `Destiny Fulfilled`, `Desvelado`, `Detroit 2`, `Dex Meets Dexter`, `Dharma`, `Die A Legend`, `Different World`, `Dig Your Roots`, `Digital Druglord`, `Dirt`, `Disclaimer I / II`, `Discovery`, `Disraeli Gears`, `Disumano`, `Dizzy Up The Girl`, `Don't Play That Song`, `Donda`, `Donde Quiero Estar`, `Doo-Wops & Hooligans`, `Down The Way`, `Dr. Feelgood`, `Dream Your Life Away`, `Dreaming Out Loud`, `Drip Harder`, `Drive`, `Drones`, `Dropped Outta College`, `Drowning`, `Dua Warna Cinta`, `Dulce Beat`, `Dusty In Memphis`, `Dutty Rock`, `Dying To Live`, `ENR`, `East Atlanta Love Letter`, `Editorial`, `Edna`, `El Abayarde`, `El Amor En Los Tiempos Del Perreo`, `El Camino`, `El Comienzo`, `El Dorado`, `El Karma`, `El Mal Querer`, `El Malo`, `El Trabajo Es La Suerte`, `El Viaje De Copperpot`, `Electric Ladyland`, `Emotion`, `En Tus Planes`, `Endless Summer Vacation`, `Enter The Wu-Tang (36 Chambers)`, `Equals (=)`, `Estrella`, `Euphoria`, `Europop`, `Evermore`, `Every Kingdom`, `Everyday Life`, `Evolve`, `Expectations`, `Face Yourself`, `Facelift`, `Fallin'`, `Fancy You`, `Fantas\xEDa`, `Favourite Worst Nightmare`, `Fear Of The Dark`, `Fearless`, `Feel Something`, `Feels Like Home`, `Femme Fatale`, `Ferxxocalipsis`, `Fifty Shades Darker`, `Fifty Shades Freed`, `Fifty Shades Of Grey`, `Final (Vol.1)`, `Finding Beauty In Negative Spaces`, `Fine Line`, `First Impressions Of Earth`, `First Steps`, `Five Seconds Flat`, `Folklore`, `For Emma, Forever Ago`, `Forajido EP 1`, `Forever`, `Forever Young`, `Formula Of Love: O+T=<3`, `Free 6lack`, `Freudian`, `Frozen II`, `Full Moon Fever`, `Funhouse`, `Funk Wav Bounces Vol.1`, `Future History`, `FutureSex/LoveSounds`, `Fuzzybrain`, `Gallery`, `Gangsta's Paradise`, `Gemini`, `Gemini Rights`, `Generationwhy`, `Get A Grip`, `Get Up`, `Gettin' Old`, `Girl`, `Gladiator`, `Glisten`, `Globalization`, `Gloria`, `Glory Days`, `God's Project`, `Gold Skies`, `Golden`, `Good Evening`, `Good Thing`, `Goodbye Yellow Brick Road`, `Gossip Columns`, `Got Your Six`, `Graceland`, `Graduation`, `Grand Champ`, `Grandson, Vol. 1`, `Green River`, `Guerra`, `Ha*Ash Primera Fila - Hecho Realidad`, `Haiz`, `Hamilton`, `Happy Endings`, `Harry Styles`, `Hasta La Ra\xEDz`, `Hatful Of Hollow`, `Head In The Clouds`, `Heard It In A Past Life`, `Heart Shaped World`, `Heartbeat City`, `Heartbreak On A Full Moon / Cuffing Season - 12 Days Of Christmas`, `Heaven Or Hell`, `Heaven knows`, `Hellbilly Deluxe`, `Hellboy`, `Help!`, `Her Loss`, `Here Comes The Cowboy`, `Hey World`, `High School Musical`, `High Tide In The Snake's Nest`, `Historias De Un Capricornio`, `Hndrxx`, `Hombres G (Devu\xE9lveme A Mi Chica)`, `Homerun`, `Homework`, `Hot Fuss`, `Hot Pink`, `Hot Sauce / Hello Future`, `Hot Space`, `Hotel Diablo`, `Houses Of The Holy`, `How Big, How Blue, How Beautiful`, `How I'm Feeling`, `How To Be Human`, `How To Save A Life`, `How To: Friend, Love, Freefall`, `Hozier`, `Human`, `Huncho Jack, Jack Huncho`, `Hunter Hayes`, `Hysteria`, `I Am...Sasha Fierce`, `I Can't Handle Change`, `I Met You When I Was 18. (The Playlist)`, `I Never Liked You`, `I Never Loved A Man The Way I Love You`, `I See You`, `I Think You Think Too Much Of Me`, `I Used To Know Her`, `I Used To Think I Could Fly`, `I'm Comin' Over`, `Ich & Keine Maske`, `If You Can Believe Your Eyes & Ears`, `Il Ballo Della Vita`, `Ill Communication`, `Imagination & The Misfit Kid`, `Imagine`, `Immortalized`, `In A Perfect World...`, `In Colour`, `In My Own Words`, `In Rainbows`, `In Return`, `In The Lonely Hour`, `Infest`, `Innuendo`, `Inter Shibuya - La Mafia`, `Interstellar`, `Is This It`, `It Was Written`, `It's Not Me, It's You`, `It's Only Me`, `Ivory`, `JackBoys`, `Jamie`, `Jazz`, `Jibrail & Iblis`, `Jordi`, `Jordin Sparks`, `Jose`, `Just As I Am`, `Just Cause Y'all Waited 2`, `Just Like You`, `Justified`, `K-12 / After School`, `K.I.D.S.`, `K.O.`, `K.O.B. Live`, `KG0516`, `KOD`, `Kane Brown`, `Kid A`, `Kid Krow`, `Kids See Ghosts`, `Kids in Love`, `Kinks (You Really Got Me)`, `Know-It-All`, `Konvicted`, `Kring`, `LANY`, `LM5`, `La Criatura`, `La Flaca`, `La Melodia De La Calle`, `La Revolucion`, `Lady Lady`, `Lady Wood`, `Langit Mong Bughaw`, `Las Que No Iban A Salir`, `Last Day Of Summer`, `Last Year Was Complicated`, `Layers`, `Layover`, `Lazarus`, `Led Zeppelin`, `Left Of The Middle`, `Leftoverture`, `Legends Never Die`, `Let's Skip To The Wedding`, `Let's Talk About Love`, `Licensed To Ill`, `Life In Cartoon Motion`, `Life Thru A Lens`, `Lifelines`, `Like..?`, `Lil Big Pac`, `Lil Boat`, `Lil Boat 2`, `Lil Boat 3.5`, `Lil Kiwi`, `Lil Pump`, `Limon Y Sal`, `Listen Without Prejudice`, `Little Voice`, `Live On Red Barn Radio I & II`, `Lo Que And\xE1bamos Buscando`, `Lofi Fruits Music 2021`, `London Calling`, `Los Campeones Del Pueblo`, `Los Extraterrestres`, `Los Favoritos 2`, `Lost`, `Lost In Love`, `Loud`, `Love Sick`, `Love Story`, `Love Stuff`, `Love Yourself: Tear`, `Lover`, `Luca Brasi 2: Gangsta Grillz`, `Lust For Life`, `Luv Is Rage`, `M!ssundaztood`, `Ma Fleur`, `Made In Lagos`, `Mafia Bidness`, `Magazines Or Novels`, `Mainstream Sellout`, `Majestic`, `Make It Big`, `Make Yourself`, `Making Mirrors`, `Mamma Mia! Here We Go Again`, `Man Of The Woods`, `Manic`, `Me And My Gang`, `Meduza`, `Meet The Orphans`, `Meet The Woo`, `Melim`, `Mellon Collie And The Infinite Sadness`, `Melly vs. Melvin`, `Memories...Do Not Open`, `Menagerie`, `Midnights`, `Minecraft - Volume Alpha`, `Minutes To Midnight`, `Mix Pa Llorar En Tu Cuarto`, `Modo Avi\xF3n`, `Monkey Business`, `Mono.`, `Montana`, `Montevallo`, `Moosetape`, `Morning View`, `Motivan2`, `Moving Pictures`, `Mr. Davis`, `Mr. Misunderstood`, `Mulan`, `Mura Masa`, `Music From The Edge Of Heaven`, `Music Of The Sun`, `My House`, `My Kinda Party`, `My Krazy Life`, `My Liver Will Handle What My Heart Can't`, `My Moment`, `My Own Lane`, `My Turn`, `My Worlds`, `Na Praia (Ao Vivo)`, `Nakamura`, `Nation Of Two`, `Navegando`, `Need You Now`, `Neon Future III`, `Neotheater`, `Never Trust A Happy Song`, `New English`, `News Of The World`, `Nicole`, `Night & Day`, `Nimmerland`, `Nimrod`, `Nine Track Mind`, `No Angel`, `No Me Pidas Perd\xF3n`, `No More Drama`, `No Protection`, `No Strings Attached`, `No Time To Die`, `Nobody Is Listening`, `Non Stop Erotic Cabaret`, `Non-Fiction`, `Northsbest`, `Nostalgia`, `Nostalgia, Ultra`, `Notes On A Conditional Form`, `Now Or Never`, `O Embaixador (Ao Vivo)`, `O My Heart`, `OK Computer`, `Ocean`, `Ocean Avenue`, `Ocean Eyes`, `Odisea`, `Oh My My`, `Oh, What A Life`, `On The 6`, `One In A Million`, `One More Light`, `One Of These Nights`, `Open Up And Say...Ahh!`, `Ordinary Man`, `Origins`, `Out Of The Blue`, `Over It`, `OzuTochi`, `PTSD`, `Pa Las Baby's Y Belikeada`, `Pa Que Hablen`, `Pa' Luego Es Tarde`, `Pa' Otro La 'O`, `Pablo Honey`, `Pain Is Love`, `Pain Is Temporary`, `Painting Pictures`, `Palmen Aus Plastik 2`, `Para Mi Ex`, `Para Siempre`, `Partners In Crime`, `Pawn Shop`, `Pegasus / Neon Shark VS Pegasus`, `Pet Sounds`, `Piece By Piece`, `Pier Pressure`, `Pineapple Sunrise`, `Piseiro 2020 Ao Vivo`, `Planet Pit`, `Plans`, `Play Deep`, `Playa Saturno`, `Por Primera Vez`, `Por Vida`, `Positions`, `Post Human: Survival Horror`, `Poster Girl`, `Prazer, Eu Sou Ferrugem (Ao Vivo)`, `Pretty Girls Like Trap Music`, `Pretty. Odd.`, `Prince Royce`, `Prisma`, `Prometo`, `Providence`, `Puberty 2`, `Punisher`, `Purgatory`, `Purple Rain`, `Que Bendici\xF3n`, `Queen Of The Clouds`, `Quiero Volver`, `R&G (Rhythm & Gangsta): The Masterpiece`, `Raise!`, `Ransom 2`, `Rapunzel`, `Rare`, `Re Mida`, `Ready To Die`, `Realer`, `Rebelde`, `Reclassified`, `Recovery`, `Recuerden Mi Estilo`, `Reggatta De Blanc`, `Regulate\u2026 G Funk Era`, `Reik`, `Reise, Reise`, `Relapse`, `Relaxing Piano Lullabies And Natural Sleep Aid For Baby Sleep Music`, `Religiously. The Album.`, `Replay`, `Results May Vary`, `Revenge`, `Revolve`, `Revolver`, `Ricky Martin`, `Rien 100 Rien`, `Ripcord`, `Rise And Fall, Rage And Grace`, `Rise Of An Empire`, `Robin Hood: Prince Of Thieves`, `Rock N Roll Jesus`, `Romance`, `Romances`, `Ronan`, `Royal Blood`, `Rumours`, `Sad Boyz 4 Life II`, `San Lucas`, `Santana World`, `Saturation III`, `Sauce Boyz`, `Savage Mode`, `Saxobeats`, `Scarlet`, `Schwarzes Herz`, `Seal The Deal & Let's Boogie`, `Section.80`, `Segundo Romance`, `Sehnsucht`, `Shake The Snow Globe`, `Shang-Chi And The Legend Of The Ten Rings: The Album`, `Sheer Heart Attack`, `Shiesty Season`, `Shock Value`, `Shoot For The Stars, Aim For The Moon`, `Signed Sealed And Delivered`, `Signos`, `Silent Alarm`, `Simplemente Gracias`, `Sin Bandera`, `Sing Me A Lullaby, My Sweet Temptation`, `Sinner`, `Sirio`, `Sit Still, Look Pretty`, `Skin`, `Slowhand`, `Smash`, `Smithereens`, `Snow Cougar`, `Social Cues`, `Some Girls`, `Song Hits From Holiday Inn`, `Songs For Dads`, `Songs For The Deaf`, `Songs For You, Truths For Me`, `Songs In The Key Of Life`, `Souled Out`, `Sounds Of Silence`, `Soy Como Quiero Ser`, `Speak Now`, `Speak Your Mind`, `Speakerboxxx/The Love Below`, `Spider-Man: Into The Spider-Verse`, `Split Decision`, `Square Up`, `SremmLife`, `Starboy`, `Stay +`, `Stay Dangerous`, `Staying At Tamara's`, `Steppenwolf`, `Stick Season`, `Still Bill`, `Straight Outta Compton`, `Strange Trails`, `Stronger`, `Suavemente`, `Sublime`, `Suck It and See`, `Sucker`, `Sue\xF1os`, `Sugar`, `Summer Forever`, `Summer,`, `Sunset Season`, `Sunshine On Leith`, `Surfer Rosa`, `Sweet Talker`, `SweetSexySavage`, `System Of A Down`, `TA13OO`, `Talk That Talk`, `Talking Heads: 77`, `Tangled Up`, `Tango In The Night`, `Taxi Driver`, `Taylor Swift`, `Tell Me It's Real`, `Ten`, `Ten Summoner's Tales`, `Terra Sem Cep (Ao Vivo)`, `Terral`, `Testing`, `Tha Carter III`, `Thank Me Later`, `That's Christmas To Me`, `The Academy`, `The Adventures Of Bobby Ray`, `The Album`, `The Andy Williams Christmas Album`, `The Aviary`, `The Balcony`, `The Battle Of Los Angeles`, `The Beatles (White Album)`, `The Beginning`, `The Better Life`, `The Big Day`, `The Book`, `The Breakfast Club`, `The Cars`, `The Colour And The Shape`, `The Death Of Peace Of Mind`, `The Diary Of Alicia Keys`, `The Documentary`, `The Emancipation Of Mimi`, `The Eminem Show`, `The End Of Everything`, `The Final Countdown`, `The Forever Story`, `The Foundation`, `The Goat`, `The Golden Child`, `The Good Parts`, `The Greatest Showman: Reimagined`, `The Green Trip`, `The Hardest Love`, `The Head And The Heart`, `The Human Condition`, `The Infamous`, `The Lady Killer`, `The Last Don II`, `The Lion King`, `The Lockdown Sessions`, `The London Sessions`, `The Lord Of The Rings: The Fellowship Of The Ring`, `The Lost Boy`, `The Magic Of Christmas / The Christmas Song`, `The Marshall Mathers LP`, `The Martin Garrix Collection`, `The Melodic Blue`, `The Mockingbird & The Crow`, `The Pains Of Growing`, `The Papercut Chronicles`, `The Perfect Luv Tape`, `The Pinkprint`, `The Predator`, `The Queen Is Dead`, `The ReVe Festival: Finale`, `The Rise And Fall Of Ziggy Stardust And The Spiders From Mars`, `The Rising Tied`, `The River`, `The Stone Roses`, `The Story Of Us`, `The Stranger`, `The Sufferer & The Witness`, `The Sun's Tirade`, `The Temptations Sing Smokey`, `The Time Of Our Lives`, `The Way It Is`, `The Wonderful World Of Sam Cooke`, `The Writing's On The Wall`, `The Young And The Hopeless`, `Therapy`, `Therapy Session`, `There Is More (Live)`, `There Is Nothing Left To Lose`, `These Things Happen`, `Third Eye Blind`, `This Is Me...Then`, `This Unruly Mess I've Made`, `Threat to Survival`, `Thrill Of The Chase`, `Time`, `Timelezz`, `To Let A Good Thing Die`, `To Pimp A Butterfly`, `Toast To Our Differences`, `Todos Os Cantos, Vol. 1 (Ao Vivo)`, `Too Hard`, `Torches X`, `Total Xanarchy`, `Toto IV`, `Toulouse Street`, `Tourist History`, `Toxicity`, `Tragic Kingdom`, `Tranquility Base Hotel & Casino`, `Traumazine`, `Traveler`, `Tres Hombres`, `Trip At Knight`, `Tron: Legacy`, `True Blue`, `True Colors`, `Trustfall`, `Tu Veneno Mortal`, `Tudo Em Paz`, `Ubuntu`, `Ugly Is Beautiful`, `Ultra 2021`, `Una Mattina`, `Unbroken`, `Uncovered`, `Under Pressure`, `Unsponsored Content`, `Unstoppable`, `Unwritten`, `Urban Flora`, `Urban Hymns`, `Use Your Illusion I`, `Veneer`, `Versions Of Me`, `Vibes`, `Vice Versa`, `Vices & Virtues`, `Victory`, `Vida`, `Viejo Marihuano`, `Visual\xEDzate`, `Walk Away`, `Walk Me Home...`, `Watch The Throne`, `Wave`, `We Broke The Rules`, `We Love You Tecca`, `We Love You Tecca 2`, `Weezer (Green Album)`, `Welcome To The Madhouse`, `Westlife`, `What A Time To Be Alive`, `What Do You Think About The Car?`, `What Is Love?`, `What Makes You Country`, `What Separates Me From You`, `What You See Is What You Get / What You See Ain't Always What You Get`, `When It's Dark Out`, `When We All Fall Asleep, Where Do We Go?`, `Where The Light Is`, `While The World Was Burning`, `White Pony`, `Whitney`, `Who Really Cares`, `Who You Are`, `Who's Next`, `Wide Open`, `Wilder Mind`, `Wildfire`, `Willy And The Poor Boys`, `Wings / You Never Walk Alone`, `Wish`, `Wish You Were Here`, `Without Warning`, `Wonder`, `X&Y`, `XOXO`, `Y Que Quede Claro`, `YBN: The Mixtape`, `Yo Creo`, `You Will Regret`, `Youngblood`, `Younger Now`, `Youth`], artist: [`$NOT`, `$uicideboy$`, `(G)I-DLE`, `*NSYNC`, `2 Chainz`, `21 Savage`, `6LACK`, `? & The Mysterians`, `A Boogie Wit da Hoodie`, `A Taste of Honey`, `A Tribe Called Quest`, `A-Ha`, `ABBA`, `AC/DC`, `AJ Tracey`, `ATEEZ`, `Ace of Base`, `Adele`, `Ado`, `Aerosmith`, `Agust D`, `Aitana`, `Al Dexter & his Troopers`, `Al Green`, `Al Jolson`, `Al Martino`, `Alan Jackson`, `Alannah Myles`, `Alec Benjamin`, `Alejandro Sanz`, `Alesso`, `Alfredo Olivas`, `Ali Gatie`, `Alice In Chains`, `Alina Baraz`, `All Time Low`, `All-4-One`, `All-American Rejects`, `Alok`, `America`, `American Quartet`, `Amii Stewart`, `Amitabh Bhattacharya`, `Ana Castela`, `Anderson .Paak`, `Andy Grammer`, `Angus & Julia Stone`, `Anirudh Ravichander`, `Anita Ward`, `Anitta`, `Anton Karas`, `Anuel AA`, `Arcade Fire`, `Archie Bell & The Drells`, `Archies`, `Aretha Franklin`, `Arizona Zervas`, `Armin van Buuren`, `Arthur Conley`, `Artie Shaw`, `Asake`, `Asees Kaur`, `Association`, `Atif Aslam`, `Audioslave`, `Aventura`, `Avril Lavigne`, `Aya Nakamura`, `B J Thomas`, `B.o.B`, `BLACKPINK`, `BONES`, `BROCKHAMPTON`, `BTS`, `Baby Keem`, `Bachman-Turner Overdrive`, `Backstreet Boys`, `Bad Bunny`, `Badshah`, `Bailey Zimmerman`, `Banda El Recodo`, `Barbra Streisand`, `Barry White`, `Bazzi`, `Bebe Rexha`, `Becky G`, `Becky Hill`, `Bee Gees`, `Ben Bernie`, `Ben Howard`, `Ben Selvin`, `Berlin`, `Bessie Smith`, `Bethel Music`, `Bette Midler`, `Beyonce`, `Bibi Blocksberg`, `Bibi und Tina`, `BigXthaPlug`, `Bill Doggett`, `Bill Haley & his Comets`, `Bill Withers`, `Billy Davis Jr`, `Billy Joel`, `Billy Paul`, `Billy Preston`, `Billy Swan`, `Birdy`, `Bizarrap`, `Blake Shelton`, `Blur`, `Bob Marley & The Wailers`, `Bob Seger`, `Bobby Darin`, `Bobby Lewis`, `Bobby McFerrin`, `Bobby Vinton`, `Boney M.`, `Bonez MC`, `Bonnie Tyler`, `Booba`, `Boston`, `BoyWithUke`, `Boyce Avenue`, `Bradley Cooper`, `Bread`, `Brent Faiyaz`, `Brett Young`, `Bring Me The Horizon`, `Britney Spears`, `Brooks & Dunn`, `Bruce Channel`, `Bruno & Marrone`, `Bryan Adams`, `Bryce Vine`, `Buddy Holly`, `Burna Boy`, `C. Tangana`, `CKay`, `CRO`, `Camilo`, `Capital Bra`, `Captain & Tennille`, `Cardi B`, `Carin Leon`, `Carlos Vives`, `Carly Simon`, `Carpenters`, `Cavetown`, `Celine Dion`, `Central Cee`, `Chaka Khan`, `Champs`, `Charlie Rich`, `Chayanne`, `Cheat Codes`, `Cher`, `Chic`, `Chicago`, `Chris Brown`, `Chris Isaak`, `Chris Young`, `Christina Aguilera`, `Christina Perri`, `Christopher Cross`, `Chuck Berry`, `Ciara`, `Cigarettes After Sex`, `Cliff Edwards (Ukelele Ike)`, `Cody Johnson`, `Colbie Caillat`, `Colby O'Donis`, `Cole Swindell`, `Coleman Hawkins`, `Contours`, `Coolio`, `Count Basie`, `Cris Mj`, `Culture Club`, `Cyndi Lauper`, `D-Block Europe`, `DAY6`, `DJ Khaled`, `DJ Luian`, `DJ Nelson`, `DMX`, `DNCE`, `DaVido`, `Dadju`, `Daft Punk`, `Dan + Shay`, `Daniel Powter`, `Danny Ocean`, `Darius Rucker`, `Dave`, `David Bowie`, `David Guetta`, `Daya`, `Dean Martin`, `Deee-Lite`, `Deep Purple`, `Deftones`, `Demi Lovato`, `Dennis Lloyd`, `Denzel Curry`, `Dermot Kennedy`, `Desiigner`, `Devo`, `Dewa 19`, `Dexys Midnight Runners`, `Diddy`, `Dido`, `Die drei !!!`, `Diego & Victor Hugo`, `Diljit Dosanjh`, `Dimitri Vegas & Like Mike`, `Dinah Shore`, `Dionne Warwick`, `Dire Straits`, `Disclosure`, `Dixie Cups`, `Doja Cat`, `Dolly Parton`, `Don Diablo`, `Don Henley`, `Don McLean`, `Don Omar`, `Donna Summer`, `Donovan`, `Dr. Dre`, `Drake`, `Dreamville`, `Dua Lipa`, `EMF`, `ENHYPEN`, `Earth, Wind & Fire`, `Ed Sheeran`, `Eddie Cantor`, `Eddie Cochran`, `Eddy Howard`, `Edgar Winter Group`, `Edwin Hawkins Singers`, `Edwin Starr`, `El Alfa`, `Eladio Carrion`, `Electric Light Orchestra`, `Elevation Worship`, `Ella Henderson`, `Ellie Goulding`, `Elton John`, `Elvis Presley`, `Empire of the Sun`, `En Vogue`, `Enrique Iglesias`, `Eslabon Armado`, `Ethel Waters`, `Etta James`, `Evanescence`, `Exile`, `Extreme`, `Faith Hill`, `Fall Out Boy`, `Fanny Brice`, `Farruko`, `Fats Domino`, `Fats Waller`, `Feid`, `Felix Jaehn`, `Fergie`, `Fetty Wap`, `Fiersa Besari`, `Fifth Harmony`, `Fine Young Cannibals`, `Five Finger Death Punch`, `Fleetwood Mac`, `Flo-Rida`, `Florence + The Machine`, `Flume`, `Foo Fighters`, `Foreigner`, `Foster The People`, `Four Aces`, `Frank Ocean`, `Frank Sinatra`, `Frankie Avalon`, `Frankie Valli`, `Fred Astaire`, `Freda Payne`, `Freddie Dredd`, `Freddy Fender`, `French Montana`, `Fuerza Regida`, `Fujii Kaze`, `Future`, `G-Eazy`, `Garfunkel and Oates`, `Gary Lewis & The Playboys`, `Gary Numan`, `Gene Autry`, `Gene Chandler`, `Gene Vincent`, `George Michael`, `George Strait`, `Gera MX`, `Ghost`, `Ghostemane`, `Gigi D'Agostino`, `Gladys Knight & The Pips`, `Glass Animals`, `Glee Cast`, `Gloria Gaynor`, `Godsmack`, `Gorillaz`, `Gotye`, `Grand Funk Railroad`, `Green Day`, `Grouplove`, `Grupo Firme`, `Grupo Marca Registrada`, `Gryffin`, `Gucci Mane`, `Guess Who`, `Gunna`, `Gusttavo Lima`, `Guy Mitchell`, `Gwen Stefani`, `Gzuz`, `H.E.R.`, `HARDY`, `Hailee Steinfeld`, `Halsey`, `Hans Zimmer`, `Harris Jayaraj`, `Harry Chapin`, `Harry James`, `Harry Nilsson`, `Harry Styles`, `Hayley Williams`, `Herb Alpert`, `Herman's Hermits`, `Hillsong UNITED`, `Hillsong Worship`, `Hollywood Undead`, `Honey Cone`, `Hoobastank`, `Hues Corporation`, `I Prevail`, `ITZY`, `IVE`, `Ice Cube`, `Ice Spice`, `Iggy Azalea`, `Imagine Dragons`, `Incubus`, `Internet Money`, `Isaac Hayes`, `J Geils Band`, `J. Cole`, `JAY-Z`, `JJ Lin`, `JP Saxe`, `JVKE`, `Jack Harlow`, `Jack Johnson`, `Jackie Wilson`, `Jacquees`, `James Arthur`, `James Brown`, `James TW`, `James Taylor`, `Jamie Foxx`, `Janet Jackson`, `Janis Joplin`, `Jason Aldean`, `Jason Mraz`, `Jay Chou`, `Jay Sean`, `Jay Wheeler`, `Jaymes Young`, `Jean Knight`, `Jeezy`, `Jennifer Lopez`, `Jennifer Warnes`, `Jeremih`, `Jeremy Zucker`, `Jerry Lee Lewis`, `Jerry Murad's Harmonicats`, `Jess Glynne`, `Jessie J`, `Jewel`, `Jimi Hendrix`, `Jimin`, `Jimmie Rodgers`, `Jimmy Dean`, `Jo Stafford`, `Joan Jett & The Blackhearts`, `Joao Gilberto`, `Joel Corry`, `John Fred & The Playboy Band`, `John Legend`, `John Mayer`, `John Williams`, `Johnnie Ray`, `Johnnie Taylor`, `Johnny Cash`, `Johnny Horton`, `Johnny Mathis`, `Johnny Mercer`, `Johnny Nash`, `Joji`, `Jon Bellion`, `Jonas Blue`, `Jonas Brothers`, `Joni James`, `Jorja Smith`, `Juan Gabriel`, `Juan Luis Guerra 4.40`, `Juanes`, `Juice Newton`, `Julia Michaels`, `Justin Bieber`, `Justin Quiles`, `KALEO`, `KAROL G`, `KAYTRANADA`, `KK`, `KSI`, `KYLE`, `Kacey Musgraves`, `Kane Brown`, `Kanye West`, `Karan Aujla`, `Kate Smith`, `Katy Perry`, `Kay Kyser`, `Ke$ha`, `Kehlani`, `Kelly Clarkson`, `Kenny Chesney`, `Kenny Loggins`, `Kenny Rogers`, `Kenshi Yonezu`, `Kenya Grace`, `Kevin Gates`, `Key Glock`, `Khalid`, `Kim Carnes`, `Kim Petras`, `Kimbra`, `Kina`, `King Gnu`, `Kings of Leon`, `Kingsmen`, `Kitty Kallen`, `Kodak Black`, `Kodaline`, `Kollegah`, `Kool & The Gang`, `Kungs`, `Kygo`, `Kylie Minogue`, `LE SSERAFIM`, `LISA`, `LMFAO`, `LUDMILLA`, `La Adictiva Banda San Jos\xE9 de Mesillas`, `La Oreja de Van Gogh`, `Labrinth`, `Lady Antebellum`, `Lady GaGa`, `Lainey Wilson`, `Lana Del Rey`, `Latto`, `Lauryn Hill`, `Lauv`, `League of Legends`, `Lee Brice`, `Leon Bridges`, `Leona Lewis`, `Lesley Gore`, `Leslie Odom Jr.`, `Liam Payne`, `Lifehouse`, `Lil Baby`, `Lil Dicky`, `Lil Durk`, `Lil Mosey`, `Lil Nas X`, `Lil Pump`, `Lil Skies`, `Lil Tjay`, `Lil Uzi Vert`, `Lil Yachty`, `Lil' Kim`, `Lil' Wayne`, `Lin-Manuel Miranda`, `Linkin Park`, `Lionel Richie`, `Lipps Inc`, `Lisa Loeb`, `Little Peggy March`, `Little Richard`, `Lofi Fruits Music`, `Lord Huron`, `Los Del Rio`, `Los Dos Carnales`, `Los Lobos`, `Los Temerarios`, `Los Tigres Del Norte`, `Los Tucanes De Tijuana`, `Lou Reed`, `Loud Luxury`, `Louis Jordan`, `Louis Tomlinson`, `Love Unlimited`, `Lovin' Spoonful`, `Luan Santana`, `Luciano`, `Luis Miguel`, `Luis R Conriquez`, `Lulu`, `Lunay`, `Lupe Fiasco`, `M`, `MAX`, `MC Hammer`, `MC Ryan SP`, `MKTO`, `Mabel`, `Machine Gun Kelly`, `Madison Beer`, `Madonna`, `Mahalini`, `Major Lazer`, `Mambo Kingz`, `Maneskin`, `Marco Antonio Sol\xEDs`, `Margaret Whiting`, `Maria Becerra`, `Mario`, `Mario Lanza`, `Mark Ronson`, `Maroon 5`, `Marshmello`, `Martin Garrix`, `Mary Ford`, `Mary J Blige`, `Mary J. Blige`, `Mary Wells`, `Matoma`, `Mau y Ricky`, `Meek Mill`, `Megadeth`, `Melanie`, `Melanie Martinez`, `Melendi`, `Men At Work`, `Metro Boomin`, `Michael Bubl\xE9`, `Michael Jackson`, `Michael McDonald`, `Michael Sembello`, `Miguel`, `Mike Posner`, `Miley Cyrus`, `Milky Chance`, `Minnie Riperton`, `Miracle Tones`, `Miranda Lambert`, `Mohit Chauhan`, `Mon Laferte`, `Moneybagg Yo`, `Monsta X`, `Mora`, `Morad`, `Morat`, `Mother Mother`, `Motley Crue`, `Ms. Lauryn Hill`, `Mumford & Sons`, `Muse`, `Mya`, `Myke Towers`, `NCT 127`, `NCT DREAM`, `NEFFEX`, `Nadin Amizah`, `Nancy Sinatra`, `Nat King Cole`, `Nate Smith`, `Natti Natasha`, `Nayer`, `Neil Diamond`, `Neil Sedaka`, `Nekfeu`, `Nelly`, `New Vaudeville Band`, `Next`, `Nickelback`, `Nicki Minaj`, `Nicki Nicole`, `Nicky Jam`, `Nina Simone`, `Ninho`, `Nipsey Hussle`, `Nirvana`, `Niska`, `No Doubt`, `Norah Jones`, `Normani`, `OMI`, `ONE OK ROCK`, `Oasis`, `Official HIGE DANdism`, `Offset`, `Old Dominion`, `Oliver Heldens`, `Olivia Rodrigo`, `Omah Lay`, `One Direction`, `Otis Redding`, `OutKast`, `Owl City`, `P Diddy`, `P!nk`, `PLK`, `PNL`, `Pamungkas`, `Passenger`, `Pat Boone`, `Patsy Cline`, `Patti LaBelle`, `Patti Page`, `Paul & Paula`, `Paul Revere & the Raiders`, `Paul Robeson`, `Paul Russell`, `Paul Whiteman`, `Paula Abdul`, `Peaches & Herb`, `Pearl Jam`, `Pee Wee Hunt`, `Pee Wee King`, `Pentatonix`, `Percy Faith`, `Percy Sledge`, `Peso Pluma`, `Peter Cetera`, `Peter Gabriel`, `Peter, Paul & Mary`, `Pharrell Williams`, `Pierce The Veil`, `Pineapple StormTv`, `Pink Floyd`, `Pink Sweat$`, `Piso 21`, `Pitbull`, `Plan B`, `Player`, `Polo G`, `Pop Smoke`, `Portugal. The Man`, `Pouya`, `Prince`, `Prince Royce`, `Pusha T`, `Quality Control`, `Queen`, `Quinn XCII`, `R. Kelly`, `RAF Camora`, `RAYE`, `REM`, `REO Speedwagon`, `Radiohead`, `Rag'n'Bone Man`, `Rage Against The Machine`, `Rahat Fateh Ali Khan`, `Rainbow Kitten Surprise`, `Rammstein`, `Rauw Alejandro`, `Ray Charles`, `Ray Parker Jr`, `Ray Stevens`, `Red Foley`, `Red Hot Chili Peppers`, `Red Velvet`, `Regard`, `Regina Belle`, `Reik`, `Rels B`, `Rema`, `Ricardo Arjona`, `Rich The Kid`, `Rick Astley`, `Rick Dees & his Cast of Idiots`, `Rick Ross`, `Rick Springfield`, `Ricky Martin`, `Ricky Nelson`, `Rihanna`, `Rita Ora`, `Ritchie Valens`, `Rizky Febian`, `Rob Thomas`, `Roberta Flack`, `Robin Schulz`, `Robin Thicke`, `Rod Stewart`, `Rod Wave`, `Roddy Ricch`, `Roger Miller`, `Romeo Santos`, `Rosemary Clooney`, `Roxette`, `Roy Acuff`, `Roy Orbison`, `Rudimental`, `Ruel`, `Ruth B.`, `Ryan Lewis`, `SCH`, `SEVENTEEN`, `SWV`, `Sabaton`, `Sabrina Carpenter`, `Sachet Tandon`, `Sachin-Jigar`, `Sade`, `Sam Cooke`, `Sam Feldt`, `Sam Hunt`, `Sam Smith`, `Sam The Sham & The Pharaohs`, `Sammy Davis Jr`, `Sammy Kaye`, `Santana`, `Sasha Alex Sloan`, `Savage Garden`, `Saweetie`, `Scorpions`, `Sean Kingston`, `Sean Paul`, `Sebastian Yatra`, `Sech`, `Seeb`, `Sezen Aksu`, `Sfera Ebbasta`, `Shaggy`, `Shania Twain`, `Shawn Mendes`, `Sheena Easton`, `Shinedown`, `Shubh`, `Sia`, `Sid Sriram`, `Sidhu Moose Wala`, `Silk`, `Silver Convention`, `Simon & Garfunkel`, `Sinead O'Connor`, `Sir Mix-a-Lot`, `Sister Sledge`, `Ski Mask The Slump God`, `Skillet`, `Skrillex`, `Sleeping At Last`, `Smokey Robinson`, `Snoop Dogg`, `Snow Patrol`, `Soda Stereo`, `Sonu Nigam`, `Sophie Ellis-Bextor`, `Spencer Davis Group`, `Spice Girls`, `Stan Getz`, `Starland Vocal Band`, `Stephen Sanchez`, `Steve Aoki`, `Steve Lacy`, `Steve Winwood`, `Stevie B`, `Sting`, `Stormzy`, `Strawberry Alarm Clock`, `Stray Kids`, `Stromae`, `Sublime`, `Sum 41`, `Summer Walker`, `Supertramp`, `Survivor`, `Swedish House Mafia`, `System Of A Down`, `T-Pain`, `T.I.`, `TAEYEON`, `TKKG`, `TLC`, `TOMORROW X TOGETHER`, `TOTO`, `TWICE`, `Tag Team`, `Tainy`, `Tammi Terrell`, `Tanishk Bagchi`, `Tate McRae`, `Taylor Swift`, `Tears For Fears`, `Tems`, `Tennessee Ernie Ford`, `Terence Trent D'Arby`, `Teresa Brewer`, `Terry Jacks`, `The Ames Brothers`, `The Animals`, `The B52s`, `The Bangles`, `The Beatles`, `The Black Eyed Peas`, `The Black Keys`, `The Box Tops`, `The Chainsmokers`, `The Chiffons`, `The Chordettes`, `The Clash`, `The Coasters`, `The Commodores`, `The Cowsills`, `The Cranberries`, `The Crew-Cuts`, `The Cure`, `The Detroit Spinners`, `The Diamonds`, `The Doobie Brothers`, `The Doors`, `The Drifters`, `The Emotions`, `The Eurythmics`, `The Fireballs`, `The Flamingos`, `The Foundations`, `The Four Seasons`, `The Fray`, `The Game`, `The Go Gos`, `The Goo Goo Dolls`, `The Head And The Heart`, `The Hollies`, `The Ink Spots`, `The Isley Brothers`, `The Jackson 5`, `The Kid LAROI`, `The Killers`, `The Kingston Trio`, `The Kooks`, `The Lemon Pipers`, `The Living Tombstone`, `The Lumineers`, `The Mamas & The Papas`, `The Marvelettes`, `The McCoys`, `The Mills Brothers`, `The Miracles`, `The Monkees`, `The Moody Blues`, `The National`, `The Neighbourhood`, `The Notorious B.I.G.`, `The O'Jays`, `The Offspring`, `The Osmonds`, `The Partridge Family`, `The Penguins`, `The Pet Shop Boys`, `The Platters`, `The Righteous Brothers`, `The Rolling Stones`, `The Ronettes`, `The Score`, `The Script`, `The Seekers`, `The Shangri-Las`, `The Smashing Pumpkins`, `The Staple Singers`, `The Strokes`, `The Supremes`, `The Temptations`, `The Turtles`, `The Vamps`, `The Verve`, `The Village People`, `The Weavers`, `The White Stripes`, `The Young Rascals`, `The Zombies`, `Thelma Houston`, `Thomas Rhett`, `Three Days Grace`, `Three Dog Night`, `Three Man Down`, `Timbaland`, `Timmy Trumpet`, `Toby Keith`, `Tom Jones`, `Tom Petty and the Heartbreakers`, `Tommy Dorsey`, `Tommy Edwards`, `Tommy James & the Shondells`, `Tone Loc`, `Toni Braxton`, `Topic`, `Tory Lanez`, `Tove Lo`, `Trevor Daniel`, `Trey Songz`, `Trippie Redd`, `Trueno`, `Tulsi Kumar`, `Tulus`, `Twenty One Pilots`, `Two Feet`, `Ty Dolla $ign`, `Tyga`, `Tyler Hubbard`, `U2`, `UB40`, `UZI`, `Ufo361`, `Upchurch`, `V`, `Vampire Weekend`, `Van McCoy`, `Van Morrison`, `Vance Joy`, `Vanessa Carlton`, `Vanessa Williams`, `Vera Lynn`, `Vernon Dalhart`, `Vicente Fernandez`, `Vishal-Shekhar`, `Volbeat`, `WILLOW`, `Wale`, `Wallows`, `Weezer`, `Wham!`, `Whitney Houston`, `Why Don't We`, `Wilbert Harrison`, `Wilson Phillips`, `Wiz Khalifa`, `Woody Guthrie`, `Wyclef Jean`, `XXXTENTACION`, `Xavi`, `YG`, `YNW Melly`, `YOASOBI`, `Yandel`, `Years & Years`, `Yeat`, `Yo Gotti`, `Young Dolph`, `Young Miko`, `Young Thug`, `YoungBoy Never Broke Again`, `Yung Gravy`, `Yuuri`, `Yuvan Shankar Raja`, `ZAYN`, `ZZ Top`, `Zac Brown Band`, `Zach Bryan`, `Zara Larsson`, `aespa`, `benny blanco`, `blink-182`, `d4vd`, `deadmau5`, `girl in red`, `gnash`, `iann dior`, `will.i.am`], genre: `Acid House.Acid Jazz.Acid Rock.Acoustic.Acoustic Blues.Afro-Pop.Afrobeat.Alt-Rock.Alternative.Ambient.American Trad Rock.Americana.Anime.Arena Rock.Art-Rock.Avant-Garde.Avant-Punk.Baladas y Boleros.Barbershop.Baroque.Bebop.Big Band.Black Metal.Blue Note.Bluegrass.Blues.Boogaloo.Bop.Bossa Nova.Bounce.Brazilian Funk.Breakbeat.Britpop.CCM.Cajun.Cantopop.Celtic.Celtic Folk.Chamber Music.Chant.Chanukah.Chicago Blues.Chicago House.Chicano.Children\u2019s Music.Chill.Choral.Christian.Christmas.Classical.Club.College Rock.Conjunto.Cool Jazz.Country.Crunk.Dance.Dancehall.Death Metal.Deep House.Delta Blues.Detroit Techno.Dirty South.Disco.Disney.Dixieland.Doo-wop.Downtempo.Dream Pop.Drill.Drinking Songs.Drone.Drum'n'bass.Dub.Dubstep.EDM.Early Music.East Coast Rap.Easter.Easy Listening.Eclectic.Electric Blues.Electro.Electronic.Electronica.Emo.Enka.Environmental.Ethio-jazz.Experimental.Experimental Rock.Flamenco.Folk.Folk-Rock.Forro.French Pop.Funk.Fusion.Gangsta Rap.Garage.German Folk.German Pop.Glam Rock.Gospel.Goth.Grime.Grindcore.Groove.Grunge.Hair Metal.Halloween.Happy.Hard Bop.Hard Dance.Hard Rock.Hardcore.Hardcore Punk.Hardcore Rap.Hardstyle.Healing.Heavy Metal.High Classical.Hip Hop.Holiday.Honky Tonk.House.IDM.Impressionist.Indie.Industrial.Instrumental.J-Dance.J-Idol.J-Pop.J-Punk.J-Rock.J-Ska.J-Synth.Jackin House.Jam Bands.Japanese Pop.Jazz.Jungle.K-Pop.Karaoke.Kayokyoku.Kids.Kitsch.Klezmer.Krautrock.Latin.Latin Jazz.Latin Rap.Local.Lounge.Lullabies.MPB.Mainstream Jazz.Malay.Mandopop.March.Mariachi.Mawwal.Medieval.Meditation.Metal.Metalcore.Minimal Techno.Minimalism.Modern.Motown.Mugham.Musicals.Musique Concr\xE8te.Nature.Neo-Soul.Nerdcore.New Acoustic.New Age.New Mex.New Wave.No Wave.Noise.Nordic.Novelty.OPM.Oi!.Old School Rap.Opera.Orchestral.Original Score.Outlaw Country.Pagode.Party.Piano.Polka.Pop.Pop Film.Pop Latino.Post Dubstep.Power Pop.Praise & Worship.Progressive House.Progressive Rock.Proto-punk.Psych Rock.Psychedelic.Punk.Punk Rock.Qawwali.Quiet Storm.R&B.Ragtime.Rainy Day.Rap.Reggae.Reggaeton.Regional Mexicano.Relaxation.Renaissance.Retro.Rock.Rockabilly.Rocksteady.Romance.Romantic.Roots Reggae.Roots Rock.SKA.Sad.Salsa.Samba.Second Line.Sertanejo.Shaabi.Shoegaze.Sleep.Smooth Jazz.Soft Rock.Soul.Soundtrack.Southern Gospel.Southern Rock.Space Rock.Stage And Screen.Steampunk.Summer.Surf.Swamp Pop.Swing.Synth Pop.Tango.Techno.Teen Pop.Tejano.Tex-Mex.Thanksgiving.Traditional.Trance.Trip Hop.Tropical.Underground Rap.Urban.Urban Cowboy.West Coast Rap.Western Swing.World.Worldbeat.Zydeco`.split(`.`), song_name: [`(Everything I Do) I Do it For You`, `(Ghost) Riders in the Sky`, `(I Can't Get No) Satisfaction`, `(I've Got a Gal In) Kalamazoo`, `(I've Had) the Time of My Life`, `(It's No) Sin`, `(Just Like) Starting Over`, `(Let Me Be Your) Teddy Bear`, `(Put Another Nickel In) Music! Music! Music!`, `(Sexual) Healing`, `(Sittin' On) the Dock of the Bay`, `(They Long to Be) Close to You`, `(You Keep Me) Hangin' On`, `(You're My) Soul & Inspiration`, `(Your Love Keeps Lifting Me) Higher & Higher`, `12th Street Rag`, `1999`, `19th Nervous Breakdown`, `50 Ways to Leave Your Lover`, `9 to 5`, `96 Tears`, `A Boy Named Sue`, `A Hard Day's Night`, `A String of Pearls`, `A Thousand Miles`, `A Tree in the Meadow`, `A Whiter Shade of Pale`, `A Whole New World (Aladdin's Theme)`, `A Woman in Love`, `A-Tisket A-Tasket`, `ABC`, `Abracadabra`, `Ac-cent-tchu-ate the Positive`, `Addicted to Love`, `After You've Gone`, `Afternoon Delight`, `Again`, `Against All Odds (Take a Look At Me Now)`, `Ain't Misbehavin'`, `Ain't No Mountain High Enough`, `Ain't No Sunshine`, `Ain't That a Shame`, `Airplanes`, `All Along the Watchtower`, `All I Have to Do is Dream`, `All I Wanna Do`, `All My Lovin' (You're Never Gonna Get It)`, `All Night Long (All Night)`, `All Out of Love`, `All Shook Up`, `All You Need is Love`, `Alone`, `Alone Again (Naturally)`, `Always On My Mind`, `American Pie`, `American Woman`, `Angie`, `Another Brick in the Wall (part 2)`, `Another Day in Paradise`, `Another Night`, `Another One Bites the Dust`, `Apologize`, `April Showers`, `Aquarius/Let The Sunshine In`, `Are You Lonesome Tonight?`, `Arthur's Theme (Best That You Can Do)`, `As Time Goes By`, `At Last`, `At the Hop`, `Auf Wiederseh'n Sweetheart`, `Baby Baby`, `Baby Come Back`, `Baby Got Back`, `Baby Love`, `Baby One More Time`, `Bad Day`, `Bad Girls`, `Bad Moon Rising`, `Bad Romance`, `Bad, Bad Leroy Brown`, `Baker Street`, `Ball of Confusion (That's What the World is Today)`, `Ballad of the Green Berets`, `Ballerina`, `Band On the Run`, `Band of Gold`, `Battle of New Orleans`, `Be Bop a Lula`, `Be My Baby`, `Be My Love`, `Beat It`, `Beautiful Day`, `Beauty & the Beast`, `Because I Love You (The Postman Song)`, `Because You Loved Me`, `Because of You`, `Before The Next Teardrop Falls`, `Begin the Beguine`, `Behind Closed Doors`, `Being With You`, `Believe`, `Ben`, `Bennie & the Jets`, `Besame Mucho`, `Best of My Love`, `Bette Davis Eyes`, `Big Bad John`, `Big Girls Don't Cry`, `Billie Jean`, `Bitter Sweet Symphony`, `Black Or White`, `Black Velvet`, `Blaze of Glory`, `Bleeding Love`, `Blue Suede Shoes`, `Blue Tango`, `Blueberry Hill`, `Blurred Lines`, `Body & Soul`, `Bohemian Rhapsody`, `Boogie Oogie Oogie`, `Boogie Woogie Bugle Boy`, `Boom Boom Pow`, `Born in the USA`, `Born to Be Wild`, `Born to Run`, `Boulevard of Broken Dreams`, `Brand New Key`, `Brandy (You're A Fine Girl)`, `Breaking Up is Hard to Do`, `Breathe`, `Bridge Over Troubled Water`, `Brother Louie`, `Brother, Can You Spare a Dime?`, `Brown Eyed Girl`, `Brown Sugar`, `Build Me Up Buttercup`, `Burn`, `Buttons & Bows`, `Bye Bye Love`, `Bye Bye, Blackbird`, `Bye, Bye, Bye`, `Caldonia Boogie (What Makes Your Big Head So Hard)`, `California Dreamin'`, `California Girls`, `Call Me`, `Call Me Maybe`, `Can You Feel the Love Tonight`, `Can't Buy Me Love`, `Can't Get Enough of Your Love, Babe`, `Can't Help Falling in Love`, `Candle in the Wind '97`, `Candy Man`, `Car Wash`, `Careless Whisper`, `Cars`, `Cat's in the Cradle`, `Cathy's Clown`, `Celebration`, `Centerfold`, `Chain of Fools`, `Chances Are`, `Change the World`, `Chapel of Love`, `Chattanooga Choo Choo`, `Chattanoogie Shoe-Shine Boy`, `Check On It`, `Cheek to Cheek`, `Cherish`, `Cherry Pink & Apple Blossom White`, `Cold, Cold Heart`, `Colors of the Wind`, `Come On Eileen`, `Come On-a My House`, `Come Together`, `Coming Up`, `Cracklin' Rosie`, `Crazy`, `Crazy For You`, `Crazy Little Thing Called Love`, `Crazy in Love`, `Creep`, `Crimson & Clover`, `Crocodile Rock`, `Cry`, `Cry Like a Baby`, `Crying`, `Da Doo Ron Ron (When He Walked Me Home)`, `Dance to the Music`, `Dancing Queen`, `Dancing in the Dark`, `Dancing in the Street`, `Dardanella`, `Daydream Believer`, `December 1963 (Oh What a Night)`, `Delicado`, `Dilemma`, `Disco Duck`, `Disco Lady`, `Disturbia`, `Dizzy`, `Do That to Me One More Time`, `Do Wah Diddy Diddy`, `Do Ya Think I'm Sexy?`, `Do You Love Me?`, `Don't Be Cruel`, `Don't Fence Me In`, `Don't Go Breaking My Heart`, `Don't Leave Me This Way`, `Don't Let the Stars Get in Your Eyes`, `Don't Let the Sun Go Down On Me`, `Don't Speak`, `Don't Stop 'Til You Get Enough`, `Don't Worry Be Happy`, `Don't You (Forget About Me)`, `Don't You Want Me`, `Doo Wop (That Thing)`, `Down`, `Down Hearted Blues`, `Down Under`, `Downtown`, `Dreamlover`, `Dreams`, `Drop it Like It's Hot`, `Drops of Jupiter (Tell Me)`, `Duke of Earl`, `E.T.`, `Earth Angel`, `Ebony & Ivory`, `Eight Days a Week`, `Empire State Of Mind`, `End of the Road`, `Endless Love`, `Escape (The Pina Colada Song)`, `Eve of Destruction`, `Every Breath You Take`, `Every Little Thing She Does is Magic`, `Everybody Loves Somebody`, `Everybody Wants to Rule the World`, `Everyday People`, `Eye of the Tiger`, `Faith`, `Fallin'`, `Fame`, `Family Affair`, `Fantasy`, `Fast Car`, `Feel Good Inc`, `Feel Like Making Love`, `Fire & Rain`, `Firework`, `Flashdance. What a Feeling`, `Fly Robin Fly`, `Foolish Games`, `Footloose`, `For What It's Worth (Stop, Hey What's That Sound)`, `Fortunate Son`, `Frankenstein`, `Freak Me`, `Freebird`, `Frenesi`, `Funkytown`, `Gangsta's Paradise`, `Georgia On My Mind`, `Georgy Girl`, `Get Back`, `Get Down Tonight`, `Get Off of My Cloud`, `Ghostbusters`, `Gimme Some Lovin'`, `Girls Just Wanna Have Fun`, `Give Me Everything`, `Gives You Hell`, `Glamorous`, `Glory of Love`, `Go Your Own Way`, `God Bless America`, `God Bless the Child`, `Gold Digger`, `Gonna Make You Sweat (Everybody Dance Now)`, `Good Lovin'`, `Good Times`, `Good Vibrations`, `Goodbye Yellow Brick Road`, `Goodnight, Irene`, `Got to Give it Up`, `Grease`, `Great Balls of Fire`, `Greatest Love of All`, `Green Onions`, `Green River`, `Green Tambourine`, `Grenade`, `Groove is in the Heart`, `Groovin'`, `Gypsies, Tramps & Thieves`, `Hair`, `Hang On Sloopy`, `Hanging by a Moment`, `Hanky Panky`, `Happy Days Are Here Again`, `Happy Together`, `Harbour Lights`, `Hard to Say I'm Sorry`, `Harper Valley PTA`, `Have You Ever Really Loved a Woman?`, `He'll Have to Go`, `He's So Fine`, `He's a Rebel`, `Heart of Glass`, `Heart of Gold`, `Heartbreak Hotel`, `Hello Dolly`, `Hello, I Love You, Won't You Tell Me Your Name?`, `Help Me, Rhonda`, `Help!`, `Here Without You`, `Here in My Heart`, `Hero`, `Hey Baby`, `Hey Jude`, `Hey Paula`, `Hey There`, `Hey There Delilah`, `Hey Ya!`, `Higher Love`, `Hips don't lie`, `Hit the Road, Jack`, `Hold On`, `Hollaback Girl`, `Honey`, `Honky Tonk`, `Honky Tonk Woman`, `Horse With No Name`, `Hot Child In The City`, `Hot Stuff`, `Hotel California`, `Hound Dog`, `House of the Rising Sun`, `How Deep is Your Love?`, `How Do I Live?`, `How Do You Mend a Broken Heart`, `How High the Moon`, `How Much is That Doggy in the Window?`, `How Will I Know`, `How You Remind Me`, `How to Save a Life`, `Hungry Heart`, `Hurt So Good`, `I Believe I Can Fly`, `I Can Dream, Can't I?`, `I Can Help`, `I Can See Clearly Now`, `I Can't Get Next to You`, `I Can't Get Started`, `I Can't Go For That (No Can Do)`, `I Can't Help Myself (Sugar Pie, Honey Bunch)`, `I Can't Stop Loving You`, `I Don't Want to Miss a Thing`, `I Fall to Pieces`, `I Feel Fine`, `I Feel For You`, `I Feel Love`, `I Get Around`, `I Got You (I Feel Good)`, `I Got You Babe`, `I Gotta Feeling`, `I Heard it Through the Grapevine`, `I Honestly Love You`, `I Just Called to Say I Love You`, `I Just Wanna Be Your Everything`, `I Kissed A Girl`, `I Love Rock 'n' Roll`, `I Need You Now`, `I Only Have Eyes For You`, `I Shot the Sheriff`, `I Still Haven't Found What I'm Looking For`, `I Swear`, `I Think I Love You`, `I Walk the Line`, `I Wanna Dance With Somebody (Who Loves Me)`, `I Wanna Love You`, `I Want You Back`, `I Want to Hold Your Hand`, `I Want to Know What Love Is`, `I Went to Your Wedding`, `I Will Always Love You`, `I Will Follow Him`, `I Will Survive`, `I Write the Songs`, `I'll Be Missing You`, `I'll Be There`, `I'll Make Love to You`, `I'll Never Smile Again`, `I'll Take You There`, `I'll Walk Alone`, `I'll be seeing you`, `I'm Looking Over a Four Leaf Clover`, `I'm So Lonesome I Could Cry`, `I'm Sorry`, `I'm Walking Behind You`, `I'm Your Boogie Man`, `I'm Yours`, `I'm a Believer`, `I've Heard That Song Before`, `If (They Made Me a King)`, `If I Didn't Care`, `If You Don't Know Me By Now`, `If You Leave Me Now`, `Imagine`, `In Da Club`, `In the End`, `In the Ghetto`, `In the Mood`, `In the Summertime`, `In the Year 2525 (Exordium & Terminus)`, `Incense & Peppermints`, `Indian Reservation (The Lament Of The Cherokee Reservation Indian)`, `Instant Karma`, `Iris`, `Ironic`, `Irreplaceable`, `It Had to Be You`, `It's All in the Game`, `It's My Party`, `It's Now Or Never`, `It's Still Rock 'n' Roll to Me`, `It's Too Late`, `Jack & Diane`, `Jailhouse Rock`, `Jessie's Girl`, `Jive Talkin'`, `Johnny B Goode`, `Joy to the World`, `Judy in Disguise (With Glasses)`, `Jump`, `Jumpin' Jack Flash`, `Just Dance`, `Just My Imagination (Running Away With Me)`, `Just the Way You Are`, `Kansas City`, `Karma Chameleon`, `Keep On Loving You`, `Killing Me Softly With His Song`, `King of the Road`, `Kiss`, `Kiss & Say Goodbye`, `Kiss From a Rose`, `Kiss Me`, `Kiss On My List`, `Kiss You All Over`, `Knock On Wood`, `Knock Three Times`, `Kokomo`, `Kryptonite`, `Kung Fu Fighting`, `La Bamba`, `Lady`, `Lady Marmalade (Voulez-Vous Coucher Aver Moi Ce Soir?)`, `Last Train to Clarksville`, `Layla`, `Le Freak`, `Leader of the Pack`, `Lean On Me`, `Leaving, on a Jet Plane`, `Let Me Call You Sweetheart`, `Let Me Love You`, `Let it Be`, `Let it Snow! Let it Snow! Let it Snow!`, `Let's Dance`, `Let's Get it On`, `Let's Groove`, `Let's Hear it For the Boy`, `Let's Stay Together`, `Light My Fire`, `Lights`, `Like a Prayer`, `Like a Rolling Stone`, `Like a Virgin`, `Little Darlin'`, `Little Things Mean a Lot`, `Live & Let Die`, `Livin' La Vida Loca`, `Livin' On a Prayer`, `Living For the City`, `Locked Out Of Heaven`, `Lola`, `Lonely Boy`, `Long Cool Woman in a Black Dress`, `Long Tall Sally`, `Look Away`, `Lookin' Out My Back Door`, `Lose Yourself`, `Losing My Religion`, `Louie Louie`, `Love Child`, `Love Hangover`, `Love In This Club`, `Love Is Blue (L'Amour Est Bleu)`, `Love Letters in the Sand`, `Love Me Do`, `Love Me Tender`, `Love Shack`, `Love Theme From 'A Star is Born' (Evergreen)`, `Love Train`, `Love Will Keep Us Together`, `Love is a Many Splendoured Thing`, `Love to Love You Baby`, `Love's Theme`, `Loving You`, `Low`, `Macarena`, `Mack the Knife`, `Maggie May`, `Magic`, `Magic Carpet Ride`, `Make Love to Me`, `Make it With You`, `Makin' Whoopee`, `Mama Told Me Not to Come`, `Man in the Mirror`, `Manana (Is Soon Enough For Me)`, `Maneater`, `Maniac`, `Maybellene`, `Me & Bobby McGee`, `Me & Mrs Jones`, `Memories Are Made of This`, `Mercy Mercy Me (The Ecology)`, `Mickey`, `Midnight Train to Georgia`, `Minnie the Moocher`, `Miss You`, `Miss You Much`, `Mister Sandman`, `Mmmbop`, `Mona Lisa`, `Monday Monday`, `Money For Nothing`, `Mony Mony`, `Mood Indigo`, `Moonlight Cocktail`, `Moonlight Serenade`, `More Than Words`, `More Than a Feeling`, `Morning Train (Nine to Five)`, `Mr Big Stuff`, `Mr Brightside`, `Mr Tambourine Man`, `Mrs Brown You've Got a Lovely Daughter`, `Mrs Robinson`, `Mule Train`, `Music`, `My Blue Heaven`, `My Boyfriend's Back`, `My Eyes Adored You`, `My Girl`, `My Guy`, `My Heart Will Go On`, `My Life`, `My Love`, `My Man`, `My Prayer`, `My Sharona`, `My Sweet Lord`, `Na Na Hey Hey (Kiss Him Goodbye)`, `Nature Boy`, `Near You`, `Need You Now`, `Need You Tonight`, `Never Gonna Give You Up`, `Night & Day`, `Night Fever`, `Nights in White Satin`, `No One`, `No Scrubs`, `Nobody Does it Better`, `Nothin' on You`, `Nothing Compares 2 U`, `Nothing's Gonna Stop Us Now`, `Ode To Billie Joe`, `Oh Happy Day`, `Oh My Papa (O Mein Papa)`, `Oh, Pretty Woman`, `Ol' Man River`, `Ole Buttermilk Sky`, `On Bended Knee`, `On My Own`, `On the Atchison, Topeka & the Santa Fe`, `One`, `One Bad Apple`, `One More Try`, `One O'Clock Jump`, `One Sweet Day`, `One of These Nights`, `One of Us`, `Only The Lonely (Know The Way I Feel)`, `Only You (And You Alone)`, `Open Arms`, `Over There`, `Over the Rainbow`, `Paint it Black`, `Papa Don't Preach`, `Papa Was a Rolling Stone`, `Papa's Got a Brand New Bag`, `Paper Doll`, `Paper Planes`, `Paperback Writer`, `Party Rock Anthem`, `Peg o' My Heart`, `Peggy Sue`, `Pennies From Heaven`, `Penny Lane`, `People`, `People Got to Be Free`, `Personality`, `Philadelphia Freedom`, `Physical`, `Piano Man`, `Pick Up the Pieces`, `Pistol Packin' Mama`, `Play That Funky Music`, `Please Mr Postman`, `Poker Face`, `Pon De Replay`, `Pony Time`, `Pop Muzik`, `Prisoner of Love`, `Private Eyes`, `Promiscuous`, `Proud Mary`, `Purple Haze`, `Purple Rain`, `Puttin' on the Ritz`, `Que sera sera (Whatever will be will be)`, `Queen of Hearts`, `Rag Doll`, `Rag Mop`, `Rags to Riches`, `Raindrops Keep Falling On My Head`, `Rapture`, `Ray of Light`, `Reach Out (I'll Be There)`, `Red Red Wine`, `Rehab`, `Respect`, `Return to Sender`, `Reunited`, `Revolution`, `Rhapsody in Blue`, `Rhinestone Cowboy`, `Rich Girl`, `Riders On the Storm`, `Right Back Where We Started From`, `Ring My Bell`, `Ring of Fire`, `Rock Around the Clock`, `Rock With You`, `Rock Your Baby`, `Rock the Boat`, `Rock the Casbah`, `Roll Over Beethoven`, `Roll With It`, `Rolling In The Deep`, `Rosanna`, `Roses Are Red`, `Royals`, `Ruby Tuesday`, `Rudolph, the Red-Nosed Reindeer`, `Rum & Coca-Cola`, `Runaround Sue`, `Runaway`, `Running Scared`, `Rush Rush`, `Sailing`, `Save the Best For Last`, `Save the Last Dance For Me`, `Say It Right`, `Say My Name`, `Say Say Say`, `Say You, Say Me`, `School's Out`, `Seasons in the Sun`, `Secret Love`, `Sentimental Journey`, `Sexyback`, `Sh-Boom (Life Could Be a Dream)`, `Shadow Dancing`, `Shake Down`, `Shake You Down`, `She Drives Me Crazy`, `She Loves You`, `She's a Lady`, `Shining Star`, `Shop Around`, `Shout`, `Silly Love Songs`, `Since U Been Gone`, `Sing, Sing, Sing (With A Swing)`, `Singing The Blues`, `Single Ladies (Put A Ring On It)`, `Sir Duke`, `Sixteen Tons`, `Sledgehammer`, `Sleep Walk`, `Sleepy Lagoon`, `Slow Poke`, `Smells Like Teen Spirit`, `Smoke Gets in Your Eyes`, `Smoke On the Water`, `Smoke! Smoke! Smoke! (That Cigarette)`, `Smooth`, `So Much in Love`, `Soldier Boy`, `Some Enchanted Evening`, `Some of These Days`, `Somebody That I Used to Know`, `Somebody to Love`, `Someday`, `Somethin' Stupid`, `Something`, `Soul Man`, `Spanish Harlem`, `Spill the Wine`, `Spinning Wheel`, `Spirit in the Sky`, `St George & the Dragonette`, `St Louis Blues`, `Stagger Lee`, `Stairway to Heaven`, `Stand By Me`, `Stardust`, `Stars & Stripes Forever`, `Stay (I Missed You)`, `Stayin' Alive`, `Stop! in the Name of Love`, `Stormy Weather (Keeps Rainin' All the Time)`, `Straight Up`, `Strange Fruit`, `Stranger On the Shore`, `Strangers in the Night`, `Strawberry Fields Forever`, `Streets of Philadelphia`, `Stronger`, `Stuck On You`, `Sugar Shack`, `Sugar Sugar`, `Summer in the City`, `Summertime Blues`, `Sunday, Monday or Always`, `Sunshine Superman`, `Sunshine of Your Love`, `Superstar`, `Superstition`, `Surfin' USA`, `Suspicious Minds`, `Swanee`, `Sweet Caroline (Good Times Never Seemed So Good)`, `Sweet Child O' Mine`, `Sweet Dreams (Are Made of This)`, `Sweet Georgia Brown`, `Sweet Home Alabama`, `Sweet Soul Music`, `Swinging On a Star`, `T For Texas (Blue Yodel No 1)`, `TSOP (The Sound of Philadelphia)`, `Take Me Home, Country Roads`, `Take My Breath Away`, `Take On Me`, `Take The 'A' Train`, `Take a Bow`, `Tammy`, `Tangerine`, `Tears in Heaven`, `Tears of a Clown`, `Temperature`, `Tennessee Waltz`, `Tequila`, `Tha Crossroads`, `Thank You (Falettinme be Mice Elf Again)`, `That Lucky Old Sun (Just Rolls Around Heaven All Day)`, `That Old Black Magic`, `That'll Be the Day`, `That's Amore`, `That's What Friends Are For`, `That's the Way (I Like It)`, `That's the Way Love Goes`, `The Boy is Mine`, `The Boys of Summer`, `The Christmas Song (Chestnuts Roasting On An Open Fire)`, `The End of the World`, `The First Time Ever I Saw Your Face`, `The Girl From Ipanema`, `The Glow-Worm`, `The Great Pretender`, `The Gypsy`, `The Hustle`, `The Joker`, `The Last Dance`, `The Letter`, `The Loco-Motion`, `The Long & Winding Road`, `The Love You Save`, `The Morning After`, `The Power of Love`, `The Prisoner's Song`, `The Reason`, `The Rose`, `The Sign`, `The Song From Moulin Rouge (Where Is Your Heart)`, `The Sounds of Silence`, `The Streak`, `The Sweet Escape`, `The Thing`, `The Tide is High`, `The Tracks of My Tears`, `The Twist`, `The Wanderer`, `The Way We Were`, `The Way You Look Tonight`, `The Way You Move`, `Theme From 'A Summer Place'`, `Theme From 'Greatest American Hero' (Believe It Or Not)`, `Theme From 'Shaft'`, `There goes my baby`, `These Boots Are Made For Walking`, `Third Man Theme`, `This Diamond Ring`, `This Guy's in Love With You`, `This Land is Your Land`, `This Love`, `This Ole House`, `This Used to Be My Playground`, `Three Coins in the Fountain`, `Three Times a Lady`, `Thrift Shop`, `Thriller`, `Ticket to Ride`, `Tie a Yellow Ribbon 'round the Old Oak Tree`, `Tiger Rag`, `Tighten Up`, `Tik-Toc`, `Till I Waltz Again With You`, `Till The End of Time`, `Time After Time`, `Time of the Season`, `To Sir, with Love`, `Tom Dooley`, `Tonight's the Night (Gonna Be Alright)`, `Too Close`, `Too Young`, `Tossing & Turning`, `Total Eclipse of the Heart`, `Touch Me`, `Toxic`, `Travellin' Band`, `Travellin' Man`, `Truly Madly Deeply`, `Turn! Turn! Turn! (To Everything There is a Season)`, `Tutti Frutti`, `Twist & Shout`, `Two Hearts`, `U Can't Touch This`, `U Got it Bad`, `Umbrella`, `Un-Break My Heart`, `Unbelievable`, `Unchained Melody`, `Uncle Albert (Admiral Halsey)`, `Under the Boardwalk`, `Under the Bridge`, `Unforgettable`, `Up Around the Bend`, `Up Up & Away`, `Up Where We Belong`, `Upside Down`, `Use Somebody`, `Vaya Con Dios (may God Be With You)`, `Venus`, `Vision of Love`, `Viva La Vida`, `Vogue`, `Volare`, `Wabash Cannonball`, `Waiting For a Girl Like You`, `Wake Me Up Before You Go Go`, `Wake Up Little Susie`, `Walk Don't Run`, `Walk Like a Man`, `Walk Like an Egyptian`, `Walk On By`, `Walk On the Wild Side`, `Walk This Way`, `Wannabe`, `Want Ads`, `Wanted`, `War`, `Waterfalls`, `Wayward Wind`, `We Are Family`, `We Are Young`, `We Are the Champions`, `We Are the World`, `We Belong Together`, `We Built This City`, `We Can Work it Out`, `We Didn't Start the Fire`, `We Found Love`, `We Got The Beat`, `We Will Rock You`, `We've Only Just Begun`, `Weak`, `Wedding Bell Blues`, `West End Blues`, `West End Girls`, `What Goes Around Comes Around`, `What a Fool Believes`, `What'd I Say`, `What's Going On?`, `What's Love Got to Do With It?`, `Whatcha Say`, `Wheel of Fortune`, `When Doves Cry`, `When You Wish Upon a Star`, `When a Man Loves a Woman`, `Where Did Our Love Go`, `Where is the Love?`, `Whip It`, `Whispering`, `White Christmas`, `White Rabbit`, `Whole Lotta Love`, `Whole Lotta Shakin' Goin' On`, `Whoomp! (There it Is)`, `Why Do Fools Fall in Love?`, `Why Don't You Believe Me?`, `Wichita Lineman`, `Wicked Game`, `Wild Thing`, `Wild Wild West`, `Will It Go Round In Circles`, `Will You Love Me Tomorrow`, `Winchester Cathedral`, `Wind Beneath My Wings`, `Wipe Out`, `Wishing Well`, `With Or Without You`, `Without Me`, `Without You`, `Woman`, `Won't Get Fooled Again`, `Wooly Bully`, `Working My Way Back to You`, `YMCA`, `Yakety Yak`, `Yeah!`, `Yellow Rose of Texas`, `Yesterday`, `You Ain't Seen Nothin' Yet`, `You Always Hurt the One You Love`, `You Are the Sunshine of My Life`, `You Belong With Me`, `You Belong to Me`, `You Can't Hurry Love`, `You Don't Bring Me Flowers`, `You Don't Have to Be a Star (To Be in My Show)`, `You Light Up My Life`, `You Make Me Feel Brand New`, `You Make Me Feel Like Dancing`, `You Really Got Me`, `You Send Me`, `You Sexy Thing`, `You Were Meant for Me`, `You make Me Wanna`, `You'll Never Know`, `You're Beautiful`, `You're So Vain`, `You're Still the One`, `You're the One That I Want`, `You've Got a Friend`, `You've Lost That Lovin' Feelin'`, `Your Cheatin' Heart`, `Your Song`] }, person: { bio_part: `activist.artist.author.blogger.business owner.coach.creator.designer.developer.dreamer.educator.engineer.entrepreneur.environmentalist.film lover.filmmaker.foodie.founder.friend.gamer.geek.grad.inventor.leader.model.musician.nerd.parent.patriot.person.philosopher.photographer.public speaker.scientist.singer.streamer.student.teacher.traveler.veteran.writer`.split(`.`), bio_pattern: [`{{person.bio_part}}`, `{{person.bio_part}}, {{person.bio_part}}`, `{{person.bio_part}}, {{person.bio_part}}, {{person.bio_part}}`, `{{person.bio_part}}, {{person.bio_part}}, {{person.bio_part}} {{internet.emoji}}`, `{{word.noun}} {{person.bio_supporter}}`, `{{word.noun}} {{person.bio_supporter}}  {{internet.emoji}}`, `{{word.noun}} {{person.bio_supporter}}, {{person.bio_part}}`, `{{word.noun}} {{person.bio_supporter}}, {{person.bio_part}} {{internet.emoji}}`], bio_supporter: [`advocate`, `devotee`, `enthusiast`, `fan`, `junkie`, `lover`, `supporter`], first_name: { generic: `Aaliyah.Abagail.Abbey.Abbie.Abbigail.Abby.Abdiel.Abdul.Abdullah.Abe.Abelardo.Abigail.Abigale.Abigayle.Abner.Adah.Adalberto.Adaline.Adan.Addie.Addison.Adela.Adelbert.Adele.Adelia.Adeline.Adell.Adella.Adelle.Aditya.Adolf.Adolfo.Adolph.Adolphus.Adonis.Adrain.Adriana.Adrianna.Adriel.Adrien.Afton.Aglae.Agustin.Agustina.Ahmad.Ahmed.Aida.Aidan.Aiden.Aileen.Aimee.Aisha.Aiyana.Akeem.Alaina.Alana.Alanis.Alanna.Alayna.Alba.Albertha.Albin.Albina.Alda.Alden.Alec.Aleen.Alejandra.Alejandrin.Alek.Alena.Alene.Alessandra.Alessandro.Alessia.Aletha.Alexa.Alexandre.Alexandrea.Alexandria.Alexandrine.Alexandro.Alexane.Alexanne.Alexie.Alexys.Alexzander.Alf.Alfonzo.Alford.Alfreda.Ali.Alia.Alisa.Alisha.Alivia.Aliya.Aliyah.Aliza.Alize.Allene.Allie.Ally.Alphonso.Alta.Althea.Alva.Alvah.Alvena.Alvera.Alverta.Alvina.Alvis.Alyce.Alycia.Alysa.Alysha.Alyson.Alysson.Amalia.Amani.Amara.Amari.Amaya.Ambrose.Amelie.Amely.America.Americo.Amie.Amina.Amir.Amira.Amiya.Amparo.Amya.Anabel.Anabelle.Anahi.Anais.Anastacio.Anastasia.Anderson.Andreane.Andreanne.Angel.Angeline.Angelita.Angus.Anibal.Anika.Anissa.Aniya.Aniyah.Anjali.Annabel.Annabell.Annabelle.Annalise.Annamae.Annamarie.Annetta.Ansel.Ansley.Antone.Antonetta.Antonette.Antonietta.Antonina.Antwan.Antwon.Anya.Ara.Araceli.Aracely.Arch.Archibald.Ardella.Arden.Ardith.Arely.Ari.Ariane.Arianna.Aric.Ariel.Arielle.Arjun.Arlie.Arlo.Armand.Armani.Arnaldo.Arne.Arno.Arnoldo.Arnulfo.Aron.Art.Arvel.Arvid.Arvilla.Aryanna.Asa.Asha.Ashlee.Ashleigh.Ashly.Ashlynn.Ashton.Ashtyn.Asia.Assunta.Astrid.Athena.Aubree.Audie.Audra.Audreanne.August.Augusta.Augustine.Augustus.Aurelia.Aurelie.Aurelio.Aurore.Austen.Austyn.Autumn.Ava.Avery.Avis.Axel.Ayana.Ayden.Ayla.Aylin.Baby.Bailee.Bailey.Barney.Baron.Barrett.Bart.Bartholome.Barton.Baylee.Beau.Beaulah.Bell.Bella.Belle.Benedict.Bennett.Benton.Berenice.Bernadine.Bernardo.Berneice.Bernhard.Bernie.Berniece.Bernita.Berry.Berta.Bertram.Bertrand.Beryl.Bethel.Bette.Bettie.Bettye.Bianka.Birdie.Blair.Blaise.Blaze.Bo.Bonita.Boris.Braden.Bradly.Brady.Braeden.Brain.Brando.Brandt.Brandyn.Brannon.Branson.Brant.Braulio.Braxton.Brayan.Breana.Breanna.Breanne.Brenden.Brendon.Brenna.Brennan.Brennon.Bret.Bria.Briana.Brianne.Brice.Bridgette.Bridie.Brielle.Brigitte.Brionna.Brisa.Britney.Brock.Broderick.Brody.Brook.Brooklyn.Brooks.Brown.Bryana.Bryce.Brycen.Bryon.Buck.Bud.Buddy.Buford.Bulah.Burdette.Burley.Burnice.Buster.Cade.Caden.Caesar.Caitlyn.Cale.Caleigh.Cali.Calista.Callie.Camden.Camila.Camilla.Camren.Camron.Camryn.Camylle.Candelario.Candida.Candido.Cara.Carey.Carissa.Carlee.Carleton.Carley.Carli.Carlie.Carlo.Carlotta.Carmel.Carmela.Carmella.Carmelo.Carmine.Carolanne.Carolina.Carolyne.Carson.Carter.Casandra.Casey.Casimer.Casimir.Casper.Cassandre.Cassidy.Cassie.Catalina.Caterina.Catharine.Cathrine.Cathryn.Cayla.Ceasar.Cecile.Cedrick.Celestine.Celestino.Celine.Chadd.Chadrick.Chaim.Chance.Chandler.Chanel.Chanelle.Charity.Charley.Chase.Chasity.Chauncey.Chaya.Chaz.Chelsey.Chelsie.Chesley.Chet.Cheyanne.Cheyenne.Chloe.Christ.Christa.Christelle.Christiana.Christop.Christophe.Chyna.Ciara.Cicero.Cielo.Cierra.Citlalli.Clair.Clarabelle.Clare.Clarissa.Claud.Claudie.Claudine.Clemens.Clement.Clementina.Clementine.Clemmie.Cleo.Cleora.Cleta.Cletus.Cleve.Cleveland.Clotilde.Clovis.Cloyd.Coby.Colby.Cole.Coleman.Collin.Colt.Colten.Colton.Columbus.Concepcion.Conner.Connor.Conor.Constantin.Consuelo.Cooper.Coralie.Corbin.Cordelia.Cordell.Cordia.Cordie.Corene.Corine.Cornell.Corrine.Cortez.Cortney.Coty.Courtney.Coy.Crawford.Creola.Cristal.Cristian.Cristobal.Cristopher.Cruz.Crystel.Cullen.Curt.Cydney.Cyril.Cyrus.D'angelo.Dagmar.Dahlia.Daija.Daisha.Dakota.Dallin.Dalton.Damaris.Dameon.Damian.Damien.Damion.Dana.Dandre.Dane.Dangelo.Danial.Daniela.Daniella.Danika.Dannie.Dante.Danyka.Daphne.Daphnee.Daphney.Darby.Daren.Darian.Dariana.Darien.Dario.Darion.Darius.Daron.Darrick.Darrion.Darron.Darwin.Dashawn.Dasia.Davin.Davion.Davon.Davonte.Dawson.Dax.Dayana.Dayna.Dayne.Dayton.Deangelo.Declan.Dedric.Dedrick.Dee.Deion.Deja.Dejah.Dejon.Dejuan.Delaney.Delfina.Delilah.Dell.Delmer.Delpha.Delphia.Delphine.Delta.Demarco.Demarcus.Demario.Demetris.Demetrius.Demond.Dena.Denis.Deon.Deondre.Deontae.Deonte.Dereck.Derick.Deron.Deshaun.Deshawn.Desmond.Dessie.Destany.Destin.Destinee.Destiney.Destini.Destiny.Devan.Devante.Deven.Devon.Devonte.Devyn.Dewayne.Dewitt.Diamond.Diego.Dillan.Dillon.Dimitri.Dina.Dino.Dion.Dock.Dolly.Domenic.Domenica.Domenick.Domenico.Dominique.Donato.Donavon.Donnell.Donny.Dorcas.Dorian.Dorothea.Dorris.Dortha.Dorthy.Dovie.Drake.Dudley.Dulce.Duncan.Durward.Dusty.Dylan.Earlene.Earline.Earnestine.Easter.Easton.Ebba.Eda.Edd.Eden.Edgardo.Edison.Edwardo.Edwina.Edyth.Edythe.Effie.Efrain.Efren.Einar.Eino.Eladio.Elaina.Elda.Eldon.Eldora.Eldred.Eldridge.Eleanora.Eleanore.Eleazar.Electa.Elenor.Elenora.Eleonore.Elfrieda.Eli.Elian.Eliane.Eliezer.Elinor.Elinore.Elisabeth.Elise.Eliseo.Elisha.Elissa.Eliza.Ellie.Elliot.Elliott.Ellsworth.Elmira.Elmo.Elmore.Elna.Elnora.Elody.Eloisa.Elouise.Eloy.Elroy.Else.Elta.Elton.Elva.Elvera.Elvie.Elvis.Elwin.Elwyn.Elyse.Elyssa.Elza.Emelia.Emelie.Emely.Emerald.Emerson.Emery.Emie.Emil.Emile.Emilia.Emiliano.Emilie.Emmalee.Emmanuel.Emmanuelle.Emmet.Emmie.Emmitt.Emmy.Emory.Ena.Enid.Enoch.Enola.Enos.Enrico.Ephraim.Era.Eriberto.Erich.Ericka.Erling.Erna.Ernestina.Ernie.Erwin.Eryn.Esmeralda.Esperanza.Esta.Esteban.Estefania.Estel.Estell.Estella.Estevan.Estrella.Etha.Ethan.Ethelyn.Ethyl.Ettie.Eudora.Eugenia.Eulah.Eulalia.Euna.Eusebio.Evalyn.Evangeline.Evans.Eve.Eveline.Everardo.Everette.Evert.Evie.Ewald.Ewell.Ezekiel.Ezequiel.Ezra.Fabian.Fabiola.Fae.Fanny.Fatima.Faustino.Fausto.Favian.Fay.Federico.Felicita.Felicity.Felipa.Felton.Fermin.Fern.Ferne.Fidel.Filiberto.Filomena.Finn.Fiona.Flavie.Flavio.Fleta.Fletcher.Flo.Florencio.Florian.Florida.Florine.Flossie.Floy.Ford.Forest.Foster.Francesca.Francesco.Francis.Francisca.Franco.Franz.Freddy.Frederic.Frederik.Frederique.Fredy.Freeda.Freeman.Freida.Frida.Frieda.Friedrich.Fritz.Furman.Gabe.Gabriella.Gabrielle.Gaetano.Gage.Gardner.Garett.Garfield.Garland.Garnet.Garnett.Garret.Garrick.Garrison.Garth.Gaston.Gavin.General.Genesis.Gennaro.Genoveva.Geo.Georgette.Georgiana.Georgianna.Geovanni.Geovanny.Geovany.Gerda.Gerhard.Germaine.German.Gerry.Gerson.Gia.Gianni.Gideon.Gilda.Giles.Gillian.Gino.Giovani.Giovanna.Giovanni.Giovanny.Gisselle.Giuseppe.Gladyce.Glenna.Glennie.Godfrey.Golda.Golden.Gonzalo.Gracie.Graciela.Graham.Granville.Grayce.Grayson.Green.Gregoria.Gregorio.Greta.Greyson.Griffin.Grover.Guadalupe.Gudrun.Guido.Guiseppe.Gunnar.Gunner.Gus.Gussie.Gust.Gustave.Hadley.Hailee.Hailey.Hailie.Hal.Haleigh.Haley.Halie.Halle.Hallie.Hank.Hanna.Hans.Hardy.Harley.Harmon.Harmony.Harrison.Haskell.Hassan.Hassie.Haven.Hayden.Haylee.Hayley.Haylie.Hazle.Heath.Heaven.Heber.Helena.Helene.Helga.Hellen.Helmer.Heloise.Henderson.Henri.Henriette.Hermann.Hermina.Herminia.Herminio.Hershel.Herta.Hertha.Hester.Hettie.Hilario.Hilbert.Hildegard.Hillard.Hillary.Hilma.Hilton.Hipolito.Hiram.Hobart.Holden.Hollie.Hollis.Horacio.Hortense.Hosea.Houston.Howell.Hoyt.Hudson.Hulda.Humberto.Hunter.Hyman.Ibrahim.Icie.Idell.Idella.Ignatius.Ike.Ila.Ilene.Iliana.Ima.Imani.Imelda.Immanuel.Imogene.Ines.Irwin.Isabell.Isabella.Isabelle.Isac.Isadore.Isai.Isaiah.Isaias.Isidro.Isobel.Isom.Issac.Itzel.Iva.Ivah.Ivory.Ivy.Izabella.Izaiah.Jabari.Jace.Jacey.Jacinthe.Jacinto.Jackeline.Jackie.Jacklyn.Jackson.Jacky.Jaclyn.Jacques.Jacynthe.Jada.Jade.Jaden.Jadon.Jadyn.Jaeden.Jaida.Jaiden.Jailyn.Jaime.Jairo.Jakayla.Jakob.Jaleel.Jalen.Jalon.Jalyn.Jamaal.Jamal.Jamar.Jamarcus.Jamel.Jameson.Jamey.Jamie.Jamil.Jamir.Jamison.Jammie.Jan.Janae.Janelle.Janessa.Janick.Janiya.Jannie.Jany.Jaquan.Jaquelin.Jaqueline.Jaren.Jarod.Jaron.Jarred.Jarrell.Jarret.Jarrett.Jarrod.Jarvis.Jasen.Jasmin.Jasper.Jaunita.Javon.Javonte.Jayce.Jaycee.Jayda.Jayde.Jayden.Jaydon.Jaylan.Jaylen.Jaylin.Jaylon.Jayme.Jayne.Jayson.Jazlyn.Jazmin.Jazmyn.Jazmyne.Jean.Jeanie.Jed.Jedediah.Jedidiah.Jefferey.Jeffry.Jena.Jenifer.Jennings.Jennyfer.Jensen.Jerad.Jeramie.Jeramy.Jerel.Jeremie.Jermain.Jermey.Jerod.Jeromy.Jerrell.Jerrod.Jerrold.Jess.Jessie.Jessika.Jessy.Jessyca.Jett.Jettie.Jevon.Jewel.Jewell.Jillian.Joana.Joanie.Joannie.Joanny.Joany.Joaquin.Jocelyn.Jodie.Jody.Joelle.Joesph.Johan.Johann.Johathan.Johnathon.Johnnie.Johnpaul.Johnson.Jolie.Jonas.Jonatan.Jordane.Jordi.Jordon.Jordy.Jordyn.Josefa.Joshuah.Josiah.Josiane.Josianne.Josie.Josue.Jovan.Jovani.Jovanny.Jovany.Judah.Judd.Jude.Judge.Judson.Jules.Juliana.Julianne.Julien.Juliet.Junior.Junius.Justen.Justice.Justina.Justine.Juston.Justus.Justyn.Juvenal.Juwan.Kacey.Kaci.Kacie.Kade.Kaden.Kadin.Kaela.Kaelyn.Kaia.Kailee.Kailey.Kailyn.Kaitlin.Kaitlyn.Kale.Kaleb.Kaleigh.Kaley.Kali.Kallie.Kameron.Kamille.Kamren.Kamron.Kamryn.Kane.Kareem.Karelle.Kariane.Karianne.Karina.Karine.Karlee.Karley.Karli.Karlie.Karolann.Karson.Kasandra.Kasey.Kassandra.Katarina.Katelin.Katelyn.Katelynn.Katharina.Katheryn.Kathlyn.Kathryne.Katlyn.Katlynn.Katrine.Kattie.Kavon.Kaya.Kaycee.Kayden.Kaylah.Kaylee.Kayleigh.Kayley.Kayli.Kaylie.Kaylin.Keagan.Keanu.Keara.Keaton.Keegan.Keeley.Keely.Keenan.Keira.Kellen.Kelly.Kelsi.Kelsie.Kelton.Kendall.Kendrick.Kenna.Kennedi.Kennedy.Kennith.Kenton.Kenya.Kenyatta.Kenyon.Keon.Kerry.Keshaun.Keshawn.Keven.Kevon.Keyon.Keyshawn.Khalid.Khalil.Kian.Kiana.Kianna.Kiara.Kiarra.Kiel.Kiera.Kieran.Kiley.Kim.King.Kip.Kira.Kirsten.Kirstin.Kitty.Kobe.Koby.Kody.Kolby.Kole.Korbin.Korey.Kory.Kraig.Kris.Kristian.Kristofer.Kristoffer.Krystel.Krystina.Kurtis.Kyla.Kylee.Kyleigh.Kyler.Kylie.Kyra.Lacey.Lacy.Ladarius.Lafayette.Laila.Laisha.Lambert.Lamont.Landen.Lane.Laney.Larissa.Laron.Larue.Laurel.Lauretta.Lauriane.Laurianne.Laurine.Laury.Lauryn.Lavada.Lavern.Laverna.Lavina.Lavinia.Lavon.Lavonne.Lawson.Layla.Layne.Lazaro.Lea.Leann.Leanna.Leanne.Leatha.Leda.Lee.Leif.Leila.Leilani.Lelah.Lelia.Lempi.Lemuel.Lenna.Lennie.Lenny.Lenora.Lenore.Leola.Leonardo.Leone.Leonel.Leonie.Leonor.Leonora.Leopold.Leopoldo.Leora.Lera.Lesley.Leslie.Lesly.Lessie.Leta.Letha.Letitia.Lew.Lexi.Lexie.Lexus.Lia.Liam.Liana.Libbie.Libby.Lilian.Liliana.Liliane.Lilla.Lilliana.Lilly.Lily.Lilyan.Lina.Lincoln.Linnea.Linnie.Linwood.Lisandro.Lisette.Litzy.Liza.Lizeth.Lizzie.Llewellyn.Logan.Lolita.Loma.Lon.London.Lonie.Lonny.Lonzo.Loraine.Lorenz.Lorenza.Lorine.Lorna.Lottie.Lou.Louie.Louisa.Lourdes.Louvenia.Loy.Loyal.Loyce.Luciano.Lucie.Lucienne.Lucile.Lucinda.Lucio.Lucious.Lucius.Ludie.Ludwig.Lue.Luella.Luigi.Luisa.Lukas.Lulu.Luna.Lupe.Lura.Lurline.Lyda.Lyla.Lynn.Lyric.Lysanne.Mabelle.Mac.Macey.Maci.Macie.Mackenzie.Macy.Madaline.Madalyn.Maddison.Madelyn.Madelynn.Madge.Madie.Madilyn.Madisen.Madison.Madisyn.Madonna.Madyson.Maegan.Maeve.Mafalda.Magali.Magdalen.Magdalena.Magnolia.Magnus.Maia.Maida.Maiya.Major.Makayla.Makenna.Makenzie.Malachi.Malika.Malinda.Mallie.Mallory.Malvina.Manley.Manuela.Mara.Marcel.Marcelina.Marcelino.Marcelle.Marcellus.Marcelo.Margarete.Margarett.Margaretta.Margarette.Marge.Margot.Margret.Mariah.Mariam.Mariana.Mariane.Marianna.Mariano.Maribel.Mariela.Marielle.Marietta.Marilie.Marilou.Marilyne.Marina.Marion.Marisa.Marisol.Maritza.Marjolaine.Marjory.Markus.Marlee.Marlen.Marley.Marlin.Marques.Marquis.Marquise.Martina.Martine.Maryam.Maryjane.Maryse.Mason.Mateo.Mathias.Mathilde.Matilda.Matilde.Matteo.Maud.Maude.Maudie.Mauricio.Maurine.Maverick.Mavis.Maxie.Maxime.Maximilian.Maximillia.Maximillian.Maximo.Maximus.Maxwell.Maya.Maybell.Maybelle.Maye.Maymie.Maynard.Mayra.Mazie.Mckayla.Mckenna.Mckenzie.Meagan.Meaghan.Meda.Megane.Meggie.Mekhi.Melany.Melisa.Mellie.Melvina.Melyna.Melyssa.Merl.Merlin.Merritt.Mertie.Mervin.Meta.Mia.Micaela.Micah.Michaela.Michale.Michel.Mikayla.Mikel.Milan.Miles.Milford.Miller.Millie.Milo.Mina.Minerva.Miracle.Mireille.Mireya.Misael.Missouri.Mitchel.Mittie.Modesta.Modesto.Mohamed.Mohammad.Mohammed.Moises.Mollie.Monroe.Monserrat.Monserrate.Montana.Monte.Monty.Morgan.Moriah.Mortimer.Morton.Mose.Moshe.Mossie.Mozell.Mozelle.Muhammad.Murl.Murphy.Murray.Mustafa.Mya.Myah.Mylene.Myles.Myriam.Myrl.Myrna.Myrtice.Myrtie.Myrtis.Nadia.Nakia.Name.Nannie.Naomie.Napoleon.Narciso.Nash.Nasir.Nat.Natalia.Nathanael.Nathanial.Nathen.Nayeli.Ned.Nedra.Neha.Nelda.Nella.Nelle.Nels.Neoma.Nestor.Neva.Newell.Newton.Nia.Nicholaus.Nicklaus.Nickolas.Nico.Nicola.Nicolette.Nigel.Nikita.Nikki.Nikko.Niko.Nikolas.Nils.Noble.Noe.Noelia.Noemi.Noemie.Noemy.Nola.Nolan.Nona.Norbert.Norberto.Norene.Norris.Norval.Norwood.Nova.Novella.Nya.Nyah.Nyasia.Obie.Oceane.Ocie.Octavia.Oda.Odell.Odessa.Odie.Ofelia.Okey.Ola.Olaf.Ole.Olen.Oleta.Olin.Oma.Omari.Omer.Ona.Onie.Ophelia.Oral.Oran.Oren.Orie.Orin.Orion.Orland.Orlo.Orpha.Orrin.Orval.Osbaldo.Osborne.Osvaldo.Oswald.Oswaldo.Otha.Otho.Otilia.Ottilie.Ottis.Otto.Ova.Ozella.Paige.Palma.Pansy.Paolo.Paris.Parker.Pascale.Pasquale.Pat.Patience.Pattie.Paxton.Payton.Pearlie.Pearline.Peggie.Penelope.Percival.Petra.Peyton.Phoebe.Pierce.Pierre.Pietro.Pink.Pinkie.Piper.Polly.Porter.Precious.Presley.Price.Prince.Princess.Providenci.Prudence.Queen.Queenie.Quentin.Quincy.Quinn.Quinten.Quinton.Rachelle.Rae.Raegan.Rafaela.Raheem.Rahsaan.Rahul.Raina.Raleigh.Randi.Ransom.Raoul.Raphael.Raphaelle.Rashad.Rashawn.Rasheed.Raven.Raymundo.Reagan.Reanna.Reba.Rebeca.Rebeka.Rebekah.Reece.Reed.Reese.Regan.Reggie.Reid.Reilly.Reina.Reinhold.Remington.Ressie.Reta.Retha.Retta.Reuben.Reva.Rey.Reyes.Reymundo.Reyna.Reynold.Rhea.Rhett.Rhianna.Rhiannon.Rhoda.Richie.Richmond.Rickie.Rico.Rigoberto.Riley.River.Robb.Robbie.Robin.Rocio.Rocky.Rod.Rodger.Rodrick.Rodrigo.Roel.Rogers.Rollin.Roma.Romaine.Ronaldo.Ronny.Rory.Rosalee.Rosalia.Rosalind.Rosalinda.Rosalyn.Rosamond.Rosanna.Rosario.Roscoe.Rosella.Roselyn.Rosendo.Rosetta.Rosina.Roslyn.Rossie.Rowan.Rowena.Rowland.Roxane.Royal.Royce.Rozella.Rubie.Rubye.Rupert.Russ.Russel.Rusty.Ruthe.Ruthie.Ryann.Ryder.Rylan.Rylee.Ryleigh.Ryley.Sabina.Sabryna.Sadye.Sage.Saige.Sallie.Salma.Samanta.Samara.Samir.Sammie.Samson.Sandrine.Sanford.Santa.Santina.Santino.Sarai.Sarina.Sasha.Savanah.Savanna.Savannah.Savion.Scarlett.Schuyler.Scot.Scottie.Scotty.Seamus.Sebastian.Sedrick.Selena.Selina.Selmer.Serena.Serenity.Shad.Shaina.Shakira.Shana.Shanel.Shanelle.Shania.Shanie.Shaniya.Shanna.Shannon.Shanny.Shanon.Shany.Shaylee.Shayna.Shayne.Shea.Shemar.Sheridan.Sherwood.Shyann.Shyanne.Sibyl.Sid.Sienna.Sierra.Sigmund.Sigrid.Sigurd.Silas.Sim.Simeon.Simone.Sincere.Sister.Skye.Skyla.Skylar.Sofia.Soledad.Solon.Sonny.Stan.Stanford.Stanton.Stefan.Stefanie.Stephan.Stephania.Stephany.Stephon.Sterling.Stevie.Stone.Summer.Sunny.Susana.Susanna.Sven.Syble.Sydnee.Sydney.Sydni.Sydnie.Sylvan.Tad.Talia.Talon.Tamia.Tania.Tanner.Taryn.Tate.Tatum.Tatyana.Taurean.Tavares.Taya.Teagan.Telly.Terrill.Terry.Tess.Tessie.Tevin.Thad.Thaddeus.Thalia.Thea.Theo.Theodora.Therese.Theresia.Theron.Thora.Thurman.Tia.Tiana.Tianna.Tiara.Tierra.Tillman.Timmothy.Tito.Titus.Tobin.Tod.Tomasa.Toney.Torey.Torrance.Torrey.Toy.Trace.Tracy.Travon.Tre.Tremaine.Tremayne.Trent.Trenton.Tressa.Tressie.Treva.Trever.Trevion.Trey.Trinity.Trisha.Tristian.Tristin.Triston.Trudie.Trycia.Trystan.Turner.Twila.Tyra.Tyree.Tyreek.Tyrel.Tyrell.Tyrese.Tyrique.Tyshawn.Tyson.Ubaldo.Ulices.Ulises.Una.Unique.Urban.Uriah.Uriel.Ursula.Vada.Valentin.Valentina.Valentine.Vallie.Vance.Vaughn.Veda.Velda.Vella.Velva.Vena.Verda.Verdie.Vergie.Verla.Verlie.Vern.Verner.Vernice.Vernie.Verona.Vesta.Vicenta.Vicente.Vida.Vidal.Vilma.Vince.Vincenza.Vincenzo.Vinnie.Violette.Virgie.Virginie.Vita.Vito.Viva.Viviane.Vivianne.Vivien.Vivienne.Vladimir.Waino.Waldo.Walker.Walton.Ward.Watson.Wava.Waylon.Webster.Weldon.Wellington.Werner.Westley.Weston.Wilber.Wilburn.Wiley.Wilford.Wilfredo.Wilfrid.Wilhelm.Wilhelmine.Will.Willa.Willie.Willow.Willy.Wilmer.Wilton.Winfield.Winnifred.Winona.Wyatt.Wyman.Xander.Xavier.Xzavier.Yadira.Yasmeen.Yasmin.Yasmine.Yazmin.Yesenia.Yessenia.Yoshiko.Zachariah.Zachery.Zack.Zackary.Zackery.Zakary.Zander.Zane.Zaria.Zechariah.Zelda.Zella.Zelma.Zena.Zetta.Zion.Zita.Zoe.Zoey.Zoie.Zoila.Zola.Zora.Zula`.split(`.`), female: `Ada.Adrienne.Agnes.Alberta.Alexandra.Alexis.Alice.Alicia.Alison.Allison.Alma.Alyssa.Amanda.Amber.Amelia.Amy.Ana.Andrea.Angela.Angelica.Angelina.Angie.Anita.Ann.Anna.Anne.Annette.Annie.Antoinette.Antonia.April.Arlene.Ashley.Audrey.Barbara.Beatrice.Becky.Belinda.Bernadette.Bernice.Bertha.Bessie.Beth.Bethany.Betsy.Betty.Beulah.Beverly.Billie.Blanca.Blanche.Bobbie.Bonnie.Brandi.Brandy.Brenda.Bridget.Brittany.Brooke.Camille.Candace.Candice.Carla.Carmen.Carol.Carole.Caroline.Carolyn.Carrie.Cassandra.Catherine.Cathy.Cecelia.Cecilia.Celia.Charlene.Charlotte.Chelsea.Cheryl.Christie.Christina.Christine.Christy.Cindy.Claire.Clara.Claudia.Colleen.Connie.Constance.Cora.Cristina.Crystal.Cynthia.Daisy.Danielle.Darla.Darlene.Dawn.Deanna.Debbie.Deborah.Debra.Delia.Della.Delores.Denise.Desiree.Diana.Diane.Dianna.Dianne.Dixie.Dolores.Donna.Dora.Doreen.Doris.Dorothy.Ebony.Edith.Edna.Eileen.Elaine.Eleanor.Elena.Elisa.Elizabeth.Ella.Ellen.Eloise.Elsa.Elsie.Elvira.Emily.Emma.Erica.Erika.Erin.Erma.Ernestine.Essie.Estelle.Esther.Ethel.Eula.Eunice.Eva.Evelyn.Faith.Fannie.Faye.Felicia.Flora.Florence.Frances.Freda.Gail.Gayle.Geneva.Genevieve.Georgia.Geraldine.Gertrude.Gina.Ginger.Gladys.Glenda.Gloria.Grace.Gretchen.Gwen.Gwendolyn.Hannah.Harriet.Hattie.Hazel.Heather.Heidi.Helen.Henrietta.Hilda.Holly.Hope.Ida.Inez.Irene.Iris.Irma.Isabel.Jacqueline.Jacquelyn.Jana.Jane.Janet.Janice.Janie.Janis.Jasmine.Jeanette.Jeanne.Jeannette.Jeannie.Jenna.Jennie.Jennifer.Jenny.Jessica.Jill.Jo.Joan.Joann.Joanna.Joanne.Jodi.Johanna.Josefina.Josephine.Joy.Joyce.Juana.Juanita.Judith.Judy.Julia.Julie.June.Kara.Karen.Kari.Karla.Kate.Katherine.Kathleen.Kathryn.Kathy.Katie.Katrina.Kay.Kayla.Kelley.Kelli.Kellie.Kendra.Kimberly.Krista.Kristen.Kristi.Kristie.Kristin.Kristina.Kristine.Kristy.Krystal.Lana.Latoya.Laura.Lauren.Laurie.Laverne.Leah.Leigh.Lela.Lena.Leona.Leticia.Lila.Lillian.Lillie.Linda.Lindsay.Lindsey.Lisa.Lois.Lola.Lora.Lorena.Lorene.Loretta.Lori.Lorraine.Louise.Lucia.Lucille.Lucy.Lula.Luz.Lydia.Lynda.Lynette.Lynne.Mabel.Mable.Madeline.Mae.Maggie.Mamie.Mandy.Marcella.Marcia.Margaret.Margarita.Margie.Marguerite.Maria.Marian.Marianne.Marie.Marilyn.Marjorie.Marlene.Marsha.Marta.Martha.Mary.Maryann.Mattie.Maureen.Maxine.May.Megan.Meghan.Melanie.Melba.Melinda.Melissa.Melody.Mercedes.Meredith.Michele.Michelle.Mildred.Mindy.Minnie.Miranda.Miriam.Misty.Molly.Mona.Monica.Monique.Muriel.Myra.Myrtle.Nadine.Nancy.Naomi.Natalie.Natasha.Nellie.Nettie.Nichole.Nicole.Nina.Nora.Norma.Olga.Olive.Olivia.Ollie.Opal.Ora.Pam.Pamela.Patricia.Patsy.Patti.Patty.Paula.Paulette.Pauline.Pearl.Peggy.Penny.Phyllis.Priscilla.Rachael.Rachel.Ramona.Raquel.Rebecca.Regina.Renee.Rhonda.Rita.Roberta.Robyn.Rochelle.Rosa.Rosalie.Rose.Rosemarie.Rosemary.Rosie.Roxanne.Ruby.Ruth.Sabrina.Sadie.Sally.Samantha.Sandra.Sandy.Sara.Sarah.Shari.Sharon.Shawna.Sheila.Shelia.Shelley.Shelly.Sheri.Sherri.Sherry.Sheryl.Shirley.Silvia.Sonia.Sonja.Sonya.Sophia.Sophie.Stacey.Stacy.Stella.Stephanie.Sue.Susan.Susie.Suzanne.Sylvia.Tabitha.Tamara.Tami.Tammy.Tanya.Tara.Tasha.Teresa.Teri.Terri.Thelma.Theresa.Tiffany.Tina.Toni.Tonya.Tracey.Traci.Tricia.Valerie.Vanessa.Velma.Vera.Verna.Veronica.Vicki.Vickie.Vicky.Victoria.Viola.Violet.Virginia.Vivian.Wanda.Wendy.Whitney.Wilma.Winifred.Yolanda.Yvette.Yvonne`.split(`.`), male: `Aaron.Abel.Abraham.Adam.Adrian.Al.Alan.Albert.Alberto.Alejandro.Alex.Alexander.Alfonso.Alfred.Alfredo.Allan.Allen.Alonzo.Alton.Alvin.Amos.Andre.Andres.Andrew.Andy.Angelo.Anthony.Antonio.Archie.Armando.Arnold.Arthur.Arturo.Aubrey.Austin.Barry.Ben.Benjamin.Bennie.Benny.Bernard.Bert.Bill.Billy.Blake.Bob.Bobby.Boyd.Brad.Bradford.Bradley.Brandon.Brendan.Brent.Brett.Brian.Bruce.Bryan.Bryant.Byron.Caleb.Calvin.Cameron.Carl.Carlos.Carlton.Carroll.Cary.Cecil.Cedric.Cesar.Chad.Charles.Charlie.Chester.Chris.Christian.Christopher.Clarence.Clark.Claude.Clay.Clayton.Clifford.Clifton.Clint.Clinton.Clyde.Cody.Colin.Conrad.Corey.Cornelius.Cory.Craig.Curtis.Dale.Dallas.Damon.Dan.Daniel.Danny.Darin.Darnell.Darrel.Darrell.Darren.Darrin.Darryl.Daryl.Dave.David.Dean.Delbert.Dennis.Derek.Derrick.Devin.Dewey.Dexter.Domingo.Dominic.Dominick.Don.Donald.Donnie.Doug.Douglas.Doyle.Drew.Duane.Dustin.Dwayne.Dwight.Earl.Earnest.Ed.Eddie.Edgar.Edmond.Edmund.Eduardo.Edward.Edwin.Elbert.Elias.Elijah.Ellis.Elmer.Emanuel.Emilio.Emmett.Enrique.Eric.Erick.Erik.Ernest.Ernesto.Ervin.Eugene.Evan.Everett.Felipe.Felix.Fernando.Floyd.Forrest.Francisco.Frank.Frankie.Franklin.Fred.Freddie.Frederick.Fredrick.Gabriel.Garrett.Garry.Gary.Gene.Geoffrey.George.Gerald.Gerard.Gerardo.Gilbert.Gilberto.Glen.Glenn.Gordon.Grady.Grant.Greg.Gregg.Gregory.Guillermo.Gustavo.Guy.Harold.Harry.Harvey.Hector.Henry.Herbert.Herman.Homer.Horace.Howard.Hubert.Hugh.Hugo.Ian.Ignacio.Ira.Irvin.Irving.Isaac.Ismael.Israel.Ivan.Jack.Jacob.Jake.James.Jared.Jason.Javier.Jay.Jeff.Jeffery.Jeffrey.Jerald.Jeremiah.Jeremy.Jermaine.Jerome.Jerry.Jesse.Jesus.Jim.Jimmie.Jimmy.Joe.Joel.Joey.John.Johnathan.Johnny.Jon.Jonathan.Jonathon.Jordan.Jorge.Jose.Joseph.Josh.Joshua.Juan.Julian.Julio.Julius.Justin.Karl.Keith.Kelvin.Ken.Kenneth.Kenny.Kent.Kevin.Kirk.Kristopher.Kurt.Kyle.Lamar.Lance.Larry.Laurence.Lawrence.Leland.Leo.Leon.Leonard.Leroy.Lester.Levi.Lewis.Lionel.Lloyd.Lonnie.Loren.Lorenzo.Louis.Lowell.Lucas.Luis.Luke.Luther.Lyle.Mack.Malcolm.Manuel.Marc.Marco.Marcos.Marcus.Mario.Mark.Marlon.Marshall.Martin.Marty.Marvin.Mathew.Matt.Matthew.Maurice.Max.Melvin.Merle.Michael.Micheal.Miguel.Mike.Milton.Mitchell.Morris.Moses.Myron.Nathan.Nathaniel.Neal.Neil.Nelson.Nicholas.Nick.Nicolas.Noah.Noel.Norman.Oliver.Omar.Orlando.Orville.Oscar.Otis.Owen.Pablo.Patrick.Paul.Pedro.Percy.Perry.Pete.Peter.Phil.Philip.Phillip.Preston.Rafael.Ralph.Ramiro.Ramon.Randal.Randall.Randolph.Randy.Raul.Ray.Raymond.Reginald.Rene.Rex.Ricardo.Richard.Rick.Rickey.Ricky.Robert.Roberto.Roderick.Rodney.Rodolfo.Rogelio.Roger.Roland.Rolando.Roman.Ron.Ronald.Ronnie.Roosevelt.Ross.Roy.Ruben.Rudolph.Rudy.Rufus.Russell.Ryan.Salvador.Salvatore.Sam.Sammy.Samuel.Santiago.Santos.Saul.Scott.Sean.Sergio.Seth.Shane.Shaun.Shawn.Sheldon.Sherman.Sidney.Simon.Spencer.Stanley.Stephen.Steve.Steven.Stewart.Stuart.Sylvester.Taylor.Ted.Terence.Terrance.Terrell.Terrence.Theodore.Thomas.Tim.Timmy.Timothy.Toby.Todd.Tom.Tomas.Tommie.Tommy.Tony.Travis.Trevor.Troy.Tyler.Tyrone.Van.Vernon.Victor.Vincent.Virgil.Wade.Wallace.Walter.Warren.Wayne.Wendell.Wesley.Wilbert.Wilbur.Wilfred.Willard.William.Willis.Wilson.Winston.Wm.Woodrow.Zachary`.split(`.`) }, gender: `Agender.Androgyne.Androgynous.Bigender.Cis female.Cis male.Cis man.Cis woman.Cis.Cisgender female.Cisgender male.Cisgender man.Cisgender woman.Cisgender.Demi-boy.Demi-girl.Demi-man.Demi-woman.Demiflux.Demigender.F2M.FTM.Female to male trans man.Female to male transgender man.Female to male transsexual man.Female to male.Gender fluid.Gender neutral.Gender nonconforming.Gender questioning.Gender variant.Genderflux.Genderqueer.Hermaphrodite.Intersex man.Intersex person.Intersex woman.Intersex.M2F.MTF.Male to female trans woman.Male to female transgender woman.Male to female transsexual woman.Male to female.Man.Multigender.Neither.Neutrois.Non-binary.Omnigender.Other.Pangender.Polygender.T* man.T* woman.Trans female.Trans male.Trans man.Trans person.Trans woman.Trans.Transsexual female.Transsexual male.Transsexual man.Transsexual person.Transsexual woman.Transsexual.Transgender female.Transgender person.Transmasculine.Trigender.Two* person.Two-spirit person.Two-spirit.Woman.Xenogender`.split(`.`), job_area: `Solutions.Program.Brand.Security.Research.Marketing.Directives.Implementation.Integration.Functionality.Response.Paradigm.Tactics.Identity.Markets.Group.Division.Applications.Optimization.Operations.Infrastructure.Intranet.Communications.Web.Branding.Quality.Assurance.Mobility.Accounts.Data.Creative.Configuration.Accountability.Interactions.Factors.Usability.Metrics`.split(`.`), job_descriptor: [`Lead`, `Senior`, `Direct`, `Corporate`, `Dynamic`, `Future`, `Product`, `National`, `Regional`, `District`, `Central`, `Global`, `Customer`, `Investor`, `International`, `Legacy`, `Forward`, `Internal`, `Human`, `Chief`, `Principal`], job_title_pattern: [`{{person.jobDescriptor}} {{person.jobArea}} {{person.jobType}}`], job_type: [`Supervisor`, `Associate`, `Executive`, `Liaison`, `Officer`, `Manager`, `Engineer`, `Specialist`, `Director`, `Coordinator`, `Administrator`, `Architect`, `Analyst`, `Designer`, `Planner`, `Orchestrator`, `Technician`, `Developer`, `Producer`, `Consultant`, `Assistant`, `Facilitator`, `Agent`, `Representative`, `Strategist`], last_name: { generic: `Abbott.Abernathy.Abshire.Adams.Altenwerth.Anderson.Ankunding.Armstrong.Auer.Aufderhar.Bahringer.Bailey.Balistreri.Barrows.Bartell.Bartoletti.Barton.Bashirian.Batz.Bauch.Baumbach.Bayer.Beahan.Beatty.Bechtelar.Becker.Bednar.Beer.Beier.Berge.Bergnaum.Bergstrom.Bernhard.Bernier.Bins.Blanda.Blick.Block.Bode.Boehm.Bogan.Bogisich.Borer.Bosco.Botsford.Boyer.Boyle.Bradtke.Brakus.Braun.Breitenberg.Brekke.Brown.Bruen.Buckridge.Carroll.Carter.Cartwright.Casper.Cassin.Champlin.Christiansen.Cole.Collier.Collins.Conn.Connelly.Conroy.Considine.Corkery.Cormier.Corwin.Cremin.Crist.Crona.Cronin.Crooks.Cruickshank.Cummerata.Cummings.D'Amore.Dach.Daniel.Dare.Daugherty.Davis.Deckow.Denesik.Dibbert.Dickens.Dicki.Dickinson.Dietrich.Donnelly.Dooley.Douglas.Doyle.DuBuque.Durgan.Ebert.Effertz.Emard.Emmerich.Erdman.Ernser.Fadel.Fahey.Farrell.Fay.Feeney.Feest.Feil.Ferry.Fisher.Flatley.Frami.Franecki.Franey.Friesen.Fritsch.Funk.Gerhold.Gerlach.Gibson.Gislason.Gleason.Gleichner.Glover.Goldner.Goodwin.Gorczany.Gottlieb.Goyette.Grady.Graham.Grant.Green.Greenfelder.Greenholt.Grimes.Gulgowski.Gusikowski.Gutkowski.Gutmann.Haag.Hackett.Hagenes.Hahn.Haley.Halvorson.Hamill.Hammes.Hand.Hane.Hansen.Harber.Harris.Hartmann.Harvey.Hauck.Hayes.Heaney.Heathcote.Hegmann.Heidenreich.Heller.Herman.Hermann.Hermiston.Herzog.Hessel.Hettinger.Hickle.Hilll.Hills.Hilpert.Hintz.Hirthe.Hodkiewicz.Hoeger.Homenick.Hoppe.Howe.Howell.Hudson.Huel.Huels.Hyatt.Jacobi.Jacobs.Jacobson.Jakubowski.Jaskolski.Jast.Jenkins.Jerde.Johns.Johnson.Johnston.Jones.Kassulke.Kautzer.Keebler.Keeling.Kemmer.Kerluke.Kertzmann.Kessler.Kiehn.Kihn.Kilback.King.Kirlin.Klein.Kling.Klocko.Koch.Koelpin.Koepp.Kohler.Konopelski.Koss.Kovacek.Kozey.Krajcik.Kreiger.Kris.Kshlerin.Kub.Kuhic.Kuhlman.Kuhn.Kulas.Kunde.Kunze.Kuphal.Kutch.Kuvalis.Labadie.Lakin.Lang.Langosh.Langworth.Larkin.Larson.Leannon.Lebsack.Ledner.Leffler.Legros.Lehner.Lemke.Lesch.Leuschke.Lind.Lindgren.Littel.Little.Lockman.Lowe.Lubowitz.Lueilwitz.Luettgen.Lynch.MacGyver.Macejkovic.Maggio.Mann.Mante.Marks.Marquardt.Marvin.Mayer.Mayert.McClure.McCullough.McDermott.McGlynn.McKenzie.McLaughlin.Medhurst.Mertz.Metz.Miller.Mills.Mitchell.Moen.Mohr.Monahan.Moore.Morar.Morissette.Mosciski.Mraz.Mueller.Muller.Murazik.Murphy.Murray.Nader.Nicolas.Nienow.Nikolaus.Nitzsche.Nolan.O'Connell.O'Conner.O'Hara.O'Keefe.O'Kon.O'Reilly.Oberbrunner.Okuneva.Olson.Ondricka.Orn.Ortiz.Osinski.Pacocha.Padberg.Pagac.Parisian.Parker.Paucek.Pfannerstill.Pfeffer.Pollich.Pouros.Powlowski.Predovic.Price.Prohaska.Prosacco.Purdy.Quigley.Quitzon.Rath.Ratke.Rau.Raynor.Reichel.Reichert.Reilly.Reinger.Rempel.Renner.Reynolds.Rice.Rippin.Ritchie.Robel.Roberts.Rodriguez.Rogahn.Rohan.Rolfson.Romaguera.Roob.Rosenbaum.Rowe.Ruecker.Runolfsdottir.Runolfsson.Runte.Russel.Rutherford.Ryan.Sanford.Satterfield.Sauer.Sawayn.Schaden.Schaefer.Schamberger.Schiller.Schimmel.Schinner.Schmeler.Schmidt.Schmitt.Schneider.Schoen.Schowalter.Schroeder.Schulist.Schultz.Schumm.Schuppe.Schuster.Senger.Shanahan.Shields.Simonis.Sipes.Skiles.Smith.Smitham.Spencer.Spinka.Sporer.Stamm.Stanton.Stark.Stehr.Steuber.Stiedemann.Stokes.Stoltenberg.Stracke.Streich.Stroman.Strosin.Swaniawski.Swift.Terry.Thiel.Thompson.Tillman.Torp.Torphy.Towne.Toy.Trantow.Tremblay.Treutel.Tromp.Turcotte.Turner.Ullrich.Upton.Vandervort.Veum.Volkman.Von.VonRueden.Waelchi.Walker.Walsh.Walter.Ward.Waters.Watsica.Weber.Wehner.Weimann.Weissnat.Welch.West.White.Wiegand.Wilderman.Wilkinson.Will.Williamson.Willms.Windler.Wintheiser.Wisoky.Wisozk.Witting.Wiza.Wolf.Wolff.Wuckert.Wunsch.Wyman.Yost.Yundt.Zboncak.Zemlak.Ziemann.Zieme.Zulauf`.split(`.`) }, last_name_pattern: { generic: [{ value: `{{person.last_name.generic}}`, weight: 95 }, { value: `{{person.last_name.generic}}-{{person.last_name.generic}}`, weight: 5 }] }, middle_name: { generic: `Addison.Anderson.Angel.Arden.Austin.Bailey.Bowie.Brooklyn.Cameron.Charlie.Corey.Drew.Dylan.Elliott.Finley.Gray.Greer.Hayden.Jaden.Jamie.Kai.Kendall.Kyle.Leslie.Marlowe.Micah.Monroe.Nico.Noah.North.Parker.Reagan.Reign.Rowan.Ryan.Sasha.Sawyer.Shawn.Shiloh.Skyler`.split(`.`), female: `Abigail.Adele.Alex.Alice.Alisha.Amber.Amelia.Amora.Ana\xEFs.Angelou.Anika.Anise.Annabel.Anne.Aphrodite.Aretha.Arya.Ashton.Aster.Audrey.Avery.Bailee.Bay.Belle.Beth.Billie.Blair.Blaise.Blake.Blanche.Blue.Bree.Brielle.Brienne.Brooke.Caleen.Candice.Caprice.Carelyn.Caylen.Celine.Cerise.Cia.Claire.Claudia.Clementine.Coral.Coraline.Dahlia.Dakota.Dawn.Della.Demi.Denise.Denver.Devine.Devon.Diana.Ebony.Eden.Eleanor.Elein.Elizabeth.Ellen.Elodie.Eloise.Ember.Emma.Erin.Eyre.Faith.Farrah.Fawn.Fayre.Fern.France.Francis.Frida.Genisis.Georgia.Grace.Gwen.Harley.Harper.Hazel.Helen.Hippolyta.Holly.Hope.Imani.Iowa.Ireland.Irene.Iris.Isa.Isla.Ivy.Jade.Jane.Jazz.Jean.Jess.Jett.Jo.Joan.Jolie.Jordan.Josie.Journey.Joy.Jules.Julien.Juliet.Juniper.Justice.Kali.Karma.Kat.Kate.Kennedy.Keva.Kylie.Lake.Lane.Lark.Layla.Lee.Leigh.Leona.Lexi.London.Lou.Louise.Love.Luna.Lux.Lynn.Lyric.Maddie.Mae.Marie.Matilda.Maude.Maybel.Meadow.Medusa.Mercy.Michelle.Mirabel.Morgan.Nalia.Naomi.Nova.Olive.Paige.Pax.Pearl.Penelope.Phoenix.Quinn.Rae.Rain.Raven.Ray.Raye.Rebel.Reese.Reeve.Regan.Riley.River.Robin.Rory.Rose.Royal.Ruth.Rylie.Sage.Sam.Saturn.Scout.Serena.Sky.Skylar.Sofia.Sophia.Storm.Sue.Suzanne.Sydney.Taylen.Taylor.Teagan.Tempest.Tenley.Thea.Trinity.Valerie.Venus.Vera.Violet.Willow.Winter.Xena.Zaylee.Zion.Zoe`.split(`.`), male: `Ace.Aiden.Alexander.Ander.Anthony.Asher.August.Aziel.Bear.Beckham.Benjamin.Buddy.Calvin.Carter.Charles.Christopher.Clyde.Cooper.Daniel.David.Dior.Elijah.Ellis.Emerson.Ethan.Ezra.Fletcher.Flynn.Gabriel.Grayson.Gus.Hank.Harrison.Hendrix.Henry.Houston.Hudson.Hugh.Isaac.Jack.Jackson.Jacob.Jakobe.James.Jaxon.Jaxtyn.Jayden.John.Joseph.Josiah.Jude.Julian.Karsyn.Kenji.Kobe.Kylo.Lennon.Leo.Levi.Liam.Lincoln.Logan.Louis.Lucas.Lucky.Luke.Mason.Mateo.Matthew.Maverick.Michael.Nixon.Ocean.Oliver.Otis.Otto.Owen.Ozzy.Rocky.Samuel.Sebastian.Sonny.Teddy.Theo.Theodore.Thomas.Truett.Walter.Warren.Watson.William.Wison.Wyatt.Ziggy.Zyair`.split(`.`) }, name: [{ value: `{{person.firstName}} {{person.lastName}}`, weight: 49 }, { value: `{{person.prefix}} {{person.firstName}} {{person.lastName}}`, weight: 7 }, { value: `{{person.firstName}} {{person.lastName}} {{person.suffix}}`, weight: 7 }, { value: `{{person.prefix}} {{person.firstName}} {{person.lastName}} {{person.suffix}}`, weight: 1 }], prefix: { generic: [`Dr.`], female: [`Miss`, `Mrs.`, `Ms.`], male: [`Mr.`] }, sex: [`female`, `male`], suffix: [`Jr.`, `Sr.`, `I`, `II`, `III`, `IV`, `V`, `MD`, `DDS`, `PhD`, `DVM`], western_zodiac_sign: [`Aquarius`, `Pisces`, `Aries`, `Taurus`, `Gemini`, `Cancer`, `Leo`, `Virgo`, `Libra`, `Scorpio`, `Sagittarius`, `Capricorn`] }, phone_number: { format: { human: [`!##-!##-####`, `(!##) !##-####`, `1-!##-!##-####`, `!##.!##.####`, `!##-!##-#### x###`, `(!##) !##-#### x###`, `1-!##-!##-#### x###`, `!##.!##.#### x###`, `!##-!##-#### x####`, `(!##) !##-#### x####`, `1-!##-!##-#### x####`, `!##.!##.#### x####`, `!##-!##-#### x#####`, `(!##) !##-#### x#####`, `1-!##-!##-#### x#####`, `!##.!##.#### x#####`], international: [`+1!##!######`], mobile: [`!##!######`], national: [`(!##) !##-####`] } }, science: { chemical_element: [{ symbol: `H`, name: `Hydrogen`, atomicNumber: 1 }, { symbol: `He`, name: `Helium`, atomicNumber: 2 }, { symbol: `Li`, name: `Lithium`, atomicNumber: 3 }, { symbol: `Be`, name: `Beryllium`, atomicNumber: 4 }, { symbol: `B`, name: `Boron`, atomicNumber: 5 }, { symbol: `C`, name: `Carbon`, atomicNumber: 6 }, { symbol: `N`, name: `Nitrogen`, atomicNumber: 7 }, { symbol: `O`, name: `Oxygen`, atomicNumber: 8 }, { symbol: `F`, name: `Fluorine`, atomicNumber: 9 }, { symbol: `Ne`, name: `Neon`, atomicNumber: 10 }, { symbol: `Na`, name: `Sodium`, atomicNumber: 11 }, { symbol: `Mg`, name: `Magnesium`, atomicNumber: 12 }, { symbol: `Al`, name: `Aluminium`, atomicNumber: 13 }, { symbol: `Si`, name: `Silicon`, atomicNumber: 14 }, { symbol: `P`, name: `Phosphorus`, atomicNumber: 15 }, { symbol: `S`, name: `Sulfur`, atomicNumber: 16 }, { symbol: `Cl`, name: `Chlorine`, atomicNumber: 17 }, { symbol: `Ar`, name: `Argon`, atomicNumber: 18 }, { symbol: `K`, name: `Potassium`, atomicNumber: 19 }, { symbol: `Ca`, name: `Calcium`, atomicNumber: 20 }, { symbol: `Sc`, name: `Scandium`, atomicNumber: 21 }, { symbol: `Ti`, name: `Titanium`, atomicNumber: 22 }, { symbol: `V`, name: `Vanadium`, atomicNumber: 23 }, { symbol: `Cr`, name: `Chromium`, atomicNumber: 24 }, { symbol: `Mn`, name: `Manganese`, atomicNumber: 25 }, { symbol: `Fe`, name: `Iron`, atomicNumber: 26 }, { symbol: `Co`, name: `Cobalt`, atomicNumber: 27 }, { symbol: `Ni`, name: `Nickel`, atomicNumber: 28 }, { symbol: `Cu`, name: `Copper`, atomicNumber: 29 }, { symbol: `Zn`, name: `Zinc`, atomicNumber: 30 }, { symbol: `Ga`, name: `Gallium`, atomicNumber: 31 }, { symbol: `Ge`, name: `Germanium`, atomicNumber: 32 }, { symbol: `As`, name: `Arsenic`, atomicNumber: 33 }, { symbol: `Se`, name: `Selenium`, atomicNumber: 34 }, { symbol: `Br`, name: `Bromine`, atomicNumber: 35 }, { symbol: `Kr`, name: `Krypton`, atomicNumber: 36 }, { symbol: `Rb`, name: `Rubidium`, atomicNumber: 37 }, { symbol: `Sr`, name: `Strontium`, atomicNumber: 38 }, { symbol: `Y`, name: `Yttrium`, atomicNumber: 39 }, { symbol: `Zr`, name: `Zirconium`, atomicNumber: 40 }, { symbol: `Nb`, name: `Niobium`, atomicNumber: 41 }, { symbol: `Mo`, name: `Molybdenum`, atomicNumber: 42 }, { symbol: `Tc`, name: `Technetium`, atomicNumber: 43 }, { symbol: `Ru`, name: `Ruthenium`, atomicNumber: 44 }, { symbol: `Rh`, name: `Rhodium`, atomicNumber: 45 }, { symbol: `Pd`, name: `Palladium`, atomicNumber: 46 }, { symbol: `Ag`, name: `Silver`, atomicNumber: 47 }, { symbol: `Cd`, name: `Cadmium`, atomicNumber: 48 }, { symbol: `In`, name: `Indium`, atomicNumber: 49 }, { symbol: `Sn`, name: `Tin`, atomicNumber: 50 }, { symbol: `Sb`, name: `Antimony`, atomicNumber: 51 }, { symbol: `Te`, name: `Tellurium`, atomicNumber: 52 }, { symbol: `I`, name: `Iodine`, atomicNumber: 53 }, { symbol: `Xe`, name: `Xenon`, atomicNumber: 54 }, { symbol: `Cs`, name: `Caesium`, atomicNumber: 55 }, { symbol: `Ba`, name: `Barium`, atomicNumber: 56 }, { symbol: `La`, name: `Lanthanum`, atomicNumber: 57 }, { symbol: `Ce`, name: `Cerium`, atomicNumber: 58 }, { symbol: `Pr`, name: `Praseodymium`, atomicNumber: 59 }, { symbol: `Nd`, name: `Neodymium`, atomicNumber: 60 }, { symbol: `Pm`, name: `Promethium`, atomicNumber: 61 }, { symbol: `Sm`, name: `Samarium`, atomicNumber: 62 }, { symbol: `Eu`, name: `Europium`, atomicNumber: 63 }, { symbol: `Gd`, name: `Gadolinium`, atomicNumber: 64 }, { symbol: `Tb`, name: `Terbium`, atomicNumber: 65 }, { symbol: `Dy`, name: `Dysprosium`, atomicNumber: 66 }, { symbol: `Ho`, name: `Holmium`, atomicNumber: 67 }, { symbol: `Er`, name: `Erbium`, atomicNumber: 68 }, { symbol: `Tm`, name: `Thulium`, atomicNumber: 69 }, { symbol: `Yb`, name: `Ytterbium`, atomicNumber: 70 }, { symbol: `Lu`, name: `Lutetium`, atomicNumber: 71 }, { symbol: `Hf`, name: `Hafnium`, atomicNumber: 72 }, { symbol: `Ta`, name: `Tantalum`, atomicNumber: 73 }, { symbol: `W`, name: `Tungsten`, atomicNumber: 74 }, { symbol: `Re`, name: `Rhenium`, atomicNumber: 75 }, { symbol: `Os`, name: `Osmium`, atomicNumber: 76 }, { symbol: `Ir`, name: `Iridium`, atomicNumber: 77 }, { symbol: `Pt`, name: `Platinum`, atomicNumber: 78 }, { symbol: `Au`, name: `Gold`, atomicNumber: 79 }, { symbol: `Hg`, name: `Mercury`, atomicNumber: 80 }, { symbol: `Tl`, name: `Thallium`, atomicNumber: 81 }, { symbol: `Pb`, name: `Lead`, atomicNumber: 82 }, { symbol: `Bi`, name: `Bismuth`, atomicNumber: 83 }, { symbol: `Po`, name: `Polonium`, atomicNumber: 84 }, { symbol: `At`, name: `Astatine`, atomicNumber: 85 }, { symbol: `Rn`, name: `Radon`, atomicNumber: 86 }, { symbol: `Fr`, name: `Francium`, atomicNumber: 87 }, { symbol: `Ra`, name: `Radium`, atomicNumber: 88 }, { symbol: `Ac`, name: `Actinium`, atomicNumber: 89 }, { symbol: `Th`, name: `Thorium`, atomicNumber: 90 }, { symbol: `Pa`, name: `Protactinium`, atomicNumber: 91 }, { symbol: `U`, name: `Uranium`, atomicNumber: 92 }, { symbol: `Np`, name: `Neptunium`, atomicNumber: 93 }, { symbol: `Pu`, name: `Plutonium`, atomicNumber: 94 }, { symbol: `Am`, name: `Americium`, atomicNumber: 95 }, { symbol: `Cm`, name: `Curium`, atomicNumber: 96 }, { symbol: `Bk`, name: `Berkelium`, atomicNumber: 97 }, { symbol: `Cf`, name: `Californium`, atomicNumber: 98 }, { symbol: `Es`, name: `Einsteinium`, atomicNumber: 99 }, { symbol: `Fm`, name: `Fermium`, atomicNumber: 100 }, { symbol: `Md`, name: `Mendelevium`, atomicNumber: 101 }, { symbol: `No`, name: `Nobelium`, atomicNumber: 102 }, { symbol: `Lr`, name: `Lawrencium`, atomicNumber: 103 }, { symbol: `Rf`, name: `Rutherfordium`, atomicNumber: 104 }, { symbol: `Db`, name: `Dubnium`, atomicNumber: 105 }, { symbol: `Sg`, name: `Seaborgium`, atomicNumber: 106 }, { symbol: `Bh`, name: `Bohrium`, atomicNumber: 107 }, { symbol: `Hs`, name: `Hassium`, atomicNumber: 108 }, { symbol: `Mt`, name: `Meitnerium`, atomicNumber: 109 }, { symbol: `Ds`, name: `Darmstadtium`, atomicNumber: 110 }, { symbol: `Rg`, name: `Roentgenium`, atomicNumber: 111 }, { symbol: `Cn`, name: `Copernicium`, atomicNumber: 112 }, { symbol: `Nh`, name: `Nihonium`, atomicNumber: 113 }, { symbol: `Fl`, name: `Flerovium`, atomicNumber: 114 }, { symbol: `Mc`, name: `Moscovium`, atomicNumber: 115 }, { symbol: `Lv`, name: `Livermorium`, atomicNumber: 116 }, { symbol: `Ts`, name: `Tennessine`, atomicNumber: 117 }, { symbol: `Og`, name: `Oganesson`, atomicNumber: 118 }], unit: [{ name: `meter`, symbol: `m` }, { name: `second`, symbol: `s` }, { name: `mole`, symbol: `mol` }, { name: `ampere`, symbol: `A` }, { name: `kelvin`, symbol: `K` }, { name: `candela`, symbol: `cd` }, { name: `kilogram`, symbol: `kg` }, { name: `radian`, symbol: `rad` }, { name: `hertz`, symbol: `Hz` }, { name: `newton`, symbol: `N` }, { name: `pascal`, symbol: `Pa` }, { name: `joule`, symbol: `J` }, { name: `watt`, symbol: `W` }, { name: `coulomb`, symbol: `C` }, { name: `volt`, symbol: `V` }, { name: `ohm`, symbol: `\u03A9` }, { name: `tesla`, symbol: `T` }, { name: `degree Celsius`, symbol: `\xB0C` }, { name: `lumen`, symbol: `lm` }, { name: `becquerel`, symbol: `Bq` }, { name: `gray`, symbol: `Gy` }, { name: `sievert`, symbol: `Sv` }, { name: `steradian`, symbol: `sr` }, { name: `farad`, symbol: `F` }, { name: `siemens`, symbol: `S` }, { name: `weber`, symbol: `Wb` }, { name: `henry`, symbol: `H` }, { name: `lux`, symbol: `lx` }, { name: `katal`, symbol: `kat` }] }, team: { creature: `ants.bats.bears.bees.birds.buffalo.cats.chickens.cattle.dogs.dolphins.ducks.elephants.fishes.foxes.frogs.geese.goats.horses.kangaroos.lions.monkeys.owls.oxen.penguins.people.pigs.rabbits.sheep.tigers.whales.wolves.zebras.banshees.crows.black cats.chimeras.ghosts.conspirators.dragons.dwarves.elves.enchanters.exorcists.sons.foes.giants.gnomes.goblins.gooses.griffins.lycanthropes.nemesis.ogres.oracles.prophets.sorcerors.spiders.spirits.vampires.warlocks.vixens.werewolves.witches.worshipers.zombies.druids`.split(`.`), name: [`{{location.state}} {{team.creature}}`] }, vehicle: { bicycle_type: [`Adventure Road Bicycle`, `BMX Bicycle`, `City Bicycle`, `Cruiser Bicycle`, `Cyclocross Bicycle`, `Dual-Sport Bicycle`, `Fitness Bicycle`, `Flat-Foot Comfort Bicycle`, `Folding Bicycle`, `Hybrid Bicycle`, `Mountain Bicycle`, `Recumbent Bicycle`, `Road Bicycle`, `Tandem Bicycle`, `Touring Bicycle`, `Track/Fixed-Gear Bicycle`, `Triathlon/Time Trial Bicycle`, `Tricycle`], fuel: [`Diesel`, `Electric`, `Gasoline`, `Hybrid`], manufacturer: `Aston Martin.Audi.BMW.BYD.Bentley.Bugatti.Cadillac.Chevrolet.Chrysler.Citro\xEBn.Dodge.Ferrari.Fiat.Ford.Honda.Hyundai.Jaguar.Jeep.Kia.Lamborghini.Land Rover.MG.Mahindra & Mahindra.Maruti.Maserati.Mazda.Mercedes Benz.Mini.Mitsubishi.NIO.Nissan.Peugeot.Polestar.Porsche.Renault.Rivian.Rolls Royce.Skoda.Smart.Subaru.Suzuki.Tata.Tesla.Toyota.Vauxhall.Volkswagen.Volvo`.split(`.`), model: `1.2.911.A4.A8.ATS.Accord.Alpine.Altima.Aventador.Beetle.CTS.CX-9.Camaro.Camry.Challenger.Charger.Civic.Colorado.Corvette.Countach.Cruze.Durango.El Camino.Element.Escalade.Expedition.Explorer.F-150.Fiesta.Focus.Fortwo.Golf.Grand Caravan.Grand Cherokee.Impala.Jetta.Land Cruiser.LeBaron.Malibu.Model 3.Model S.Model T.Model X.Model Y.Murcielago.Mustang.PT Cruiser.Prius.Ranchero.Roadster.Sentra.Silverado.Spyder.Taurus.V90.Volt.Wrangler.XC90.XTS`.split(`.`), type: [`Cargo Van`, `Convertible`, `Coupe`, `Crew Cab Pickup`, `Extended Cab Pickup`, `Hatchback`, `Minivan`, `Passenger Van`, `SUV`, `Sedan`, `Wagon`] }, word: { adjective: `abandoned.able.acceptable.acclaimed.accomplished.accurate.aching.acidic.actual.admired.adolescent.advanced.affectionate.afraid.aged.aggravating.aggressive.agile.agitated.agreeable.ajar.alarmed.alert.alienated.alive.all.altruistic.amazing.ambitious.ample.amused.angelic.anguished.animated.annual.another.antique.any.apprehensive.appropriate.apt.arid.artistic.ashamed.assured.astonishing.athletic.austere.authentic.authorized.avaricious.average.aware.awesome.awful.babyish.back.bad.baggy.bare.basic.beloved.beneficial.best.better.big.biodegradable.bitter.black.black-and-white.blank.blaring.bleak.blind.blond.blue.blushing.bogus.boiling.bony.boring.bossy.both.bouncy.bowed.brave.breakable.bright.brilliant.brisk.broken.brown.bruised.bulky.burdensome.burly.bustling.busy.buttery.buzzing.calculating.candid.carefree.careless.caring.cautious.cavernous.celebrated.charming.cheap.cheerful.chilly.chubby.circular.classic.clean.clear.clear-cut.close.closed.cloudy.clueless.clumsy.cluttered.coarse.colorful.colorless.colossal.comfortable.common.compassionate.competent.complete.complicated.concerned.concrete.confused.considerate.content.cool.cooperative.coordinated.corny.corrupt.courageous.courteous.crafty.crazy.creamy.creative.criminal.critical.crooked.crowded.cruel.crushing.cuddly.cultivated.cumbersome.curly.cute.damaged.damp.dapper.dark.darling.dazzling.dead.deadly.deafening.dearest.decent.decisive.deep.defenseless.defensive.deficient.definite.definitive.delectable.delicious.delirious.dense.dental.dependable.dependent.descriptive.deserted.determined.devoted.different.difficult.digital.diligent.dim.direct.dirty.discrete.disloyal.dismal.distant.distinct.distorted.doting.downright.drab.dramatic.dreary.dual.dull.dutiful.each.early.earnest.easy.ecstatic.edible.educated.elastic.elderly.electric.elegant.elementary.elliptical.eminent.emotional.empty.enchanted.enchanting.energetic.enlightened.enraged.entire.equatorial.essential.esteemed.ethical.everlasting.every.evil.exalted.excellent.excitable.excited.exhausted.exotic.expensive.experienced.expert.extra-large.extroverted.failing.faint.fair.fake.familiar.fantastic.far.far-flung.far-off.faraway.fat.fatal.fatherly.favorable.favorite.fearless.feline.filthy.fine.finished.firm.first.firsthand.fixed.flashy.flawed.flawless.flickering.flimsy.flowery.fluffy.flustered.focused.fond.foolhardy.foolish.forceful.formal.forsaken.fortunate.fragrant.frail.frank.free.french.frequent.friendly.frightened.frilly.frivolous.frizzy.front.frozen.frugal.fruitful.functional.funny.fussy.fuzzy.gaseous.general.gentle.genuine.gifted.gigantic.giving.glaring.glass.gleaming.glittering.gloomy.glorious.glossy.glum.golden.good.good-natured.gorgeous.graceful.gracious.grandiose.granular.grave.gray.great.greedy.grim.grimy.gripping.grizzled.grouchy.grounded.growing.grown.grubby.gruesome.grumpy.guilty.gullible.gummy.hairy.handsome.handy.happy.happy-go-lucky.hard-to-find.harmful.hasty.hateful.haunting.heartfelt.heavenly.heavy.hefty.helpful.helpless.hidden.hoarse.hollow.homely.honorable.honored.hopeful.hospitable.hot.huge.humble.humiliating.hungry.hurtful.husky.icy.ideal.idealistic.idolized.ignorant.ill.ill-fated.illiterate.illustrious.imaginary.imaginative.immaculate.immediate.immense.impartial.impassioned.impeccable.impish.impolite.important.impossible.impractical.impressionable.impressive.improbable.impure.inborn.incomparable.incomplete.inconsequential.indelible.indolent.inexperienced.infamous.infatuated.inferior.infinite.informal.innocent.insecure.insidious.insignificant.insistent.instructive.intelligent.intent.interesting.internal.international.intrepid.ironclad.irresponsible.jagged.jam-packed.jaunty.jealous.jittery.joyful.joyous.jubilant.judicious.juicy.jumbo.junior.juvenile.kaleidoscopic.key.knotty.knowledgeable.known.kooky.kosher.lanky.last.lasting.late.lavish.lawful.lazy.leading.lean.left.legal.light.lighthearted.likable.likely.limited.limp.limping.linear.lined.liquid.little.live.lively.livid.lone.lonely.long.long-term.lost.lovable.lovely.low.lucky.lumbering.lumpy.lustrous.mad.made-up.magnificent.majestic.major.male.mammoth.married.marvelous.massive.mature.meager.mealy.mean.measly.meaty.mediocre.medium.memorable.menacing.merry.messy.metallic.mild.milky.mindless.minor.minty.miserable.miserly.misguided.mixed.moist.monstrous.monthly.monumental.moral.motionless.muddy.muffled.multicolored.mundane.murky.mushy.musty.muted.mysterious.narrow.natural.naughty.nautical.near.neat.necessary.needy.negative.neglected.negligible.neighboring.nervous.new.next.nice.nifty.nimble.nippy.nocturnal.normal.noted.noteworthy.noxious.numb.nutritious.obedient.oblong.obvious.odd.oddball.official.oily.old.old-fashioned.only.optimal.optimistic.orange.orderly.ordinary.ornate.ornery.other.our.outgoing.outlandish.outlying.outrageous.outstanding.oval.overcooked.overdue.palatable.pale.paltry.parallel.parched.partial.passionate.pastel.peaceful.peppery.perfumed.perky.personal.pertinent.pessimistic.petty.phony.physical.pink.pitiful.plain.pleasant.pleased.pleasing.plump.pointed.pointless.polished.polite.political.poor.portly.posh.possible.potable.powerful.powerless.practical.precious.present.prestigious.pretty.pricey.prickly.primary.prime.private.probable.productive.profitable.profuse.proper.proud.prudent.punctual.puny.pure.purple.pushy.putrid.puzzled.qualified.quarrelsome.quarterly.queasy.querulous.questionable.quick.quick-witted.quiet.quintessential.quixotic.radiant.ragged.rapid.rare.raw.realistic.reasonable.recent.reckless.rectangular.red.reflecting.regal.regular.remarkable.remorseful.repentant.respectful.responsible.rewarding.rich.right.rigid.ripe.roasted.robust.rosy.rotating.rotten.rough.round.rowdy.royal.rubbery.ruddy.rundown.runny.rural.rusty.sad.salty.same.sandy.sarcastic.sardonic.scaly.scared.scary.scented.scientific.scornful.scratchy.second.second-hand.secondary.secret.self-assured.self-reliant.selfish.sentimental.separate.serene.serpentine.severe.shabby.shadowy.shady.shallow.shameful.shameless.shimmering.shiny.shocked.shoddy.short.short-term.showy.shrill.shy.sick.silent.silky.silver.similar.simple.simplistic.sinful.sizzling.skeletal.sleepy.slight.slimy.slow.slushy.small.smart.smoggy.smooth.smug.snappy.snarling.sneaky.sniveling.snoopy.sociable.soft.soggy.somber.some.sophisticated.sore.sorrowful.soulful.soupy.sour.spanish.sparkling.sparse.specific.speedy.spherical.spiffy.spirited.spiteful.splendid.spotless.square.squeaky.squiggly.stable.staid.stained.stale.standard.stark.steel.steep.sticky.stiff.stingy.stormy.straight.strange.strict.strident.striking.strong.stunning.stupendous.sturdy.stylish.subdued.submissive.substantial.subtle.suburban.sudden.sugary.sunny.super.superb.superficial.superior.supportive.sure-footed.surprised.svelte.sweet.swift.talkative.tall.tame.tangible.tasty.tattered.taut.tedious.teeming.tempting.tender.tense.tepid.terrible.that.these.thick.thin.thorny.thorough.those.thrifty.tidy.tight.timely.tinted.tiny.tired.torn.total.tough.tragic.trained.triangular.tricky.trim.trivial.troubled.true.trusting.trustworthy.trusty.turbulent.twin.ugly.ultimate.unaware.uncomfortable.uncommon.unconscious.understated.uneven.unfinished.unfit.unfortunate.unhappy.unhealthy.uniform.unimportant.unique.unkempt.unknown.unlawful.unlined.unlucky.unpleasant.unrealistic.unripe.unruly.unselfish.unsightly.unsteady.unsung.untidy.untimely.untried.untrue.unused.unusual.unwelcome.unwieldy.unwilling.unwritten.upbeat.upright.upset.urban.usable.useless.utilized.utter.vague.vain.valuable.variable.vast.velvety.vengeful.vibrant.victorious.violent.vivacious.vivid.voluminous.warlike.warm.warmhearted.warped.wasteful.waterlogged.watery.wavy.wealthy.weary.webbed.wee.weekly.weighty.weird.well-documented.well-groomed.well-lit.well-made.well-off.well-to-do.well-worn.which.whimsical.whirlwind.whispered.white.whole.whopping.wicked.wide.wide-eyed.wiggly.willing.wilted.winding.windy.winged.wise.witty.wobbly.woeful.wonderful.wordy.worldly.worse.worst.worthless.worthwhile.worthy.wrathful.wretched.writhing.wrong.wry.yearly.yellow.yellowish.young.youthful.yummy.zany.zealous.zesty`.split(`.`), adverb: `abnormally.absentmindedly.accidentally.acidly.actually.adventurously.afterwards.almost.always.angrily.annually.anxiously.arrogantly.awkwardly.badly.bashfully.beautifully.bitterly.bleakly.blindly.blissfully.boastfully.boldly.bravely.briefly.brightly.briskly.broadly.busily.calmly.carefully.carelessly.cautiously.certainly.cheerfully.clearly.cleverly.closely.coaxingly.colorfully.commonly.continually.coolly.correctly.courageously.crossly.cruelly.curiously.daily.daintily.dearly.deceivingly.deeply.defiantly.deliberately.delightfully.diligently.dimly.doubtfully.dreamily.easily.elegantly.energetically.enormously.enthusiastically.equally.especially.even.evenly.eventually.exactly.excitedly.extremely.fairly.faithfully.famously.far.fast.fatally.ferociously.fervently.fiercely.fondly.foolishly.fortunately.frankly.frantically.freely.frenetically.frightfully.fully.furiously.generally.generously.gently.gladly.gleefully.gracefully.gratefully.greatly.greedily.happily.hastily.healthily.heavily.helpfully.helplessly.highly.honestly.hopelessly.hourly.hungrily.immediately.innocently.inquisitively.instantly.intensely.intently.interestingly.inwardly.irritably.jaggedly.jealously.joshingly.jovially.joyfully.joyously.jubilantly.judgementally.justly.keenly.kiddingly.kindheartedly.kindly.kissingly.knavishly.knottily.knowingly.knowledgeably.kookily.lazily.less.lightly.likely.limply.lively.loftily.longingly.loosely.loudly.lovingly.loyally.madly.majestically.meaningfully.mechanically.merrily.miserably.mockingly.monthly.more.mortally.mostly.mysteriously.naturally.nearly.neatly.needily.nervously.never.nicely.noisily.not.obediently.obnoxiously.oddly.offensively.officially.often.only.openly.optimistically.overconfidently.owlishly.painfully.partially.patiently.perfectly.physically.playfully.politely.poorly.positively.potentially.powerfully.promptly.properly.punctually.quaintly.quarrelsomely.queasily.questionably.questioningly.quicker.quickly.quietly.quirkily.quizzically.rapidly.rarely.readily.really.reassuringly.recklessly.regularly.reluctantly.repeatedly.reproachfully.restfully.righteously.rightfully.rigidly.roughly.rudely.sadly.safely.scarcely.scarily.searchingly.sedately.seemingly.seldom.selfishly.separately.seriously.shakily.sharply.sheepishly.shrilly.shyly.silently.sleepily.slowly.smoothly.softly.solemnly.solidly.sometimes.soon.speedily.stealthily.sternly.strictly.successfully.suddenly.surprisingly.suspiciously.sweetly.swiftly.sympathetically.tenderly.tensely.terribly.thankfully.thoroughly.thoughtfully.tightly.tomorrow.too.tremendously.triumphantly.truly.truthfully.ultimately.unabashedly.unaccountably.unbearably.unethically.unexpectedly.unfortunately.unimpressively.unnaturally.unnecessarily.upbeat.upliftingly.upright.upside-down.upward.upwardly.urgently.usefully.uselessly.usually.utterly.vacantly.vaguely.vainly.valiantly.vastly.verbally.very.viciously.victoriously.violently.vivaciously.voluntarily.warmly.weakly.wearily.well.wetly.wholly.wildly.willfully.wisely.woefully.wonderfully.worriedly.wrongly.yawningly.yearly.yearningly.yesterday.yieldingly.youthfully`.split(`.`), conjunction: `after.although.and.as.because.before.but.consequently.even.finally.for.furthermore.hence.how.however.if.inasmuch.incidentally.indeed.instead.lest.likewise.meanwhile.nor.now.once.or.provided.since.so.supposing.than.that.though.till.unless.until.what.when.whenever.where.whereas.wherever.whether.which.while.who.whoever.whose.why.yet`.split(`.`), interjection: `yuck.oh.phooey.blah.boo.whoa.yowza.huzzah.boohoo.fooey.geez.pfft.ew.ah.yum.brr.hm.yahoo.aha.woot.drat.gah.meh.psst.aw.ugh.yippee.eek.gee.bah.gadzooks.duh.ha.mmm.ouch.phew.ack.uh-huh.gosh.hmph.pish.zowie.er.ick.oof.um`.split(`.`), noun: `CD.SUV.abacus.academics.accelerator.accompanist.account.accountability.acquaintance.ad.adaptation.address.adrenalin.adult.advancement.advertisement.adviser.affect.affiliate.aftermath.agreement.airbus.aircraft.airline.airmail.airman.airport.alb.alert.allegation.alliance.alligator.allocation.almighty.amendment.amnesty.analogy.angle.annual.antelope.anticodon.apparatus.appliance.approach.apricot.arcade.archaeology.armchair.armoire.asset.assist.atrium.attraction.availability.avalanche.awareness.babushka.backbone.backburn.bakeware.bandwidth.bar.barge.baritone.barracks.baseboard.basket.bathhouse.bathrobe.battle.begonia.behest.bell.bench.bend.beret.best-seller.bid.bidet.bin.birdbath.birdcage.birth.blight.blossom.blowgun.bob.bog.bonfire.bonnet.bookcase.bookend.boulevard.bourgeoisie.bowler.bowling.boyfriend.brace.bracelet.bran.breastplate.brief.brochure.brook.brush.bug.bump.bungalow.cafe.cake.calculus.cannon.cantaloupe.cap.cappelletti.captain.caption.carboxyl.cardboard.carnival.case.casement.cash.casket.cassava.castanet.catalyst.cauliflower.cellar.celsius.cemetery.ceramic.ceramics.certification.chainstay.chairperson.challenge.championship.chap.chapel.character.characterization.charlatan.charm.chasuble.cheese.cheetah.chiffonier.chops.chow.cinder.cinema.circumference.citizen.clamp.clavicle.cleaner.climb.co-producer.coal.coast.cod.coil.coin.coliseum.collaboration.collectivization.colon.colonialism.comestible.commercial.commodity.community.comparison.completion.complication.compromise.concentration.configuration.confusion.conservation.conservative.consistency.contractor.contrail.convection.conversation.cook.coordination.cop-out.cope.cork.cornet.corporation.corral.cosset.costume.couch.council.councilman.countess.courtroom.cow.creator.creature.crest.cricket.crocodile.cross-contamination.cruelty.cuckoo.curl.custody.custom.cutlet.cutover.cycle.daddy.dandelion.dash.daughter.dead.decision.deck.declaration.decongestant.decryption.deduction.deed.deer.defendant.density.department.dependency.deployment.depot.derby.descendant.descent.design.designation.desk.detective.devastation.developing.developmental.devil.diagram.digestive.digit.dime.director.disadvantage.disappointment.disclosure.disconnection.discourse.dish.disk.disposer.distinction.diver.diversity.dividend.divine.doing.doorpost.doubter.draft.draw.dream.dredger.dress.drive.drug.duffel.dulcimer.dusk.duster.dwell.e-mail.earth.ecliptic.ectoderm.edge.editor.effector.eggplant.electronics.elevation.elevator.elver.embarrassment.embossing.emergent.encouragement.entry.epic.equal.essence.eternity.ethyl.euphonium.event.exasperation.excess.executor.exhaust.expansion.expense.experience.exploration.extension.extent.exterior.eyebrow.eyeliner.farm.farmer.fat.fax.feather.fedora.fellow.fen.fencing.ferret.festival.fibre.filter.final.finding.finer.finger.fireplace.fisherman.fishery.fit.flame.flat.fledgling.flight.flint.flood.flu.fog.fold.folklore.follower.following.foodstuffs.footrest.forage.forager.forgery.fork.formamide.formation.formula.fort.fowl.fraudster.freckle.freezing.freight.fuel.fun.fund.fundraising.futon.gallery.galoshes.gastropod.gazebo.gerbil.ghost.giant.gift.giggle.glider.gloom.goat.godfather.godparent.going.goodwill.governance.government.gown.gradient.graffiti.grandpa.grandson.granny.grass.gray.gripper.grouper.guacamole.guard.guidance.guide.gym.gymnast.habit.haircut.halt.hamburger.hammock.handful.handle.handover.harp.haversack.hawk.heartache.heartbeat.heating.hello.help.hepatitis.heroine.hexagon.hierarchy.hippodrome.honesty.hoof.hope.horde.hornet.horst.hose.hospitalization.hovel.hovercraft.hubris.humidity.humor.hundred.hunger.hunt.husband.hutch.hydrant.hydrocarbon.hydrolyse.hydrolyze.hyena.hygienic.hyphenation.ice-cream.icebreaker.igloo.ignorance.illusion.impact.import.importance.impostor.in-joke.incandescence.independence.individual.information.injunction.innovation.insolence.inspection.instance.institute.instruction.instructor.integer.intellect.intent.interchange.interior.intervention.interviewer.invite.iridescence.issue.jacket.jazz.jellyfish.jet.jogging.joy.juggernaut.jump.jungle.junior.jury.kettledrum.kick.kielbasa.kinase.king.kiss.kit.knickers.knight.knitting.knuckle.label.labourer.lace.lady.lamp.language.larva.lashes.laughter.lava.lawmaker.lay.leading.league.legend.legging.legislature.lender.license.lid.lieu.lifestyle.lift.linseed.litter.loaf.lobster.longboat.lotion.lounge.louse.lox.loyalty.luck.lyre.maestro.mainstream.maintainer.majority.makeover.making.mallard.management.manner.mantua.marathon.march.marimba.marketplace.marksman.markup.marten.massage.masterpiece.mathematics.meadow.meal.meander.meatloaf.mechanic.median.membership.mentor.merit.metabolite.metal.middle.midwife.milestone.millet.minion.minister.minor.minority.mixture.mobility.molasses.mom.moment.monasticism.monocle.monster.morbidity.morning.mortise.mountain.mouser.mousse.mozzarella.muscat.mythology.napkin.necklace.nectarine.negotiation.nephew.nerve.netsuke.newsletter.newsprint.newsstand.nightlife.noon.nougat.nucleotidase.nudge.numeracy.numeric.nun.obedience.obesity.object.obligation.ocelot.octave.offset.oil.omelet.onset.opera.operating.optimal.orchid.order.ostrich.other.outlaw.outrun.outset.overcoat.overheard.overload.ownership.pacemaker.packaging.paintwork.palate.pants.pantyhose.papa.parade.parsnip.partridge.passport.pasta.patroller.pear.pearl.pecan.pendant.peninsula.pension.peony.pepper.perfection.permafrost.perp.petal.petticoat.pharmacopoeia.phrase.pick.piglet.pigpen.pigsty.pile.pillbox.pillow.pilot.pine.pinstripe.place.plain.planula.plastic.platter.platypus.pleasure.pliers.plugin.plumber.pneumonia.pocket-watch.poetry.polarisation.polyester.pomelo.pop.poppy.popularity.populist.porter.possession.postbox.precedent.premeditation.premier.premise.premium.pressure.presume.priesthood.printer.privilege.procurement.produce.programme.prohibition.promise.pronoun.providence.provider.provision.publication.publicity.pulse.punctuation.pupil.puppet.puritan.quart.quinoa.quit.railway.range.rationale.ravioli.rawhide.reach.reasoning.reboot.receptor.recommendation.reconsideration.recovery.redesign.relative.release.remark.reorganisation.repeat.replacement.reporter.representation.republican.request.requirement.reservation.resolve.resource.responsibility.restaurant.retention.retrospectivity.reward.ribbon.rim.riser.roadway.role.rosemary.roundabout.rubric.ruin.rule.runway.rust.safe.sailor.saloon.sand.sandbar.sanity.sarong.sauerkraut.saw.scaffold.scale.scarification.scenario.schedule.schnitzel.scholarship.scorn.scorpion.scout.scrap.scratch.seafood.seagull.seal.season.secrecy.secret.section.sediment.self-confidence.sermon.sesame.settler.shadowbox.shark.shipper.shore.shoulder.sideboard.siege.sightseeing.signature.silk.simple.singing.skean.skeleton.skyline.skyscraper.slide.slime.slipper.smog.smoke.sock.soliloquy.solution.solvency.someplace.sonar.sonata.sonnet.soup.soybean.space.spear.spirit.spork.sport.spring.sprinkles.squid.stall.starboard.statue.status.stay.steak.steeple.step.step-mother.sticker.stir-fry.stitcher.stock.stool.story.strait.stranger.strategy.straw.stump.subexpression.submitter.subsidy.substitution.suitcase.summary.summer.sunbeam.sundae.supplier.surface.sushi.suspension.sustenance.swanling.swath.sweatshop.swim.swine.swing.switch.switchboard.swordfish.synergy.t-shirt.tabletop.tackle.tail.tapioca.taro.tarragon.taxicab.teammate.technician.technologist.tectonics.tenant.tenement.tennis.tentacle.teriyaki.term.testimonial.testing.thigh.thongs.thorn.thread.thunderbolt.thyme.tinderbox.toaster.tomatillo.tomb.tomography.tool.tooth.toothbrush.toothpick.topsail.traditionalism.traffic.translation.transom.transparency.trash.travel.tray.trench.tribe.tributary.trick.trolley.tuba.tuber.tune-up.turret.tusk.tuxedo.typeface.typewriter.unblinking.underneath.underpants.understanding.unibody.unique.unit.utilization.valentine.validity.valley.valuable.vanadyl.vein.velocity.venom.version.verve.vestment.veto.viability.vibraphone.vibration.vicinity.video.violin.vision.vista.vol.volleyball.wafer.waist.wallaby.warming.wasabi.waterspout.wear.wedding.whack.whale.wheel.widow.wilderness.willow.window.wombat.word.worth.wriggler.yak.yarmulke.yeast.yin.yogurt.zebra.zen`.split(`.`), preposition: `a.abaft.aboard.about.above.absent.across.afore.after.against.along.alongside.amid.amidst.among.amongst.an.anenst.anti.apropos.apud.around.as.aside.astride.at.athwart.atop.barring.before.behind.below.beneath.beside.besides.between.beyond.but.by.circa.concerning.considering.despite.down.during.except.excepting.excluding.failing.following.for.forenenst.from.given.in.including.inside.into.lest.like.mid.midst.minus.modulo.near.next.notwithstanding.of.off.on.onto.opposite.out.outside.over.pace.past.per.plus.pro.qua.regarding.round.sans.save.since.than.the.through.throughout.till.times.to.toward.towards.under.underneath.unlike.until.unto.up.upon.versus.via.vice.with.within.without.worth`.split(`.`), verb: `abnegate.abscond.abseil.absolve.accentuate.accept.access.accessorise.accompany.account.accredit.achieve.acknowledge.acquire.adjourn.adjudge.admonish.adumbrate.advocate.afford.airbrush.ameliorate.amend.amount.anaesthetise.analyse.anesthetize.anneal.annex.antagonize.ape.apologise.apostrophize.appertain.appreciate.appropriate.approximate.arbitrate.archive.arraign.arrange.ascertain.ascribe.assail.atomize.attend.attest.attribute.augment.avow.axe.baa.banish.bank.baptise.battle.beard.beep.behold.belabor.bemuse.besmirch.bestride.better.bewail.bicycle.bide.bind.biodegrade.blacken.blaspheme.bleach.blend.blink.bliss.bloom.bludgeon.bobble.boggle.bolster.book.boom.bootleg.border.bore.boss.braid.brand.brandish.break.breed.broadcast.broadside.brood.browse.buck.burgeon.bus.butter.buzzing.camouflage.cannibalise.canter.cap.capitalise.capitalize.capsize.card.carouse.carp.carpool.catalog.catalyze.catch.categorise.cease.celebrate.censor.certify.char.charter.chase.chatter.chime.chip.christen.chromakey.chunder.chunter.cinch.circle.circulate.circumnavigate.clamor.clamour.claw.cleave.clinch.clinking.clone.clonk.coagulate.coexist.coincide.collaborate.colligate.colorize.colour.comb.come.commandeer.commemorate.communicate.compete.conceal.conceptualize.conclude.concrete.condense.cone.confide.confirm.confiscate.confound.confute.congregate.conjecture.connect.consign.construe.contradict.contrast.contravene.controvert.convalesce.converse.convince.convoke.coop.cop.corner.covenant.cow.crackle.cram.crank.creak.creaking.cripple.croon.cross.crumble.crystallize.culminate.culture.curry.curse.customise.cycle.dally.dampen.darn.debit.debut.decide.decode.decouple.decriminalize.deduce.deduct.deflate.deflect.deform.defrag.degenerate.degrease.delete.delight.deliquesce.demob.demobilise.democratize.demonstrate.denitrify.deny.depart.depend.deplore.deploy.deprave.depute.dereference.describe.desecrate.deselect.destock.detain.develop.devise.dial.dicker.digitize.dilate.disapprove.disarm.disbar.discontinue.disgorge.dishearten.dishonor.disinherit.dislocate.dispense.display.dispose.disrespect.dissemble.ditch.divert.dock.doodle.downchange.downshift.dowse.draft.drag.drain.dramatize.drowse.drum.dwell.economise.edge.efface.egg.eke.electrify.embalm.embed.embody.emboss.emerge.emphasise.emphasize.emulsify.encode.endow.enfold.engage.engender.enhance.enlist.enrage.enrich.enroll.entice.entomb.entrench.entwine.equate.essay.etch.eulogise.even.evince.exacerbate.exaggerate.exalt.exempt.exonerate.expatiate.explode.expostulate.extract.extricate.eyeglasses.fabricate.facilitate.factorise.factorize.fail.fall.familiarize.fashion.father.fathom.fax.federate.feminize.fence.fess.fictionalize.fiddle.fidget.fill.flash.fleck.flight.floodlight.floss.fluctuate.fluff.fly.focalise.foot.forearm.forecast.foretell.forgather.forgo.fork.form.forswear.founder.fraternise.fray.frizz.fumigate.function.furlough.fuss.gad.gallivant.galvanize.gape.garage.garrote.gasp.gestate.give.glimmer.glisten.gloat.gloss.glow.gnash.gnaw.goose.govern.grade.graduate.graft.grok.guest.guilt.gulp.gum.gurn.gust.gut.guzzle.ham.harangue.harvest.hassle.haul.haze.headline.hearten.heighten.highlight.hoick.hold.hole.hollow.holster.home.homeschool.hoot.horn.horse.hotfoot.house.hover.howl.huddle.huff.hunger.hunt.husk.hype.hypothesise.hypothesize.idle.ignite.imagineer.impact.impanel.implode.incinerate.incline.inculcate.industrialize.ingratiate.inhibit.inject.innovate.inscribe.insert.insist.inspect.institute.institutionalize.intend.intermarry.intermesh.intermix.internalise.internalize.internationalize.intrigue.inure.inveigle.inventory.investigate.irk.iterate.jaywalk.jell.jeopardise.jiggle.jive.joint.jot.jut.keel.knife.knit.know.kowtow.lack.lampoon.large.leap.lecture.legitimize.lend.libel.liberalize.license.ligate.list.lobotomise.lock.log.loose.low.lowball.machine.magnetize.major.make.malfunction.manage.manipulate.maroon.masculinize.mash.mask.masquerade.massage.masticate.materialise.matter.maul.memorise.merge.mesh.metabolise.microblog.microchip.micromanage.militate.mill.minister.minor.misappropriate.miscalculate.misfire.misjudge.miskey.mismatch.mispronounce.misread.misreport.misspend.mob.mobilise.mobilize.moisten.mooch.moor.moralise.mortar.mosh.mothball.motivate.motor.mould.mount.muddy.mummify.mutate.mystify.nab.narrate.narrowcast.nasalise.nauseate.navigate.neaten.neck.neglect.norm.notarize.object.obscure.observe.obsess.obstruct.obtrude.offend.offset.option.orchestrate.orient.orientate.outbid.outdo.outfit.outflank.outfox.outnumber.outrank.outrun.outsource.overburden.overcharge.overcook.overdub.overfeed.overload.overplay.overproduce.overreact.override.overspend.overstay.overtrain.overvalue.overwork.own.oxidise.oxidize.oxygenate.pace.pack.pale.pant.paralyse.parody.part.pause.pave.penalise.persecute.personalise.perspire.pertain.peter.pike.pillory.pinion.pip.pity.pivot.pixellate.plagiarise.plait.plan.please.pluck.ponder.popularize.portray.prance.preclude.preheat.prejudge.preregister.presell.preside.pretend.print.prioritize.probate.probe.proceed.procrastinate.profane.progress.proliferate.proofread.propound.proselytise.provision.pry.publicize.puff.pull.pulp.pulverize.purse.put.putrefy.quadruple.quaff.quantify.quarrel.quash.quaver.question.quiet.quintuple.quip.quit.rag.rally.ramp.randomize.rationalise.rationalize.ravage.ravel.react.readies.readjust.readmit.ready.reapply.rear.reassemble.rebel.reboot.reborn.rebound.rebuff.rebuild.rebuke.recede.reckon.reclassify.recompense.reconstitute.record.recount.redact.redevelop.redound.redraw.redress.reel.refer.reference.refine.reflate.refute.regulate.reiterate.rejigger.rejoin.rekindle.relaunch.relieve.remand.remark.reopen.reorient.replicate.repossess.represent.reprimand.reproach.reprove.repurpose.requite.reschedule.resort.respray.restructure.retool.retract.revere.revitalise.revoke.reword.rewrite.ride.ridge.rim.ring.rise.rival.roger.rosin.rot.rout.row.rue.rule.safeguard.sashay.sate.satirise.satirize.satisfy.saturate.savour.scale.scamper.scar.scare.scarper.scent.schematise.scheme.schlep.scoff.scoop.scope.scotch.scowl.scrabble.scram.scramble.scrape.screw.scruple.scrutinise.scuffle.scuttle.search.secularize.see.segregate.sell.sense.sensitize.sequester.serenade.serialize.serve.service.settle.sew.shaft.sham.shampoo.shanghai.shear.sheathe.shell.shinny.shirk.shoot.shoulder.shout.shovel.showboat.shred.shrill.shudder.shush.sidetrack.sign.silt.sin.singe.sit.sizzle.skateboard.ski.slake.slap.slather.sleet.slink.slip.slope.slump.smarten.smuggle.snack.sneak.sniff.snoop.snow.snowplow.snuggle.soap.solace.solder.solicit.source.spark.spattering.spectacles.spectate.spellcheck.spew.spice.spirit.splash.splay.split.splosh.splurge.spook.square.squirm.stabilise.stable.stack.stage.stake.starch.state.statement.stiffen.stigmatize.sting.stint.stoop.store.storyboard.stratify.structure.stuff.stunt.substantiate.subtract.suckle.suffice.suffocate.summarise.sun.sunbathe.sunder.sup.surge.surprise.swat.swathe.sway.swear.swelter.swerve.swill.swing.symbolise.synthesise.syringe.table.tabulate.tag.tame.tank.tankful.tarry.task.taxicab.team.telescope.tenant.terraform.terrorise.testify.think.throbbing.thump.tighten.toady.toe.tough.tousle.traduce.train.transcend.transplant.trash.treasure.treble.trek.trial.tromp.trouser.trust.tune.tut.twine.twist.typify.unbalance.uncork.uncover.underachieve.undergo.underplay.unearth.unfreeze.unfurl.unlearn.unscramble.unzip.uproot.upsell.usher.vacation.vamoose.vanish.vary.veg.venture.verify.vet.veto.volunteer.vulgarise.waft.wallop.waltz.warp.wash.waver.weary.weatherize.wedge.weep.weight.welcome.westernise.westernize.while.whine.whisper.whistle.whitewash.whup.wilt.wing.wire.wisecrack.wolf.wound.wring.writ.yak.yawn.yearn.yuppify`.split(`.`) } };
 
 // node_modules/.pnpm/@faker-js+faker@10.5.0/node_modules/@faker-js/faker/dist/locale/en.js
-var r3 = new yt({ locale: [e3, Ct] });
+var r4 = new yt({ locale: [e3, Ct] });
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/variables/dynamic.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/variables/dynamic.js
 function categoryImageUrl(category) {
-  return r3.image.urlLoremFlickr({ category });
+  return r4.image.urlLoremFlickr({ category });
 }
 var DYNAMIC_VARIABLES = {
   // Common
   $guid: {
     description: "A uuid-v4 style guid",
-    generate: () => r3.string.uuid()
+    generate: () => r4.string.uuid()
   },
   $timestamp: {
     description: "The current UNIX timestamp in seconds",
@@ -39551,149 +43069,149 @@ var DYNAMIC_VARIABLES = {
   },
   $randomUUID: {
     description: "A random 36-character UUID",
-    generate: () => r3.string.uuid()
+    generate: () => r4.string.uuid()
   },
   // Text, numbers, and colors
   $randomAlphaNumeric: {
     description: "A random alpha-numeric character",
-    generate: () => r3.string.alphanumeric(1)
+    generate: () => r4.string.alphanumeric(1)
   },
   $randomBoolean: {
     description: "A random boolean value",
-    generate: () => String(r3.datatype.boolean())
+    generate: () => String(r4.datatype.boolean())
   },
   $randomInt: {
     description: "A random integer between 0 and 1000",
-    generate: () => String(r3.number.int({ min: 0, max: 1e3 }))
+    generate: () => String(r4.number.int({ min: 0, max: 1e3 }))
   },
   $randomColor: {
     description: "A random color name",
-    generate: () => r3.color.human()
+    generate: () => r4.color.human()
   },
   $randomHexColor: {
     description: "A random hex color value",
-    generate: () => r3.color.rgb({ format: "hex" })
+    generate: () => r4.color.rgb({ format: "hex" })
   },
   $randomAbbreviation: {
     description: "A random abbreviation",
-    generate: () => r3.hacker.abbreviation()
+    generate: () => r4.hacker.abbreviation()
   },
   // Internet and IP addresses
   $randomIP: {
     description: "A random IPv4 address",
-    generate: () => r3.internet.ipv4()
+    generate: () => r4.internet.ipv4()
   },
   $randomIPV6: {
     description: "A random IPv6 address",
-    generate: () => r3.internet.ipv6()
+    generate: () => r4.internet.ipv6()
   },
   $randomMACAddress: {
     description: "A random MAC address",
-    generate: () => r3.internet.mac()
+    generate: () => r4.internet.mac()
   },
   $randomPassword: {
     description: "A random 15-character alpha-numeric password",
-    generate: () => r3.internet.password({ length: 15 })
+    generate: () => r4.internet.password({ length: 15 })
   },
   $randomLocale: {
     description: "A random two-letter language code (ISO 639-1)",
-    generate: () => r3.location.language().alpha2
+    generate: () => r4.location.language().alpha2
   },
   $randomUserAgent: {
     description: "A random user agent string",
-    generate: () => r3.internet.userAgent()
+    generate: () => r4.internet.userAgent()
   },
   $randomProtocol: {
     description: "A random internet protocol",
-    generate: () => r3.helpers.arrayElement(["http", "https"])
+    generate: () => r4.helpers.arrayElement(["http", "https"])
   },
   $randomSemver: {
     description: "A random semantic version number",
-    generate: () => r3.system.semver()
+    generate: () => r4.system.semver()
   },
   // Names
   $randomFirstName: {
     description: "A random first name",
-    generate: () => r3.person.firstName()
+    generate: () => r4.person.firstName()
   },
   $randomLastName: {
     description: "A random last name",
-    generate: () => r3.person.lastName()
+    generate: () => r4.person.lastName()
   },
   $randomFullName: {
     description: "A random first and last name",
-    generate: () => r3.person.fullName()
+    generate: () => r4.person.fullName()
   },
   $randomNamePrefix: {
     description: "A random name prefix",
-    generate: () => r3.person.prefix()
+    generate: () => r4.person.prefix()
   },
   $randomNameSuffix: {
     description: "A random name suffix",
-    generate: () => r3.person.suffix()
+    generate: () => r4.person.suffix()
   },
   // Profession
   $randomJobArea: {
     description: "A random job area",
-    generate: () => r3.person.jobArea()
+    generate: () => r4.person.jobArea()
   },
   $randomJobDescriptor: {
     description: "A random job descriptor",
-    generate: () => r3.person.jobDescriptor()
+    generate: () => r4.person.jobDescriptor()
   },
   $randomJobTitle: {
     description: "A random job title",
-    generate: () => r3.person.jobTitle()
+    generate: () => r4.person.jobTitle()
   },
   $randomJobType: {
     description: "A random job type",
-    generate: () => r3.person.jobType()
+    generate: () => r4.person.jobType()
   },
   // Phone, address, and location
   $randomPhoneNumber: {
     description: "A random ten-digit phone number",
-    generate: () => r3.phone.number({ style: "national" })
+    generate: () => r4.phone.number({ style: "national" })
   },
   $randomPhoneNumberExt: {
     description: "A random phone number with extension",
-    generate: () => `${r3.phone.number()} x${r3.string.numeric(4)}`
+    generate: () => `${r4.phone.number()} x${r4.string.numeric(4)}`
   },
   $randomCity: {
     description: "A random city name",
-    generate: () => r3.location.city()
+    generate: () => r4.location.city()
   },
   $randomStreetName: {
     description: "A random street name",
-    generate: () => r3.location.street()
+    generate: () => r4.location.street()
   },
   $randomStreetAddress: {
     description: "A random street address",
-    generate: () => r3.location.streetAddress()
+    generate: () => r4.location.streetAddress()
   },
   $randomCountry: {
     description: "A random country name",
-    generate: () => r3.location.country()
+    generate: () => r4.location.country()
   },
   $randomCountryCode: {
     description: "A random two-letter country code (ISO 3166-1 alpha-2)",
-    generate: () => r3.location.countryCode()
+    generate: () => r4.location.countryCode()
   },
   $randomLatitude: {
     description: "A random latitude coordinate",
-    generate: () => String(r3.location.latitude())
+    generate: () => String(r4.location.latitude())
   },
   $randomLongitude: {
     description: "A random longitude coordinate",
-    generate: () => String(r3.location.longitude())
+    generate: () => String(r4.location.longitude())
   },
   // Images
   $randomAvatarImage: {
     description: "A random avatar image URL",
-    generate: () => r3.image.avatar()
+    generate: () => r4.image.avatar()
   },
   $randomImageUrl: {
     description: "A URL of a random image",
-    generate: () => r3.image.url()
+    generate: () => r4.image.url()
   },
   $randomAbstractImage: {
     description: "A URL of a random abstract image",
@@ -39745,285 +43263,285 @@ var DYNAMIC_VARIABLES = {
   },
   $randomImageDataUri: {
     description: "A random image data URI",
-    generate: () => r3.image.dataUri()
+    generate: () => r4.image.dataUri()
   },
   // Finance
   $randomBankAccount: {
     description: "A random 8-digit bank account number",
-    generate: () => r3.finance.accountNumber(8)
+    generate: () => r4.finance.accountNumber(8)
   },
   $randomBankAccountName: {
     description: "A random bank account name",
-    generate: () => r3.finance.accountName()
+    generate: () => r4.finance.accountName()
   },
   $randomCreditCardMask: {
     description: "A random masked credit card number (last four digits)",
-    generate: () => r3.finance.creditCardNumber().slice(-4)
+    generate: () => r4.finance.creditCardNumber().slice(-4)
   },
   $randomBankAccountBic: {
     description: "A random BIC (Bank Identifier Code)",
-    generate: () => r3.finance.bic()
+    generate: () => r4.finance.bic()
   },
   $randomBankAccountIban: {
     description: "A random IBAN (International Bank Account Number)",
-    generate: () => r3.finance.iban()
+    generate: () => r4.finance.iban()
   },
   $randomTransactionType: {
     description: "A random transaction type",
-    generate: () => r3.helpers.arrayElement(["invoice", "payment", "deposit"])
+    generate: () => r4.helpers.arrayElement(["invoice", "payment", "deposit"])
   },
   $randomCurrencyCode: {
     description: "A random 3-letter currency code (ISO-4217)",
-    generate: () => r3.finance.currencyCode()
+    generate: () => r4.finance.currencyCode()
   },
   $randomCurrencyName: {
     description: "A random currency name",
-    generate: () => r3.finance.currencyName()
+    generate: () => r4.finance.currencyName()
   },
   $randomCurrencySymbol: {
     description: "A random currency symbol",
-    generate: () => r3.finance.currencySymbol()
+    generate: () => r4.finance.currencySymbol()
   },
   $randomBitcoin: {
     description: "A random bitcoin address",
-    generate: () => r3.finance.bitcoinAddress()
+    generate: () => r4.finance.bitcoinAddress()
   },
   // Business
   $randomCompanyName: {
     description: "A random company name",
-    generate: () => r3.company.name()
+    generate: () => r4.company.name()
   },
   $randomCompanySuffix: {
     description: "A random company suffix",
-    generate: () => r3.helpers.arrayElement(["Inc", "LLC", "Group", "Ltd", "Corp"])
+    generate: () => r4.helpers.arrayElement(["Inc", "LLC", "Group", "Ltd", "Corp"])
   },
   $randomBs: {
     description: "A random phrase of business-speak",
-    generate: () => r3.company.catchPhrase()
+    generate: () => r4.company.catchPhrase()
   },
   $randomBsAdjective: {
     description: "A random business-speak adjective",
-    generate: () => r3.company.buzzAdjective()
+    generate: () => r4.company.buzzAdjective()
   },
   $randomBsBuzz: {
     description: "A random business-speak buzzword",
-    generate: () => r3.company.buzzVerb()
+    generate: () => r4.company.buzzVerb()
   },
   $randomBsNoun: {
     description: "A random business-speak noun",
-    generate: () => r3.company.buzzNoun()
+    generate: () => r4.company.buzzNoun()
   },
   // Catchphrases
   $randomCatchPhrase: {
     description: "A random catchphrase",
-    generate: () => r3.company.catchPhrase()
+    generate: () => r4.company.catchPhrase()
   },
   $randomCatchPhraseAdjective: {
     description: "A random catchphrase adjective",
-    generate: () => r3.company.catchPhraseAdjective()
+    generate: () => r4.company.catchPhraseAdjective()
   },
   $randomCatchPhraseDescriptor: {
     description: "A random catchphrase descriptor",
-    generate: () => r3.company.catchPhraseDescriptor()
+    generate: () => r4.company.catchPhraseDescriptor()
   },
   $randomCatchPhraseNoun: {
     description: "A random catchphrase noun",
-    generate: () => r3.company.catchPhraseNoun()
+    generate: () => r4.company.catchPhraseNoun()
   },
   // Databases
   $randomDatabaseColumn: {
     description: "A random database column name",
-    generate: () => r3.database.column()
+    generate: () => r4.database.column()
   },
   $randomDatabaseType: {
     description: "A random database type",
-    generate: () => r3.database.type()
+    generate: () => r4.database.type()
   },
   $randomDatabaseCollation: {
     description: "A random database collation",
-    generate: () => r3.database.collation()
+    generate: () => r4.database.collation()
   },
   $randomDatabaseEngine: {
     description: "A random database engine",
-    generate: () => r3.database.engine()
+    generate: () => r4.database.engine()
   },
   // Dates
   $randomDateFuture: {
     description: "A random future datetime",
-    generate: () => r3.date.future().toString()
+    generate: () => r4.date.future().toString()
   },
   $randomDatePast: {
     description: "A random past datetime",
-    generate: () => r3.date.past().toString()
+    generate: () => r4.date.past().toString()
   },
   $randomDateRecent: {
     description: "A random recent datetime",
-    generate: () => r3.date.recent().toString()
+    generate: () => r4.date.recent().toString()
   },
   $randomWeekday: {
     description: "A random weekday name",
-    generate: () => r3.date.weekday()
+    generate: () => r4.date.weekday()
   },
   $randomMonth: {
     description: "A random month name",
-    generate: () => r3.date.month()
+    generate: () => r4.date.month()
   },
   // Domains, emails, and usernames
   $randomDomainName: {
     description: "A random domain name",
-    generate: () => r3.internet.domainName()
+    generate: () => r4.internet.domainName()
   },
   $randomDomainSuffix: {
     description: "A random domain suffix",
-    generate: () => r3.internet.domainSuffix()
+    generate: () => r4.internet.domainSuffix()
   },
   $randomDomainWord: {
     description: "A random unqualified domain name",
-    generate: () => r3.internet.domainWord()
+    generate: () => r4.internet.domainWord()
   },
   $randomEmail: {
     description: "A random email address",
-    generate: () => r3.internet.email()
+    generate: () => r4.internet.email()
   },
   $randomExampleEmail: {
     description: "A random email address from an example domain",
-    generate: () => r3.internet.exampleEmail()
+    generate: () => r4.internet.exampleEmail()
   },
   $randomUserName: {
     description: "A random username",
-    generate: () => r3.internet.username()
+    generate: () => r4.internet.username()
   },
   $randomUrl: {
     description: "A random URL",
-    generate: () => r3.internet.url()
+    generate: () => r4.internet.url()
   },
   // Files and directories
   $randomFileName: {
     description: "A random file name",
-    generate: () => r3.system.fileName()
+    generate: () => r4.system.fileName()
   },
   $randomFileType: {
     description: "A random file type",
-    generate: () => r3.system.fileType()
+    generate: () => r4.system.fileType()
   },
   $randomFileExt: {
     description: "A random file extension",
-    generate: () => r3.system.fileExt()
+    generate: () => r4.system.fileExt()
   },
   $randomCommonFileName: {
     description: "A random common file name",
-    generate: () => r3.system.commonFileName()
+    generate: () => r4.system.commonFileName()
   },
   $randomCommonFileType: {
     description: "A random common file type",
-    generate: () => r3.system.commonFileType()
+    generate: () => r4.system.commonFileType()
   },
   $randomCommonFileExt: {
     description: "A random common file extension",
-    generate: () => r3.system.commonFileExt()
+    generate: () => r4.system.commonFileExt()
   },
   $randomFilePath: {
     description: "A random file path",
-    generate: () => r3.system.filePath()
+    generate: () => r4.system.filePath()
   },
   $randomDirectoryPath: {
     description: "A random directory path",
-    generate: () => r3.system.directoryPath()
+    generate: () => r4.system.directoryPath()
   },
   $randomMimeType: {
     description: "A random MIME type",
-    generate: () => r3.system.mimeType()
+    generate: () => r4.system.mimeType()
   },
   // Stores
   $randomPrice: {
     description: "A random price between 0.00 and 1000.00",
-    generate: () => r3.commerce.price({ min: 0, max: 1e3 })
+    generate: () => r4.commerce.price({ min: 0, max: 1e3 })
   },
   $randomProduct: {
     description: "A random product name",
-    generate: () => r3.commerce.product()
+    generate: () => r4.commerce.product()
   },
   $randomProductAdjective: {
     description: "A random product adjective",
-    generate: () => r3.commerce.productAdjective()
+    generate: () => r4.commerce.productAdjective()
   },
   $randomProductMaterial: {
     description: "A random product material",
-    generate: () => r3.commerce.productMaterial()
+    generate: () => r4.commerce.productMaterial()
   },
   $randomProductName: {
     description: "A random product name with adjective and material",
-    generate: () => r3.commerce.productName()
+    generate: () => r4.commerce.productName()
   },
   $randomDepartment: {
     description: "A random commerce category",
-    generate: () => r3.commerce.department()
+    generate: () => r4.commerce.department()
   },
   // Grammar
   $randomNoun: {
     description: "A random noun",
-    generate: () => r3.word.noun()
+    generate: () => r4.word.noun()
   },
   $randomVerb: {
     description: "A random verb",
-    generate: () => r3.word.verb()
+    generate: () => r4.word.verb()
   },
   $randomIngverb: {
     description: "A random verb ending in -ing",
-    generate: () => `${r3.word.verb()}ing`
+    generate: () => `${r4.word.verb()}ing`
   },
   $randomAdjective: {
     description: "A random adjective",
-    generate: () => r3.word.adjective()
+    generate: () => r4.word.adjective()
   },
   $randomWord: {
     description: "A random word",
-    generate: () => r3.word.sample()
+    generate: () => r4.word.sample()
   },
   $randomWords: {
     description: "Some random words",
-    generate: () => r3.word.words()
+    generate: () => r4.word.words()
   },
   $randomPhrase: {
     description: "A random phrase",
-    generate: () => r3.lorem.sentence()
+    generate: () => r4.lorem.sentence()
   },
   // Lorem ipsum
   $randomLoremWord: {
     description: "A random word of lorem ipsum text",
-    generate: () => r3.lorem.word()
+    generate: () => r4.lorem.word()
   },
   $randomLoremWords: {
     description: "Some random words of lorem ipsum text",
-    generate: () => r3.lorem.words()
+    generate: () => r4.lorem.words()
   },
   $randomLoremSentence: {
     description: "A random sentence of lorem ipsum text",
-    generate: () => r3.lorem.sentence()
+    generate: () => r4.lorem.sentence()
   },
   $randomLoremSentences: {
     description: "A random 2 to 6 sentences of lorem ipsum text",
-    generate: () => r3.lorem.sentences({ min: 2, max: 6 })
+    generate: () => r4.lorem.sentences({ min: 2, max: 6 })
   },
   $randomLoremParagraph: {
     description: "A random paragraph of lorem ipsum text",
-    generate: () => r3.lorem.paragraph()
+    generate: () => r4.lorem.paragraph()
   },
   $randomLoremParagraphs: {
     description: "Three random paragraphs of lorem ipsum text",
-    generate: () => r3.lorem.paragraphs(3)
+    generate: () => r4.lorem.paragraphs(3)
   },
   $randomLoremText: {
     description: "A random amount of lorem ipsum text",
-    generate: () => r3.lorem.text()
+    generate: () => r4.lorem.text()
   },
   $randomLoremSlug: {
     description: "A random lorem ipsum URL slug",
-    generate: () => r3.lorem.slug()
+    generate: () => r4.lorem.slug()
   },
   $randomLoremLines: {
     description: "1 to 5 random lines of lorem ipsum text",
-    generate: () => r3.lorem.lines({ min: 1, max: 5 })
+    generate: () => r4.lorem.lines({ min: 1, max: 5 })
   }
 };
 function getDynamicVariableDescription(key) {
@@ -40031,9 +43549,10 @@ function getDynamicVariableDescription(key) {
 }
 var DYNAMIC_VARIABLE_NAMES = Object.keys(DYNAMIC_VARIABLES).sort();
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/variables/tokens.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/variables/tokens.js
 var VARIABLE_NAME_CHARS = "\\w$.-";
-var VARIABLE_TOKEN_PATTERN = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
+var VARIABLE_TOKEN_PATTERN = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)(\\s*\\|\\s*[${VARIABLE_NAME_CHARS}]+)*\\s*\\}\\}`, "g");
+var VALID_NAME_PATTERN = new RegExp(`^[${VARIABLE_NAME_CHARS}]+$`);
 function variableLookup(variables) {
   return new Map(variables.filter((v3) => v3.key.trim()).map((v3) => [v3.key.trim(), v3.value !== "" ? v3.value : v3.defaultValue]));
 }
@@ -40052,18 +43571,96 @@ function resolveVariable(key, variables) {
   return variableLookup(variables).get(key);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/ui/codeEditorSettings.js
-var DEFAULT_CODE_EDITOR_SETUP = {
-  lineNumbers: true,
-  foldGutter: true,
-  highlightActiveLine: true,
-  highlightActiveLineGutter: true
-};
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/VariableTooltip/dom.js
+var COPY_ICON_PATH = "M208 0H332.1c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9V336c0 26.5-21.5 48-48 48H208c-26.5 0-48-21.5-48-48V48c0-26.5 21.5-48 48-48zM48 128h80v64H64v256h192v-32h64v48c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V176c0-26.5 21.5-48 48-48z";
+var CHECK_ICON_PATH = "M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z";
+function createTooltipIcon(path) {
+  const svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg2.setAttribute("viewBox", "0 0 448 512");
+  svg2.setAttribute("width", "16");
+  svg2.setAttribute("height", "16");
+  svg2.setAttribute("aria-hidden", "true");
+  svg2.classList.add("hc-variable-tooltip-copy-icon");
+  const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pathEl.setAttribute("fill", "currentColor");
+  pathEl.setAttribute("d", path);
+  svg2.appendChild(pathEl);
+  return svg2;
+}
+function appendVariableTooltipValueRow(parent, value, key, muted) {
+  const row = document.createElement("div");
+  row.className = "cm-variable-tooltip-value-row";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.readOnly = true;
+  input.value = value;
+  input.className = "cm-variable-tooltip-value";
+  input.setAttribute("aria-label", `Resolved value for ${key}`);
+  if (muted) {
+    input.classList.add("cm-variable-tooltip-value-muted");
+  }
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "cm-variable-tooltip-copy app-no-drag";
+  copyBtn.setAttribute("aria-label", `Copy value for ${key}`);
+  copyBtn.appendChild(createTooltipIcon(COPY_ICON_PATH));
+  const handleCopy = () => {
+    void navigator.clipboard.writeText(value).then(() => {
+      copyBtn.replaceChildren(createTooltipIcon(CHECK_ICON_PATH));
+      copyBtn.setAttribute("aria-label", `Copied value for ${key}`);
+      window.setTimeout(() => {
+        copyBtn.replaceChildren(createTooltipIcon(COPY_ICON_PATH));
+        copyBtn.setAttribute("aria-label", `Copy value for ${key}`);
+      }, 2e3);
+    });
+  };
+  copyBtn.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+  });
+  copyBtn.addEventListener("click", handleCopy);
+  row.appendChild(input);
+  row.appendChild(copyBtn);
+  parent.appendChild(row);
+}
+function buildVariableTooltipDom(key, variables, onEditVariable) {
+  const content2 = getVariableTooltipContent(key, variables);
+  const dom2 = document.createElement("div");
+  dom2.className = "cm-variable-tooltip";
+  appendVariableTooltipValueRow(dom2, content2.text, key, content2.muted);
+  if (onEditVariable) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Edit value";
+    btn.className = "cm-variable-tooltip-edit app-no-drag";
+    btn.setAttribute("aria-label", `Edit value for ${key}`);
+    btn.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      onEditVariable(key);
+    });
+    dom2.appendChild(btn);
+  }
+  return dom2;
+}
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/VariableTooltip/VariableTooltipValue.js
+function VariableTooltipValue({ value, variableKey, muted }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    void navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2e3);
+    });
+  };
+  return jsxs("div", { className: "hc-variable-tooltip-value-row flex items-center gap-1.5", children: [jsx(Input, { readOnly: true, value, "aria-label": `Resolved value for ${variableKey}`, className: cn("min-w-0 flex-1", muted && "text-muted") }), jsx(Button, { type: "button", variant: "icon", "aria-label": copied ? `Copied value for ${variableKey}` : `Copy value for ${variableKey}`, onMouseDown: (event) => {
+    event.preventDefault();
+  }, onClick: handleCopy, children: jsx(FaIcon, { icon: copied ? faCircleCheck : faCopy, className: "h-4 w-4" }) })] });
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/config.js
 var DEFAULT_CODE_EDITOR_CONFIG = {
   theme: "default",
-  setup: DEFAULT_CODE_EDITOR_SETUP
+  setup: DEFAULT_CODE_EDITOR_SETUP,
+  fontSize: DEFAULT_CODE_EDITOR_FONT_SIZE
 };
 var GLOBAL_STORE_KEY = "__hc_codeEditorConfigStore";
 function getCodeEditorConfigStore() {
@@ -40085,6 +43682,218 @@ function useCodeEditorConfig() {
   const store = getCodeEditorConfigStore();
   const storeValue = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   return contextValue ?? storeValue;
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/editorChrome.js
+var lightHighlight = HighlightStyle.define([
+  { tag: tags.propertyName, color: "#881391" },
+  { tag: tags.string, color: "#c41a16" },
+  { tag: tags.number, color: "#1c00cf" },
+  { tag: tags.bool, color: "#1c00cf" },
+  { tag: tags.null, color: "#1c00cf" },
+  { tag: tags.keyword, color: "#881391" },
+  { tag: tags.bracket, color: "var(--mac-text)" },
+  { tag: tags.punctuation, color: "var(--mac-muted)" },
+  { tag: tags.comment, color: "var(--mac-muted)", fontStyle: "italic" }
+]);
+var darkHighlight = HighlightStyle.define([
+  { tag: tags.propertyName, color: "#ff7ab2" },
+  { tag: tags.string, color: "#ff8170" },
+  { tag: tags.number, color: "#78dce8" },
+  { tag: tags.bool, color: "#78dce8" },
+  { tag: tags.null, color: "#78dce8" },
+  { tag: tags.keyword, color: "#ff7ab2" },
+  { tag: tags.bracket, color: "var(--mac-text)" },
+  { tag: tags.punctuation, color: "var(--mac-muted)" },
+  { tag: tags.comment, color: "var(--mac-muted)", fontStyle: "italic" }
+]);
+function createEditorTheme(fontSize) {
+  return EditorView.theme({
+    "&": {
+      backgroundColor: "transparent",
+      color: "var(--mac-text)"
+    },
+    ".cm-scroller": {
+      overflow: "auto",
+      fontFamily: "var(--font-mono)"
+    },
+    ".cm-content": {
+      padding: "8px 0",
+      fontFamily: "var(--font-mono)",
+      fontSize,
+      caretColor: "var(--mac-accent)"
+    },
+    ".cm-line": {
+      padding: "0 8px"
+    },
+    "&.cm-focused": {
+      outline: "none"
+    },
+    "&.cm-focused .cm-cursor": {
+      borderLeftColor: "var(--mac-accent)"
+    },
+    ".cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection": {
+      backgroundColor: "var(--mac-selection) !important"
+    },
+    ".cm-gutters": {
+      backgroundColor: "transparent",
+      color: "var(--mac-muted)",
+      border: "none"
+    },
+    ".cm-activeLineGutter": {
+      backgroundColor: "var(--mac-selection)"
+    },
+    ".cm-activeLine": {
+      backgroundColor: "color-mix(in srgb, var(--mac-selection) 45%, transparent)"
+    },
+    ".cm-variable-token": {
+      color: "#32D2E2"
+    },
+    ".cm-slash-command": {
+      color: "var(--mac-accent)"
+    },
+    ".cm-slash-command-args": {
+      color: "var(--mac-muted)",
+      fontStyle: "italic"
+    },
+    ".cm-tooltip.cm-tooltip-hover": {
+      border: "1px solid var(--mac-separator)",
+      backgroundColor: "var(--mac-surface)",
+      borderRadius: "6px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+    },
+    ".cm-variable-tooltip": {
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px",
+      padding: "8px 12px",
+      fontSize: "16px",
+      color: "var(--mac-text)"
+    },
+    ".cm-variable-tooltip-value-row": {
+      display: "flex",
+      alignItems: "center",
+      gap: "6px"
+    },
+    ".cm-variable-tooltip-value": {
+      boxSizing: "border-box",
+      flex: "1 1 0%",
+      minWidth: "0",
+      borderRadius: "8px",
+      border: "1px solid var(--mac-separator)",
+      backgroundColor: "var(--mac-field)",
+      padding: "6px 10px",
+      fontSize: "16px",
+      color: "var(--mac-text)",
+      cursor: "default"
+    },
+    ".cm-variable-tooltip-value-muted": {
+      color: "var(--mac-muted)"
+    },
+    ".cm-variable-tooltip-copy": {
+      display: "inline-flex",
+      flexShrink: "0",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "30px",
+      height: "30px",
+      borderRadius: "9999px",
+      border: "none",
+      backgroundColor: "transparent",
+      color: "var(--mac-muted)",
+      cursor: "pointer"
+    },
+    ".cm-variable-tooltip-copy:hover": {
+      backgroundColor: "var(--mac-selection)",
+      color: "var(--mac-text)"
+    },
+    ".cm-variable-tooltip-copy-icon": {
+      display: "block"
+    },
+    ".cm-variable-tooltip-edit": {
+      alignSelf: "flex-start",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: "32px",
+      borderRadius: "9999px",
+      border: "1px solid var(--mac-separator)",
+      backgroundColor: "var(--mac-control)",
+      padding: "4px 12px",
+      fontSize: "15px",
+      color: "var(--mac-text)",
+      cursor: "pointer",
+      boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)"
+    },
+    ".cm-variable-tooltip-edit:hover": {
+      backgroundColor: "var(--mac-selection)"
+    },
+    ".cm-tooltip.cm-tooltip-autocomplete": {
+      border: "1px solid var(--mac-separator)",
+      backgroundColor: "var(--mac-surface)",
+      borderRadius: "6px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+      fontSize
+    },
+    ".cm-completionLabel": {
+      fontFamily: "var(--font-mono)"
+    },
+    ".cm-completionDetail": {
+      color: "var(--mac-muted)",
+      fontStyle: "normal",
+      marginLeft: "8px"
+    }
+  });
+}
+function createBuiltInSyntaxHighlighting(isDark) {
+  return syntaxHighlighting(isDark ? darkHighlight : lightHighlight);
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/slashCommandHighlighter.js
+function slashCommandHighlightPattern(commands) {
+  const names = commands.map((entry) => entry.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (names.length === 0) {
+    return /(?!)/g;
+  }
+  return new RegExp(`^(\\s*)(/(?:${names.join("|")}))([ \\t]+.*)?$`, "gm");
+}
+function createSlashCommandHighlighter(commands) {
+  const slashMatcher = new MatchDecorator({
+    regexp: slashCommandHighlightPattern(commands),
+    /**
+     * Applies accent styling to the command token and muted italic styling to args.
+     */
+    decorate: (add2, from, _to, match) => {
+      const leading = match[1] ?? "";
+      const command2 = match[2] ?? "";
+      const args = match[3];
+      const commandFrom = from + leading.length;
+      const commandTo = commandFrom + command2.length;
+      add2(commandFrom, commandTo, Decoration.mark({ class: "cm-slash-command" }));
+      if (args) {
+        add2(commandTo, commandTo + args.length, Decoration.mark({ class: "cm-slash-command-args" }));
+      }
+    }
+  });
+  return ViewPlugin.fromClass(class {
+    decorations;
+    /**
+     * Builds the initial slash-command decoration set for the editor view.
+     *
+     * @param view - CodeMirror editor view instance.
+     */
+    constructor(view) {
+      this.decorations = slashMatcher.createDeco(view);
+    }
+    /**
+     * Recomputes slash-command decorations when document content changes.
+     *
+     * @param update - View update describing what changed.
+     */
+    update(update) {
+      this.decorations = slashMatcher.updateDeco(update, this.decorations);
+    }
+  }, { decorations: (v3) => v3.decorations });
 }
 
 // node_modules/.pnpm/@uiw+codemirror-themes@4.25.10_@codemirror+language@6.12.4_@codemirror+state@6.7.0_@codemirror+view@6.43.4/node_modules/@uiw/codemirror-themes/esm/index.js
@@ -44084,7 +47893,7 @@ var xcodeDarkInit = (options) => {
 };
 var xcodeDark = xcodeDarkInit();
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/themes.js
 var themeExtensions = {
   dracula,
   githubLight,
@@ -44101,112 +47910,306 @@ function getCodeEditorThemeExtension(value) {
   return themeExtensions[value];
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
-var lightHighlight = HighlightStyle.define([
-  { tag: tags.propertyName, color: "#881391" },
-  { tag: tags.string, color: "#c41a16" },
-  { tag: tags.number, color: "#1c00cf" },
-  { tag: tags.bool, color: "#1c00cf" },
-  { tag: tags.null, color: "#1c00cf" },
-  { tag: tags.keyword, color: "#881391" },
-  { tag: tags.bracket, color: "var(--mac-text)" },
-  { tag: tags.punctuation, color: "var(--mac-muted)" },
-  { tag: tags.comment, color: "var(--mac-muted)", fontStyle: "italic" }
-]);
-var darkHighlight = HighlightStyle.define([
-  { tag: tags.propertyName, color: "#ff7ab2" },
-  { tag: tags.string, color: "#ff8170" },
-  { tag: tags.number, color: "#78dce8" },
-  { tag: tags.bool, color: "#78dce8" },
-  { tag: tags.null, color: "#78dce8" },
-  { tag: tags.keyword, color: "#ff7ab2" },
-  { tag: tags.bracket, color: "var(--mac-text)" },
-  { tag: tags.punctuation, color: "var(--mac-muted)" },
-  { tag: tags.comment, color: "var(--mac-muted)", fontStyle: "italic" }
-]);
-var editorTheme = EditorView.theme({
-  "&": {
-    backgroundColor: "transparent",
-    color: "var(--mac-text)"
-  },
-  ".cm-scroller": {
-    overflow: "auto",
-    fontFamily: "var(--font-mono)"
-  },
-  ".cm-content": {
-    padding: "8px 0",
-    fontFamily: "var(--font-mono)",
-    fontSize: "14px",
-    caretColor: "var(--mac-accent)"
-  },
-  ".cm-line": {
-    padding: "0 8px"
-  },
-  "&.cm-focused": {
-    outline: "none"
-  },
-  "&.cm-focused .cm-cursor": {
-    borderLeftColor: "var(--mac-accent)"
-  },
-  ".cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection": {
-    backgroundColor: "var(--mac-selection) !important"
-  },
-  ".cm-gutters": {
-    backgroundColor: "transparent",
-    color: "var(--mac-muted)",
-    border: "none"
-  },
-  ".cm-activeLineGutter": {
-    backgroundColor: "var(--mac-selection)"
-  },
-  ".cm-activeLine": {
-    backgroundColor: "color-mix(in srgb, var(--mac-selection) 45%, transparent)"
-  },
-  ".cm-variable-token": {
-    color: "#32D2E2"
-  },
-  ".cm-tooltip.cm-tooltip-hover": {
-    border: "1px solid var(--mac-separator)",
-    backgroundColor: "var(--mac-surface)",
-    borderRadius: "6px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
-  },
-  ".cm-variable-tooltip": {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-    padding: "8px 12px",
-    fontSize: "14px",
-    color: "var(--mac-text)"
-  },
-  ".cm-variable-tooltip-muted": {
-    color: "var(--mac-muted)"
-  },
-  ".cm-variable-tooltip-edit": {
-    alignSelf: "flex-start",
-    background: "none",
-    border: "none",
-    padding: "0",
-    cursor: "pointer",
-    fontSize: "14px",
-    color: "var(--mac-accent)"
-  },
-  ".cm-tooltip.cm-tooltip-autocomplete": {
-    border: "1px solid var(--mac-separator)",
-    backgroundColor: "var(--mac-surface)",
-    borderRadius: "6px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    fontSize: "14px"
-  },
-  ".cm-completionLabel": {
-    fontFamily: "var(--font-mono)"
-  },
-  ".cm-completionDetail": {
-    color: "var(--mac-muted)",
-    fontStyle: "normal",
-    marginLeft: "8px"
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/renderHighlightedPlaceholder.js
+var renderCache = /* @__PURE__ */ new Map();
+function buildRenderCacheKey(text2, options) {
+  const slashNames = options.slashCommands?.map((command2) => command2.name).join(",") ?? "";
+  return [text2, options.fontSize, String(options.isDark), options.theme, slashNames].join("\0");
+}
+function buildOffscreenPlaceholderExtensions(options) {
+  const extensions = [
+    javascript(),
+    EditorView.lineWrapping,
+    EditorView.editable.of(false),
+    EditorState.readOnly.of(true),
+    EditorView.theme({
+      "&": { backgroundColor: "transparent" },
+      ".cm-scroller": { overflow: "hidden" },
+      ".cm-content": {
+        padding: "0",
+        fontFamily: "var(--font-mono)",
+        fontSize: options.fontSize
+      },
+      ".cm-line": { padding: "0" },
+      ".cm-activeLine": { backgroundColor: "transparent" },
+      ".cm-slash-command": {
+        color: "var(--mac-accent)"
+      },
+      ".cm-slash-command-args": {
+        color: "var(--mac-muted)",
+        fontStyle: "italic"
+      }
+    })
+  ];
+  const themeExtension = getCodeEditorThemeExtension(options.theme);
+  if (themeExtension) {
+    extensions.push(themeExtension);
+  } else {
+    extensions.push(createBuiltInSyntaxHighlighting(options.isDark));
   }
-});
+  if (options.slashCommands && options.slashCommands.length > 0) {
+    extensions.push(createSlashCommandHighlighter(options.slashCommands));
+  }
+  return extensions;
+}
+function renderHighlightedPlaceholderDom(text2, options) {
+  const cacheKey = buildRenderCacheKey(text2, options);
+  const cached = renderCache.get(cacheKey);
+  if (cached) {
+    return cached.cloneNode(true);
+  }
+  const host = document.createElement("div");
+  host.style.cssText = "position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;";
+  document.body.appendChild(host);
+  const view = new EditorView({
+    state: EditorState.create({
+      doc: text2,
+      extensions: buildOffscreenPlaceholderExtensions(options)
+    }),
+    parent: host
+  });
+  const wrap = document.createElement("span");
+  wrap.className = "cm-placeholder cm-syntax-placeholder";
+  wrap.style.pointerEvents = "none";
+  wrap.style.display = "inline-block";
+  wrap.style.verticalAlign = "top";
+  wrap.style.whiteSpace = "pre-wrap";
+  wrap.style.opacity = "0.55";
+  wrap.style.fontFamily = "var(--font-mono)";
+  wrap.style.fontSize = options.fontSize;
+  wrap.style.userSelect = "none";
+  wrap.style.width = "100%";
+  wrap.setAttribute("aria-hidden", "true");
+  const content2 = view.dom.querySelector(".cm-content");
+  if (content2) {
+    for (const line of content2.querySelectorAll(".cm-line")) {
+      wrap.appendChild(line.cloneNode(true));
+    }
+  }
+  view.destroy();
+  host.remove();
+  renderCache.set(cacheKey, wrap.cloneNode(true));
+  return wrap;
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/syntaxHighlightedPlaceholder.js
+var SyntaxHighlightedPlaceholderWidget = class extends WidgetType {
+  text;
+  options;
+  /**
+   * @param text - Placeholder document shown when the parent editor is empty.
+   * @param options - Highlighting and theme options shared with the parent editor.
+   */
+  constructor(text2, options) {
+    super();
+    this.text = text2;
+    this.options = options;
+  }
+  /**
+   * Returns statically rendered placeholder DOM without nested editor chrome.
+   */
+  toDOM() {
+    return renderHighlightedPlaceholderDom(this.text, this.options);
+  }
+  /**
+   * Prevents the placeholder layer from intercepting pointer events meant for the parent editor.
+   */
+  ignoreEvent() {
+    return true;
+  }
+};
+function isEditorDomFocused(view) {
+  const active = view.root.activeElement;
+  if (active == null) {
+    return false;
+  }
+  return view.dom.contains(active);
+}
+function shouldShowSyntaxPlaceholder(view, engaged) {
+  if (view.state.doc.length > 0) {
+    return false;
+  }
+  if (engaged || isEditorDomFocused(view)) {
+    return false;
+  }
+  return true;
+}
+function buildSyntaxPlaceholderDecorations(text2, options) {
+  return Decoration.set([
+    Decoration.widget({
+      widget: new SyntaxHighlightedPlaceholderWidget(text2, options),
+      side: 1
+    }).range(0)
+  ]);
+}
+var SyntaxHighlightedPlaceholderPlugin = class {
+  text;
+  options;
+  placeholder;
+  /**
+   * True after a pointer press inside the editor; cleared when focus leaves the editor
+   * while the document is still empty.
+   */
+  engaged = false;
+  /**
+   * @param view - Parent CodeMirror editor view.
+   * @param text - Placeholder source shown until the user engages or types.
+   * @param options - Highlighting and theme options.
+   */
+  constructor(view, text2, options) {
+    this.text = text2;
+    this.options = options;
+    this.placeholder = this.compute(view);
+  }
+  /**
+   * Recomputes placeholder decorations from document length and engagement state.
+   *
+   * @param view - Parent CodeMirror editor view.
+   */
+  compute(view) {
+    return shouldShowSyntaxPlaceholder(view, this.engaged) ? buildSyntaxPlaceholderDecorations(this.text, this.options) : Decoration.none;
+  }
+  /**
+   * Applies a new engagement flag and refreshes decorations when it changes.
+   *
+   * @param view - Parent CodeMirror editor view.
+   * @param nextEngaged - Whether the user has pressed inside the editor chrome.
+   */
+  setEngaged(view, nextEngaged) {
+    if (this.engaged === nextEngaged) {
+      return;
+    }
+    this.engaged = nextEngaged;
+    this.placeholder = this.compute(view);
+    view.dispatch({});
+  }
+  /**
+   * Shows or hides the placeholder when the document, focus, or engagement changes.
+   *
+   * @param update - Parent view update.
+   */
+  update(update) {
+    if (update.docChanged || update.focusChanged || update.view.state.doc.length === 0) {
+      this.placeholder = this.compute(update.view);
+    }
+  }
+  get decorations() {
+    return this.placeholder;
+  }
+};
+function isEventTargetInEditor(view, target) {
+  return target instanceof Node && view.dom.contains(target);
+}
+function createSyntaxHighlightedPlaceholder(text2, options) {
+  const placeholderPlugin = ViewPlugin.fromClass(class extends SyntaxHighlightedPlaceholderPlugin {
+    /**
+     * Initializes placeholder decorations for an empty, unfocused document.
+     *
+     * @param view - Parent CodeMirror editor view.
+     */
+    constructor(view) {
+      super(view, text2, options);
+    }
+  }, { decorations: (v3) => v3.decorations });
+  const handleEditorPointerDown = (view, event) => {
+    if (view.state.doc.length > 0 || !isEventTargetInEditor(view, event.target)) {
+      return;
+    }
+    const plugin = view.plugin(placeholderPlugin);
+    if (plugin == null) {
+      return;
+    }
+    plugin.setEngaged(view, true);
+  };
+  const handleEditorFocusOut = (view) => {
+    requestAnimationFrame(() => {
+      if (view.state.doc.length > 0 || isEditorDomFocused(view)) {
+        return;
+      }
+      const plugin = view.plugin(placeholderPlugin);
+      if (plugin == null) {
+        return;
+      }
+      plugin.setEngaged(view, false);
+    });
+  };
+  const engagementHandlers = EditorView.domEventHandlers({
+    mousedown(event, view) {
+      handleEditorPointerDown(view, event);
+      return false;
+    },
+    pointerdown(event, view) {
+      handleEditorPointerDown(view, event);
+      return false;
+    },
+    focusout(_event, view) {
+      handleEditorFocusOut(view);
+      return false;
+    }
+  });
+  return [
+    placeholderPlugin,
+    engagementHandlers,
+    EditorView.contentAttributes.of({ "aria-placeholder": text2 }),
+    EditorView.theme({
+      ".cm-content:has(.cm-syntax-placeholder) .cm-activeLine": {
+        backgroundColor: "transparent !important"
+      }
+    })
+  ];
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/syntaxLinters.js
+var LINT_IDLE_TIMEOUT_MS = 500;
+function scheduleIdle(callback, timeout) {
+  if (typeof requestIdleCallback === "function") {
+    const handle2 = requestIdleCallback(callback, { timeout });
+    return () => cancelIdleCallback(handle2);
+  }
+  const handle = setTimeout(callback, 0);
+  return () => clearTimeout(handle);
+}
+function collectJavascriptSyntaxErrors(view) {
+  const diagnostics = [];
+  syntaxTree(view.state).cursor().iterate((node) => {
+    if (node.type.isError) {
+      diagnostics.push({
+        from: node.from,
+        to: node.to,
+        severity: "error",
+        message: "Syntax error"
+      });
+    }
+  });
+  return diagnostics;
+}
+function createJavascriptSyntaxLinter() {
+  let cancelPending = null;
+  return linter((view) => {
+    cancelPending?.();
+    return new Promise((resolve) => {
+      cancelPending = scheduleIdle(() => {
+        cancelPending = null;
+        resolve(collectJavascriptSyntaxErrors(view));
+      }, LINT_IDLE_TIMEOUT_MS);
+    });
+  });
+}
+function createJsonSyntaxLinter() {
+  return linter(jsonParseLinter());
+}
+
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/CodeEditor/index.js
+function clampSelection(docLength, selection2) {
+  const maxOffset2 = Math.max(0, docLength);
+  return {
+    anchor: Math.min(Math.max(0, selection2.anchor), maxOffset2),
+    head: Math.min(Math.max(0, selection2.head), maxOffset2)
+  };
+}
+var VIEW_STATE_DEBOUNCE_MS = 300;
+var SELECTION_TOOLBAR_SHOW_DELAY_MS = 450;
+var SELECTION_TOOLBAR_OFFSET_PX = 16;
 var variableMatcher = new MatchDecorator({
   regexp: new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g"),
   decoration: Decoration.mark({ class: "cm-variable-token" })
@@ -44215,21 +48218,101 @@ var variableHighlighter = ViewPlugin.fromClass(class {
   decorations;
   /**
    * Builds the initial {{variable}} decoration set for the editor view.
-   *
-   * @param view - CodeMirror editor view instance.
    */
   constructor(view) {
     this.decorations = variableMatcher.createDeco(view);
   }
   /**
    * Recomputes decorations when document content or viewport changes.
-   *
-   * @param update - View update describing what changed.
    */
   update(update) {
     this.decorations = variableMatcher.updateDeco(update, this.decorations);
   }
 }, { decorations: (v3) => v3.decorations });
+var SLASH_COMMAND_LINE_PATTERN = /^(\s*)\/(\w+)(?:[ \t]+(.*))?$/;
+function parseSlashCommandLine(lineText, lineFrom, lineNumber, commands) {
+  const match = lineText.match(SLASH_COMMAND_LINE_PATTERN);
+  if (!match) {
+    return null;
+  }
+  const command2 = match[2];
+  if (command2 == null || !commands.some((entry) => entry.name === command2)) {
+    return null;
+  }
+  const leading = match[1] ?? "";
+  const slashIndex = leading.length;
+  const from = lineFrom + slashIndex;
+  const to = lineFrom + lineText.length;
+  return {
+    command: command2,
+    args: (match[3] ?? "").trim(),
+    line: lineNumber,
+    from,
+    to
+  };
+}
+function createSlashCommandCompletionSource(commands) {
+  return (context) => {
+    const word = context.matchBefore(/^\s*\/\w*/);
+    if (!word || word.text.length === 0) {
+      return null;
+    }
+    const partial = word.text.replace(/^\s*\//, "");
+    const options = commands.filter((entry) => entry.name.startsWith(partial)).map((entry) => ({
+      label: `/${entry.name}`,
+      type: "keyword",
+      detail: entry.description,
+      apply: `/${entry.name} `
+    }));
+    if (options.length === 0) {
+      return null;
+    }
+    return { from: word.from, options };
+  };
+}
+function createScriptCompletionSource(slash2, host) {
+  return (context) => {
+    const line = context.state.doc.lineAt(context.pos);
+    const lineText = line.text.slice(0, context.pos - line.from);
+    if (/^\s*\//.test(lineText)) {
+      return slash2(context);
+    }
+    return host(context);
+  };
+}
+function slashCommandEnterHandler(commands, onSlashCommand) {
+  return Prec.highest(keymap.of([
+    {
+      key: "Enter",
+      /**
+       * Opens host slash-command UI when Enter is pressed on a complete command line.
+       */
+      run: (view) => {
+        const pos = view.state.selection.main.head;
+        const line = view.state.doc.lineAt(pos);
+        const parsed = parseSlashCommandLine(line.text, line.from, line.number, commands);
+        if (!parsed) {
+          return false;
+        }
+        const coords = view.coordsAtPos(parsed.from);
+        if (!coords) {
+          return false;
+        }
+        closeCompletion(view);
+        onSlashCommand({
+          ...parsed,
+          coords: {
+            top: coords.top,
+            left: coords.left,
+            bottom: coords.bottom,
+            right: coords.right
+          }
+        });
+        return true;
+      }
+    }
+  ]));
+}
 function findVariableAtPos(doc2, pos) {
   const line = doc2.lineAt(pos);
   const pattern = new RegExp(`\\{\\{\\s*([${VARIABLE_NAME_CHARS}]+)\\s*\\}\\}`, "g");
@@ -44241,30 +48324,6 @@ function findVariableAtPos(doc2, pos) {
     return { key: match[1], start, end: end3 };
   }
   return null;
-}
-function buildVariableTooltipDom(key, variables, onEditVariable) {
-  const content2 = getVariableTooltipContent(key, variables);
-  const dom2 = document.createElement("div");
-  dom2.className = "cm-variable-tooltip";
-  const valueEl = document.createElement("div");
-  valueEl.textContent = content2.text;
-  if (content2.muted) {
-    valueEl.className = "cm-variable-tooltip-muted";
-  }
-  dom2.appendChild(valueEl);
-  if (onEditVariable) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "Edit value";
-    btn.className = "cm-variable-tooltip-edit";
-    btn.setAttribute("aria-label", `Edit value for ${key}`);
-    btn.addEventListener("mousedown", (e4) => {
-      e4.preventDefault();
-      onEditVariable();
-    });
-    dom2.appendChild(btn);
-  }
-  return dom2;
 }
 function mergeDescribedBy(...ids) {
   const merged = ids.filter((id2) => id2 != null && id2 !== "");
@@ -44311,7 +48370,7 @@ function variableTooltipEscapeHandler(isOpen, onDismiss, getValidationDescribedB
     keydown(event, view) {
       if (event.key === "Escape" && isOpen()) {
         event.preventDefault();
-        onDismiss(view);
+        onDismiss();
         setContentDescribedBy(view.dom.querySelector(".cm-content"), getValidationDescribedBy);
         return true;
       }
@@ -44319,7 +48378,177 @@ function variableTooltipEscapeHandler(isOpen, onDismiss, getValidationDescribedB
     }
   });
 }
-function variableTooltip(variables, onEditVariable) {
+function computeSelectionActionToolbarCoords(view, selectionFrom, selectionTo) {
+  const startCoords = view.coordsAtPos(selectionFrom);
+  if (!startCoords) {
+    return null;
+  }
+  const endCoords = view.coordsAtPos(selectionTo);
+  const startCenter = startCoords.left + (startCoords.right - startCoords.left) / 2;
+  const endCenter = endCoords ? endCoords.left + (endCoords.right - endCoords.left) / 2 : startCenter;
+  return {
+    top: startCoords.top,
+    left: (startCenter + endCenter) / 2
+  };
+}
+function createSelectionActionToolbarExtensions(onToolbarChange, isEnabled2, isOpen, onDismiss) {
+  const controller = {
+    showTimer: void 0,
+    isPointerSelecting: false,
+    isToolbarOpen: false,
+    pendingState: null
+  };
+  const clearShowTimer = () => {
+    if (controller.showTimer) {
+      clearTimeout(controller.showTimer);
+      controller.showTimer = void 0;
+    }
+  };
+  const notifyToolbarChange = (state) => {
+    controller.isToolbarOpen = state != null;
+    if (state == null) {
+      controller.pendingState = null;
+    }
+    onToolbarChange(state);
+  };
+  const dismissToolbar = () => {
+    clearShowTimer();
+    if (controller.isToolbarOpen || controller.pendingState != null) {
+      notifyToolbarChange(null);
+    }
+  };
+  const scheduleShow = (state) => {
+    controller.pendingState = state;
+    clearShowTimer();
+    if (controller.isPointerSelecting) {
+      return;
+    }
+    controller.showTimer = setTimeout(() => {
+      controller.showTimer = void 0;
+      if (controller.isPointerSelecting) {
+        return;
+      }
+      notifyToolbarChange(state);
+    }, SELECTION_TOOLBAR_SHOW_DELAY_MS);
+  };
+  const showImmediately = (state) => {
+    clearShowTimer();
+    notifyToolbarChange(state);
+  };
+  const updateListener2 = EditorView.updateListener.of((update) => {
+    if (!isEnabled2()) {
+      dismissToolbar();
+      return;
+    }
+    if (!update.selectionSet && !update.docChanged && !update.viewportChanged) {
+      return;
+    }
+    const { from, to } = update.state.selection.main;
+    if (from === to) {
+      dismissToolbar();
+      return;
+    }
+    const selectionFrom = Math.min(from, to);
+    const selectionTo = Math.max(from, to);
+    const text2 = update.state.sliceDoc(selectionFrom, selectionTo);
+    if (!text2.trim()) {
+      dismissToolbar();
+      return;
+    }
+    const coords = computeSelectionActionToolbarCoords(update.view, selectionFrom, selectionTo);
+    if (!coords) {
+      dismissToolbar();
+      return;
+    }
+    const nextState = {
+      top: coords.top,
+      left: coords.left,
+      text: text2,
+      from: selectionFrom,
+      to: selectionTo
+    };
+    if (isOpen() && !update.selectionSet && update.viewportChanged) {
+      showImmediately(nextState);
+      return;
+    }
+    if (isOpen() && update.selectionSet) {
+      scheduleShow(nextState);
+      return;
+    }
+    scheduleShow(nextState);
+  });
+  const pointerGuard = EditorView.domEventHandlers({
+    /**
+     * Suppresses toolbar reveal while the user is drag-selecting with the primary button.
+     */
+    pointerdown(event) {
+      if (event.button === 0) {
+        controller.isPointerSelecting = true;
+        clearShowTimer();
+      }
+      return false;
+    },
+    /**
+     * Resumes debounced reveal after drag-select completes.
+     */
+    pointerup() {
+      controller.isPointerSelecting = false;
+      if (controller.pendingState != null && !isOpen()) {
+        scheduleShow(controller.pendingState);
+      }
+      return false;
+    }
+  });
+  const dismissHandler = EditorView.domEventHandlers({
+    keydown(event) {
+      if (event.key === "Escape" && isOpen()) {
+        event.preventDefault();
+        dismissToolbar();
+        onDismiss();
+        return true;
+      }
+      return false;
+    }
+  });
+  const cleanupPlugin = ViewPlugin.fromClass(class {
+    /**
+     * Clears any pending toolbar reveal when the editor extension is destroyed.
+     */
+    destroy() {
+      clearShowTimer();
+    }
+  });
+  return [updateListener2, pointerGuard, dismissHandler, cleanupPlugin];
+}
+function createSelectionActionKeymap(actions, onToolbarChange) {
+  const keyedActions = actions.filter((action) => action.key);
+  if (keyedActions.length === 0) {
+    return null;
+  }
+  return Prec.highest(keymap.of(keyedActions.map((action) => ({
+    key: action.key,
+    run(view) {
+      const { from, to } = view.state.selection.main;
+      if (from === to) {
+        return false;
+      }
+      const selectionFrom = Math.min(from, to);
+      const selectionTo = Math.max(from, to);
+      const text2 = view.state.sliceDoc(selectionFrom, selectionTo);
+      if (!text2.trim()) {
+        return false;
+      }
+      action.onSelect({
+        text: text2,
+        from: selectionFrom,
+        to: selectionTo
+      });
+      onToolbarChange(null);
+      return true;
+    }
+  }))));
+}
+function variableTooltip(getVariables, getOnEditVariable) {
   return hoverTooltip((view, pos) => {
     const match = findVariableAtPos(view.state.doc, pos);
     if (!match)
@@ -44329,90 +48558,438 @@ function variableTooltip(variables, onEditVariable) {
       end: match.end,
       above: true,
       create() {
-        return { dom: buildVariableTooltipDom(match.key, variables, onEditVariable) };
+        return {
+          dom: buildVariableTooltipDom(match.key, getVariables(), getOnEditVariable())
+        };
       }
     };
   });
 }
-function CodeEditor({ value, onChange: onChange2, language: language2 = "text", readOnly: readOnly2 = false, placeholder: placeholder2, minHeight = "144px", className = "", variables, onEditVariable, completionSource, themeOverride, setupOverride, id: id2, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy }) {
+var RESIZE_GRIP_PX = 16;
+function buildCoreExtensions(options) {
+  const next = [options.editorThemeExt];
+  if (options.trackViewState) {
+    next.push(options.viewStateSelectionListener);
+  }
+  const themeExtension = getCodeEditorThemeExtension(options.resolvedTheme);
+  if (themeExtension) {
+    next.push(themeExtension);
+  } else {
+    next.push(createBuiltInSyntaxHighlighting(options.isDark));
+  }
+  if (options.language === "json") {
+    next.push(json());
+  }
+  if (options.language === "javascript") {
+    next.push(javascript());
+  }
+  if (options.language === "shell") {
+    next.push(StreamLanguage.define(shell));
+  }
+  if (options.lint) {
+    if (options.language === "json") {
+      next.push(createJsonSyntaxLinter());
+    }
+    if (options.language === "javascript") {
+      next.push(createJavascriptSyntaxLinter());
+    }
+  }
+  if (options.hasVariables) {
+    next.push(variableHighlighter, variableTooltip(options.getVariables, options.getOnEditVariable), variableSelectionTooltip(options.tooltipId, options.onSelectionTooltipChange, options.getValidationDescribedBy), variableTooltipEscapeHandler(options.isSelectionTooltipOpen, options.onDismissSelectionTooltip, options.getValidationDescribedBy));
+  }
+  if (options.hasSelectionActions) {
+    next.push(...createSelectionActionToolbarExtensions(options.onSelectionActionToolbarChange, () => options.hasSelectionActions, options.isSelectionActionToolbarOpen, options.onDismissSelectionActionToolbar));
+    const keymapExtension = createSelectionActionKeymap(options.selectionActions, options.onSelectionActionToolbarChange);
+    if (keymapExtension) {
+      next.push(keymapExtension);
+    }
+  }
+  return next;
+}
+function buildCompletionExtensions(options) {
+  if (options.language !== "javascript") {
+    return [];
+  }
+  const next = [];
+  const slashCommands = options.slashCommands;
+  const hasSlashCommands = slashCommands != null && slashCommands.length > 0;
+  if (hasSlashCommands) {
+    next.push(slashCommandEnterHandler(slashCommands, options.onSlashCommand));
+  }
+  const completionOverrides = [];
+  if (hasSlashCommands && options.hasCompletionSource && options.slashCompletionSource) {
+    completionOverrides.push(createScriptCompletionSource(options.slashCompletionSource, options.stableCompletionSource));
+  } else if (hasSlashCommands && options.slashCompletionSource) {
+    completionOverrides.push(options.slashCompletionSource);
+  } else if (options.hasCompletionSource) {
+    completionOverrides.push(options.stableCompletionSource);
+  }
+  if (completionOverrides.length > 0) {
+    next.push(autocompletion({
+      activateOnTyping: true,
+      activateOnTypingDelay: 75,
+      maxRenderedOptions: 20,
+      override: completionOverrides
+    }));
+  }
+  if (hasSlashCommands) {
+    next.push(createSlashCommandHighlighter(slashCommands));
+  }
+  return next;
+}
+function buildA11yExtensions(options) {
+  const contentAttrs = {};
+  if (options.id)
+    contentAttrs.id = options.id;
+  if (options.ariaLabel)
+    contentAttrs["aria-label"] = options.ariaLabel;
+  if (options.ariaLabelledBy)
+    contentAttrs["aria-labelledby"] = options.ariaLabelledBy;
+  if (options.ariaInvalid != null)
+    contentAttrs["aria-invalid"] = String(options.ariaInvalid);
+  if (options.ariaDescribedBy)
+    contentAttrs["aria-describedby"] = options.ariaDescribedBy;
+  if (Object.keys(contentAttrs).length === 0) {
+    return [];
+  }
+  return [EditorView.contentAttributes.of(contentAttrs)];
+}
+function buildPlaceholderExtensions(options) {
+  if (!options.useHighlightedPlaceholder || !options.placeholder) {
+    return [];
+  }
+  return createSyntaxHighlightedPlaceholder(options.placeholder, {
+    fontSize: options.resolvedFontSize,
+    isDark: options.isDark,
+    theme: options.resolvedTheme,
+    slashCommands: options.slashCommands
+  });
+}
+function CodeEditor({ value, onChange: onChange2, language: language2 = "text", readOnly: readOnly2 = false, editable: editable2, placeholder: placeholder2, placeholderHighlight = false, minHeight = "144px", height, onHeightChange, initialScrollTop, initialSelection, onViewStateChange, className = "", variables, onEditVariable, completionSource, slashCommands, onSlashCommand, selectionActions, lint = true, themeOverride, setupOverride, fontSize, id: id2, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy, ...props }) {
   const config16 = useCodeEditorConfig();
   const resolvedTheme = themeOverride ?? config16.theme;
   const resolvedSetup = setupOverride ?? (readOnly2 ? null : config16.setup);
+  const resolvedFontSize = normalizeCodeEditorFontSize(fontSize ?? config16.fontSize);
+  const resolvedEditable = editable2 ?? !readOnly2;
   const [isDark, setIsDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
   const [selectionTooltip, setSelectionTooltip] = useState(null);
   const selectionTooltipRef = useRef(selectionTooltip);
   selectionTooltipRef.current = selectionTooltip;
   const setSelectionTooltipRef = useRef(setSelectionTooltip);
   setSelectionTooltipRef.current = setSelectionTooltip;
+  const [selectionActionToolbar, setSelectionActionToolbar] = useState(null);
+  const selectionActionToolbarRef = useRef(selectionActionToolbar);
+  selectionActionToolbarRef.current = selectionActionToolbar;
+  const setSelectionActionToolbarRef = useRef(setSelectionActionToolbar);
+  setSelectionActionToolbarRef.current = setSelectionActionToolbar;
+  const selectionToolbarElementRef = useRef(null);
+  const selectionActionsRef = useRef(selectionActions);
+  selectionActionsRef.current = selectionActions;
+  const hasSelectionActions = selectionActions != null && selectionActions.length > 0;
   const ariaDescribedByRef = useRef(ariaDescribedBy);
   ariaDescribedByRef.current = ariaDescribedBy;
+  const onSlashCommandRef = useRef(onSlashCommand);
+  onSlashCommandRef.current = onSlashCommand;
+  const onChangeRef = useRef(onChange2);
+  onChangeRef.current = onChange2;
+  const completionSourceRef = useRef(completionSource);
+  completionSourceRef.current = completionSource;
+  const variablesRef = useRef(variables);
+  variablesRef.current = variables;
+  const onEditVariableRef = useRef(onEditVariable);
+  onEditVariableRef.current = onEditVariable;
+  const hasVariables = variables != null;
+  const hasCompletionSource = completionSource != null;
   const tooltipId = useId();
+  const wrapperRef = useRef(null);
+  const onHeightChangeRef = useRef(onHeightChange);
+  onHeightChangeRef.current = onHeightChange;
+  const isUserResizingRef = useRef(false);
+  const editorViewRef = useRef(null);
+  const onViewStateChangeRef = useRef(onViewStateChange);
+  onViewStateChangeRef.current = onViewStateChange;
+  const initialScrollTopRef = useRef(initialScrollTop);
+  initialScrollTopRef.current = initialScrollTop;
+  const initialSelectionRef = useRef(initialSelection);
+  initialSelectionRef.current = initialSelection;
+  const viewStateDebounceRef = useRef(void 0);
+  const scrollListenerCleanupRef = useRef(null);
+  const scheduleViewStateFlushRef = useRef(() => void 0);
   const getValidationDescribedBy = () => ariaDescribedByRef.current;
+  const compartmentsRef = useRef(null);
+  if (!compartmentsRef.current) {
+    compartmentsRef.current = {
+      core: new Compartment(),
+      completion: new Compartment(),
+      a11y: new Compartment(),
+      placeholder: new Compartment()
+    };
+  }
+  const { core: coreCompartment, completion: completionCompartment, a11y: a11yCompartment, placeholder: placeholderCompartment } = compartmentsRef.current;
+  const readViewState = useCallback((view) => {
+    const selection2 = view.state.selection.main;
+    return {
+      scrollTop: Math.max(0, Math.round(view.scrollDOM.scrollTop)),
+      selection: { anchor: selection2.anchor, head: selection2.head }
+    };
+  }, []);
+  const flushViewState = useCallback(() => {
+    const view = editorViewRef.current;
+    if (!view || !onViewStateChangeRef.current) {
+      return;
+    }
+    onViewStateChangeRef.current(readViewState(view));
+  }, [readViewState]);
+  useEffect(() => {
+    scheduleViewStateFlushRef.current = () => {
+      if (viewStateDebounceRef.current) {
+        clearTimeout(viewStateDebounceRef.current);
+      }
+      viewStateDebounceRef.current = setTimeout(() => {
+        flushViewState();
+      }, VIEW_STATE_DEBOUNCE_MS);
+    };
+  }, [flushViewState]);
+  useEffect(() => {
+    return () => {
+      if (viewStateDebounceRef.current) {
+        clearTimeout(viewStateDebounceRef.current);
+      }
+      scrollListenerCleanupRef.current?.();
+      scrollListenerCleanupRef.current = null;
+      flushViewState();
+      editorViewRef.current = null;
+    };
+  }, [flushViewState]);
+  useEffect(() => {
+    if (!selectionActionToolbar) {
+      return;
+    }
+    const handlePointerDown = (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+      const editorRoot = editorViewRef.current?.dom;
+      const toolbar = selectionToolbarElementRef.current;
+      if (editorRoot?.contains(target) || toolbar?.contains(target)) {
+        return;
+      }
+      setSelectionActionToolbar(null);
+    };
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+    };
+  }, [selectionActionToolbar]);
+  useEffect(() => {
+    if (!onHeightChange) {
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    if (!wrapper) {
+      return;
+    }
+    const handlePointerDown = (event) => {
+      const rect = wrapper.getBoundingClientRect();
+      const onGrip = event.clientX >= rect.right - RESIZE_GRIP_PX && event.clientY >= rect.bottom - RESIZE_GRIP_PX;
+      if (onGrip) {
+        isUserResizingRef.current = true;
+      }
+    };
+    const handlePointerUp = () => {
+      if (!isUserResizingRef.current) {
+        return;
+      }
+      isUserResizingRef.current = false;
+      const nextHeight = Math.round(wrapper.getBoundingClientRect().height);
+      onHeightChangeRef.current?.(nextHeight);
+    };
+    wrapper.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      wrapper.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [onHeightChange]);
+  const useHighlightedPlaceholder = Boolean(placeholderHighlight && placeholder2 && language2 === "javascript");
+  const stableOnChange = useCallback((nextValue) => {
+    onChangeRef.current?.(nextValue);
+  }, []);
+  const stableCompletionSource = useMemo(() => (context) => completionSourceRef.current?.(context) ?? null, []);
+  const getVariables = useCallback(() => variablesRef.current ?? [], []);
+  const getOnEditVariable = useCallback(() => onEditVariableRef.current, []);
+  const editorThemeExt = useMemo(() => createEditorTheme(resolvedFontSize), [resolvedFontSize]);
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => setIsDark(media.matches);
     media.addEventListener("change", handleChange);
     return () => media.removeEventListener("change", handleChange);
   }, []);
-  const extensions = useMemo(() => {
-    const next = [EditorView.lineWrapping, editorTheme];
-    const themeExtension = getCodeEditorThemeExtension(resolvedTheme);
-    if (themeExtension) {
-      next.push(themeExtension);
-    } else {
-      next.push(syntaxHighlighting(isDark ? darkHighlight : lightHighlight));
+  const viewStateSelectionListener = useMemo(() => EditorView.updateListener.of((update) => {
+    if (!onViewStateChangeRef.current || !update.selectionSet) {
+      return;
     }
-    if (language2 === "json") {
-      next.push(json());
+    scheduleViewStateFlushRef.current();
+  }), []);
+  const slashCompletionSource = useMemo(() => slashCommands != null && slashCommands.length > 0 ? createSlashCommandCompletionSource(slashCommands) : null, [slashCommands]);
+  const stableOnSlashCommand = useCallback((trigger) => {
+    onSlashCommandRef.current?.(trigger);
+  }, []);
+  const coreExtensions = useMemo(() => buildCoreExtensions({
+    editorThemeExt,
+    trackViewState: onViewStateChange != null,
+    viewStateSelectionListener,
+    resolvedTheme,
+    isDark,
+    language: language2,
+    lint,
+    hasVariables,
+    tooltipId,
+    getVariables,
+    getOnEditVariable,
+    getValidationDescribedBy,
+    onSelectionTooltipChange: (state) => {
+      setSelectionTooltipRef.current(state);
+    },
+    isSelectionTooltipOpen: () => selectionTooltipRef.current != null,
+    onDismissSelectionTooltip: () => {
+      setSelectionTooltipRef.current(null);
+    },
+    hasSelectionActions,
+    selectionActions: selectionActions ?? [],
+    onSelectionActionToolbarChange: (state) => {
+      setSelectionActionToolbarRef.current(state);
+    },
+    isSelectionActionToolbarOpen: () => selectionActionToolbarRef.current != null,
+    onDismissSelectionActionToolbar: () => {
+      setSelectionActionToolbarRef.current(null);
     }
-    if (language2 === "javascript") {
-      next.push(javascript());
-      if (completionSource) {
-        next.push(autocompletion({
-          activateOnTyping: true,
-          override: [completionSource]
-        }));
-      }
-    }
-    if (language2 === "shell") {
-      next.push(StreamLanguage.define(shell));
-    }
-    if (variables) {
-      next.push(variableHighlighter, variableTooltip(variables, onEditVariable), variableSelectionTooltip(tooltipId, (state) => {
-        setSelectionTooltipRef.current(state);
-      }, getValidationDescribedBy), variableTooltipEscapeHandler(() => selectionTooltipRef.current != null, () => {
-        setSelectionTooltipRef.current(null);
-      }, getValidationDescribedBy));
-    }
-    const contentAttrs = {};
-    if (id2)
-      contentAttrs.id = id2;
-    if (ariaLabel)
-      contentAttrs["aria-label"] = ariaLabel;
-    if (ariaLabelledBy)
-      contentAttrs["aria-labelledby"] = ariaLabelledBy;
-    if (ariaInvalid != null)
-      contentAttrs["aria-invalid"] = String(ariaInvalid);
-    if (ariaDescribedBy)
-      contentAttrs["aria-describedby"] = ariaDescribedBy;
-    if (Object.keys(contentAttrs).length > 0) {
-      next.push(EditorView.contentAttributes.of(contentAttrs));
-    }
-    return next;
-  }, [
+  }), [
+    editorThemeExt,
+    onViewStateChange,
+    viewStateSelectionListener,
     resolvedTheme,
     isDark,
     language2,
-    variables,
-    onEditVariable,
-    completionSource,
-    id2,
+    lint,
+    hasVariables,
+    hasSelectionActions,
+    selectionActions,
+    tooltipId,
+    getVariables,
+    getOnEditVariable
+  ]);
+  const completionExtensions = useMemo(() => buildCompletionExtensions({
+    language: language2,
+    slashCommands,
+    hasCompletionSource,
+    stableCompletionSource,
+    slashCompletionSource,
+    onSlashCommand: stableOnSlashCommand
+  }), [
+    language2,
+    slashCommands,
+    hasCompletionSource,
+    stableCompletionSource,
+    slashCompletionSource,
+    stableOnSlashCommand
+  ]);
+  const a11yExtensions = useMemo(() => buildA11yExtensions({
+    id: id2,
     ariaLabel,
     ariaLabelledBy,
     ariaInvalid,
-    ariaDescribedBy,
-    tooltipId
-  ]);
+    ariaDescribedBy
+  }), [id2, ariaLabel, ariaLabelledBy, ariaInvalid, ariaDescribedBy]);
+  const placeholderExtensions = useMemo(() => buildPlaceholderExtensions({
+    useHighlightedPlaceholder,
+    placeholder: placeholder2,
+    resolvedFontSize,
+    isDark,
+    resolvedTheme,
+    slashCommands
+  }), [useHighlightedPlaceholder, placeholder2, resolvedFontSize, isDark, resolvedTheme, slashCommands]);
+  const coreExtensionsRef = useRef(coreExtensions);
+  coreExtensionsRef.current = coreExtensions;
+  const completionExtensionsRef = useRef(completionExtensions);
+  completionExtensionsRef.current = completionExtensions;
+  const a11yExtensionsRef = useRef(a11yExtensions);
+  a11yExtensionsRef.current = a11yExtensions;
+  const placeholderExtensionsRef = useRef(placeholderExtensions);
+  placeholderExtensionsRef.current = placeholderExtensions;
+  const stableOnCreateEditor = useCallback((view) => {
+    editorViewRef.current = view;
+    view.dispatch({
+      effects: [
+        coreCompartment.reconfigure(coreExtensionsRef.current),
+        completionCompartment.reconfigure(completionExtensionsRef.current),
+        a11yCompartment.reconfigure(a11yExtensionsRef.current),
+        placeholderCompartment.reconfigure(placeholderExtensionsRef.current)
+      ]
+    });
+    const trackViewState = onViewStateChangeRef.current != null || initialScrollTopRef.current != null || initialSelectionRef.current != null;
+    if (!trackViewState) {
+      return;
+    }
+    const restoredSelection = initialSelectionRef.current;
+    if (restoredSelection) {
+      const clamped = clampSelection(view.state.doc.length, restoredSelection);
+      view.dispatch({
+        selection: { anchor: clamped.anchor, head: clamped.head }
+      });
+    }
+    const restoredScrollTop = initialScrollTopRef.current;
+    if (restoredScrollTop != null && Number.isFinite(restoredScrollTop) && restoredScrollTop >= 0) {
+      view.scrollDOM.scrollTop = restoredScrollTop;
+    }
+    const handleScroll = () => {
+      scheduleViewStateFlushRef.current();
+    };
+    view.scrollDOM.addEventListener("scroll", handleScroll, { passive: true });
+    scrollListenerCleanupRef.current = () => {
+      view.scrollDOM.removeEventListener("scroll", handleScroll);
+    };
+  }, [a11yCompartment, completionCompartment, coreCompartment, placeholderCompartment]);
+  const stableExtensionsRef = useRef(null);
+  if (!stableExtensionsRef.current) {
+    stableExtensionsRef.current = [
+      EditorView.lineWrapping,
+      coreCompartment.of(coreExtensions),
+      completionCompartment.of(completionExtensions),
+      a11yCompartment.of(a11yExtensions),
+      placeholderCompartment.of(placeholderExtensions)
+    ];
+  }
+  const stableExtensions = stableExtensionsRef.current;
+  useEffect(() => {
+    const view = editorViewRef.current;
+    if (!view) {
+      return;
+    }
+    view.dispatch({ effects: coreCompartment.reconfigure(coreExtensions) });
+  }, [coreCompartment, coreExtensions]);
+  useEffect(() => {
+    const view = editorViewRef.current;
+    if (!view) {
+      return;
+    }
+    view.dispatch({ effects: completionCompartment.reconfigure(completionExtensions) });
+  }, [completionCompartment, completionExtensions]);
+  useEffect(() => {
+    const view = editorViewRef.current;
+    if (!view) {
+      return;
+    }
+    view.dispatch({ effects: a11yCompartment.reconfigure(a11yExtensions) });
+  }, [a11yCompartment, a11yExtensions]);
+  useEffect(() => {
+    const view = editorViewRef.current;
+    if (!view) {
+      return;
+    }
+    view.dispatch({ effects: placeholderCompartment.reconfigure(placeholderExtensions) });
+  }, [placeholderCompartment, placeholderExtensions]);
   const basicSetup3 = useMemo(() => {
     if (!resolvedSetup) {
       return {
@@ -44442,71 +49019,60 @@ function CodeEditor({ value, onChange: onChange2, language: language2 = "text", 
       lineNumbers: resolvedSetup.lineNumbers,
       foldGutter: resolvedSetup.foldGutter,
       highlightActiveLine: resolvedSetup.highlightActiveLine,
-      highlightActiveLineGutter: resolvedSetup.highlightActiveLineGutter
+      highlightActiveLineGutter: resolvedSetup.highlightActiveLineGutter,
+      highlightSelectionMatches: false,
+      autocompletion: false,
+      completionKeymap: false
     };
   }, [resolvedSetup, readOnly2]);
-  const wrapperClassName = readOnly2 ? `overflow-hidden rounded-md bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}` : `min-h-36 resize-y overflow-hidden rounded-md border border-separator bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--mac-accent)_35%,transparent),inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}`;
+  const wrapperClassName = readOnly2 ? `hc-code-editor overflow-hidden rounded-lg bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}` : `hc-code-editor min-h-36 resize-y overflow-hidden rounded-lg border border-separator bg-control shadow-[inset_0_0.5px_1px_rgba(0,0,0,0.06)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--mac-accent)_35%,transparent),inset_0_0.5px_1px_rgba(0,0,0,0.06)] app-no-drag ${className}`;
   const selectionTooltipContent = selectionTooltip ? getVariableTooltipContent(selectionTooltip.key, variables ?? []) : null;
-  return jsxs("div", { className: wrapperClassName, children: [createElement(esm_default, {
-    value,
-    onChange: readOnly2 ? void 0 : onChange2,
-    extensions,
-    theme: "none",
-    editable: !readOnly2,
-    readOnly: readOnly2,
-    placeholder: placeholder2,
-    minHeight,
-    basicSetup: basicSetup3
-  }), selectionTooltip && selectionTooltipContent && variables ? jsxs("div", { id: tooltipId, role: "tooltip", className: "pointer-events-auto fixed z-50 flex max-w-sm -translate-x-1/2 -translate-y-full flex-col gap-1.5 rounded-md border border-separator bg-surface px-3 py-2 text-[14px] text-text shadow-md app-no-drag", style: { top: selectionTooltip.top - 4, left: selectionTooltip.left }, children: [jsx("span", { className: selectionTooltipContent.muted ? "text-muted" : void 0, children: selectionTooltipContent.text }), onEditVariable ? jsx("button", { type: "button", className: "self-start text-[14px] text-accent hover:underline", "aria-label": `Edit value for ${selectionTooltip.key}`, onMouseDown: (event) => {
+  const wrapperStyle = height ? { height } : void 0;
+  const activeSelectionActions = selectionActionsRef.current ?? [];
+  const selectionActionToolbarNode = selectionActionToolbar && hasSelectionActions ? jsx("div", { ref: selectionToolbarElementRef, role: "toolbar", "aria-label": "Selection actions", className: "hc-code-editor-selection-toolbar app-no-drag pointer-events-auto fixed z-50 flex -translate-x-1/2 -translate-y-full items-center gap-1 bg-transparent p-0 text-[14px] text-text", style: {
+    top: selectionActionToolbar.top - SELECTION_TOOLBAR_OFFSET_PX,
+    left: selectionActionToolbar.left
+  }, children: activeSelectionActions.map((action) => jsxs("button", { type: "button", className: "hc-code-editor-selection-action inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-separator bg-control px-2 py-1 text-[14px] text-text shadow-sm hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent", "aria-label": action.ariaLabel, onMouseDown: (event) => {
     event.preventDefault();
-    onEditVariable();
+  }, onClick: () => {
+    action.onSelect({
+      text: selectionActionToolbar.text,
+      from: selectionActionToolbar.from,
+      to: selectionActionToolbar.to
+    });
+    setSelectionActionToolbar(null);
+  }, children: [action.icon ? jsx(FaIcon, { icon: action.icon, className: "h-3.5 w-3.5" }) : null, jsx("span", { children: action.label }), action.shortcutHint ? jsx("span", { className: "text-[14px] text-muted", children: action.shortcutHint }) : null] }, action.id)) }) : null;
+  return jsxs("div", { ref: wrapperRef, ...props, className: wrapperClassName, style: wrapperStyle, children: [createElement(esm_default, {
+    value,
+    onChange: readOnly2 ? void 0 : stableOnChange,
+    extensions: stableExtensions,
+    theme: "none",
+    editable: resolvedEditable,
+    readOnly: readOnly2,
+    placeholder: useHighlightedPlaceholder ? void 0 : placeholder2,
+    minHeight,
+    ...height ? { height: "100%" } : {},
+    basicSetup: basicSetup3,
+    onCreateEditor: stableOnCreateEditor
+  }), selectionTooltip && selectionTooltipContent && variables ? jsxs("div", { id: tooltipId, role: "tooltip", className: "hc-code-editor-tooltip app-no-drag pointer-events-auto fixed z-50 flex max-w-sm -translate-x-1/2 -translate-y-full flex-col gap-1.5 rounded-lg border border-separator bg-surface px-3 py-2 text-[16px] text-text shadow-md", style: { top: selectionTooltip.top - 4, left: selectionTooltip.left }, children: [jsx(VariableTooltipValue, { value: selectionTooltipContent.text, variableKey: selectionTooltip.key, muted: selectionTooltipContent.muted }), onEditVariable ? jsx(Button, { variant: "secondary", className: "hc-code-editor-tooltip-edit self-start", "aria-label": `Edit value for ${selectionTooltip.key}`, onMouseDown: (event) => {
+    event.preventDefault();
+    onEditVariable(selectionTooltip.key);
     setSelectionTooltip(null);
-  }, children: "Edit value" }) : null] }) : null] });
+  }, children: "Edit value" }) : null] }) : null, selectionActionToolbarNode ? portalToBody(selectionActionToolbarNode) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/EmptyState/index.js
 function variantClasses2(variant) {
   if (variant === "centered") {
     return "flex flex-1 items-center justify-center p-4 text-center text-[14px] text-muted";
   }
   return "text-[14px] text-muted";
 }
-function EmptyState({ children, variant = "inline", className }) {
-  const base2 = variantClasses2(variant);
-  const classes = className ? `${base2} ${className}` : base2;
-  return jsx("div", { className: classes, children });
+function EmptyState({ children, variant = "inline", className, ...props }) {
+  return jsx("div", { ...props, className: cn("hc-empty-state text-[16px]", variantClasses2(variant), className), children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/classes.js
-var field = "rounded-md border border-separator bg-field px-2 py-1 text-[15px] text-text app-no-drag";
-var surfaceField = "w-full rounded-md border border-separator bg-field px-3 py-2 text-[14px] text-text";
-var VARIANT_CLASSES2 = {
-  control: field,
-  surface: surfaceField
-};
-function mergeFieldClasses(variant, className) {
-  const base2 = variant === "plain" ? "" : VARIANT_CLASSES2[variant];
-  if (base2 && className)
-    return `${base2} ${className}`;
-  if (base2)
-    return base2;
-  if (className)
-    return className;
-  return void 0;
-}
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/Input.js
-function Input({ ref, variant = "control", type, className, ...props }) {
-  const resolvedVariant = type === "checkbox" || type === "radio" ? "plain" : variant;
-  return jsx("input", { ref, type, className: mergeFieldClasses(resolvedVariant, className), ...props });
-}
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/forms/Select.js
-function Select({ ref, variant = "control", className, children, ...props }) {
-  return jsx("select", { ref, className: mergeFieldClasses(variant, className), ...props, children });
-}
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/enhanceControl.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/enhanceControl.js
 var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
 var FORM_CONTROL_TAGS = /* @__PURE__ */ new Set(["button", "input", "select", "textarea"]);
 function getSingleChild(node) {
@@ -44568,9 +49134,9 @@ function enhanceControl(child, options) {
   return applyAriaProps(child, options);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/FormGroup/index.js
 function labelClasses(tone, srOnly, inline) {
-  const base2 = "text-[14px]";
+  const base2 = "hc-form-group-label text-[18px]";
   const visibility = srOnly ? "sr-only" : "";
   if (inline) {
     const color2 = tone === "muted" ? "shrink-0 text-muted" : "shrink-0 font-medium text-text";
@@ -44579,32 +49145,40 @@ function labelClasses(tone, srOnly, inline) {
   const color = tone === "muted" ? "text-muted" : "font-medium text-text";
   return `${base2} ${color} ${visibility}`.trim();
 }
-function FormGroup({ label, children, htmlFor, description, error, errorId, descriptionId, layout = "stacked", labelTone = "default", srOnly = false, className, labelClassName }) {
+function FormGroup({ label, children, htmlFor, description, error, errorId, descriptionId, layout = "stacked", labelTone = "default", srOnly = false, className, labelClassName, ...props }) {
   const generatedId = useId();
   const controlId = htmlFor ?? generatedId;
   const extra = className ?? "";
   if (layout === "associated") {
-    const associatedClasses = labelClassName ?? "text-[14px] text-text";
+    const associatedClasses = labelClassName ? `hc-form-group ${labelClassName}` : "hc-form-group text-[16px] text-text";
     return jsx("label", { htmlFor, className: associatedClasses, children: label });
   }
   if (layout === "checkboxAdjacent") {
-    const wrapperClasses2 = extra ? `flex items-start gap-2 ${extra}` : "flex items-start gap-2";
-    const adjacentLabelClasses = labelClassName ?? "min-w-0 flex-1 text-[14px] text-text";
+    const wrapperClasses2 = extra ? `hc-form-group flex items-start gap-2 ${extra}` : "hc-form-group flex items-start gap-2";
+    const adjacentLabelClasses = labelClassName ? `hc-form-group-label ${labelClassName}` : "hc-form-group-label min-w-0 flex-1 text-[16px] text-text";
     const linkedChildren = enhanceControl(children, { id: controlId });
-    return jsxs("div", { className: wrapperClasses2, children: [linkedChildren, jsx("label", { htmlFor: controlId, className: adjacentLabelClasses, children: label })] });
+    return jsxs("div", { ...props, className: wrapperClasses2, children: [linkedChildren, jsx("label", { htmlFor: controlId, className: adjacentLabelClasses, children: label })] });
   }
   if (layout === "radio") {
-    const wrapperClasses2 = extra ? `inline-flex cursor-pointer items-center gap-1.5 text-[14px] text-text app-no-drag ${extra}` : "inline-flex cursor-pointer items-center gap-1.5 text-[14px] text-text app-no-drag";
+    const wrapperClasses2 = extra ? `hc-form-group inline-flex cursor-pointer items-center gap-1.5 text-[16px] text-text app-no-drag ${extra}` : "hc-form-group inline-flex cursor-pointer items-center gap-1.5 text-[16px] text-text app-no-drag";
     const linkedChildren = enhanceControl(children, { id: controlId });
-    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [linkedChildren, label] });
+    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [linkedChildren, jsx("span", { className: "hc-form-group-label", children: label })] });
   }
   if (layout === "checkbox") {
-    const wrapperClasses2 = extra ? `flex items-center gap-2 ${extra}` : "flex items-center gap-2";
-    const linkedChildren = enhanceControl(children, { id: controlId });
-    return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [linkedChildren, jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label })] });
+    const resolvedDescriptionId2 = description != null && description !== "" ? descriptionId ?? (htmlFor ? `${htmlFor}-description` : void 0) : void 0;
+    const resolvedErrorId2 = error != null && error !== "" ? errorId ?? (htmlFor ? `${htmlFor}-error` : void 0) : void 0;
+    const describedByIds2 = [resolvedDescriptionId2, resolvedErrorId2].filter((id2) => id2 != null);
+    const describedBy2 = describedByIds2.length > 0 ? describedByIds2.join(" ") : void 0;
+    const linkedChildren = enhanceControl(children, {
+      describedBy: describedBy2,
+      id: controlId,
+      invalid: resolvedErrorId2 != null
+    });
+    const wrapperClasses2 = extra ? `hc-form-group flex flex-col gap-1 p-4 border border-separator rounded-md ${extra}` : "hc-form-group flex flex-col gap-1 p-4 border border-separator rounded-md";
+    return jsxs("div", { ...props, className: wrapperClasses2, children: [jsxs("label", { htmlFor: controlId, className: "hc-form-group-label flex flex-col gap-1", children: [jsxs("span", { className: "hc-form-group-label-row flex items-center gap-2", children: [linkedChildren, jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label })] }), resolvedDescriptionId2 ? jsx("p", { id: resolvedDescriptionId2, className: "hc-form-group-description m-0 pl-[26px] text-[14px] text-muted", children: description }) : null] }), resolvedErrorId2 ? jsx(FieldError, { id: resolvedErrorId2, spacing: "field", children: error }) : null] });
   }
   if (layout === "inline") {
-    const wrapperClasses2 = extra ? `flex min-w-0 flex-1 items-center gap-2 ${extra}` : "flex min-w-0 flex-1 items-center gap-2";
+    const wrapperClasses2 = extra ? `hc-form-group flex min-w-0 flex-1 items-center gap-2 p-4 border border-separator rounded-md ${extra}` : "hc-form-group flex min-w-0 flex-1 items-center gap-2 p-4 border border-separator rounded-md";
     const linkedChildren = enhanceControl(children, { id: controlId });
     return jsxs("label", { htmlFor: controlId, className: wrapperClasses2, children: [jsx("span", { className: labelClasses(labelTone, srOnly, true), children: label }), linkedChildren] });
   }
@@ -44617,11 +49191,11 @@ function FormGroup({ label, children, htmlFor, description, error, errorId, desc
     invalid: resolvedErrorId != null,
     id: htmlFor
   });
-  const wrapperClasses = extra ? `flex flex-col gap-1 ${extra}` : "flex flex-col gap-1";
-  return jsxs("div", { className: wrapperClasses, children: [jsxs("label", { htmlFor, className: "flex flex-col gap-1", children: [jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label }), control, resolvedDescriptionId ? jsx("p", { id: resolvedDescriptionId, className: "m-0 text-[14px] text-muted", children: description }) : null] }), resolvedErrorId ? jsx(FieldError, { id: resolvedErrorId, spacing: "field", children: error }) : null] });
+  const wrapperClasses = extra ? `hc-form-group flex flex-col gap-1 p-4 text-[16px] border border-separator rounded-md ${extra}` : "hc-form-group flex flex-col gap-1 p-4 text-[16px] border border-separator rounded-md";
+  return jsxs("div", { ...props, className: wrapperClasses, children: [jsxs("label", { htmlFor, className: "hc-form-group-label flex flex-col gap-1", children: [jsx("span", { className: labelClasses(labelTone, srOnly, false), children: label }), resolvedDescriptionId ? jsx("p", { id: resolvedDescriptionId, className: "hc-form-group-description m-0 text-[14px] text-muted", children: description }) : null, control] }), resolvedErrorId ? jsx(FieldError, { id: resolvedErrorId, spacing: "field", children: error }) : null] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/useDialogFocus.js
 var FOCUSABLE_SELECTOR = 'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 var inertLockCounts = /* @__PURE__ */ new WeakMap();
 function setInertLocked(element, locked) {
@@ -44716,20 +49290,18 @@ function useDialogFocus(panelRef) {
   }, [panelRef]);
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
-function ModalHeader({ titleId, title, description, descriptionId, headerActions, closeDisabled = false, onClose }) {
-  return jsxs("div", { className: "flex flex-wrap items-center gap-2 border-b border-separator px-4 py-4", children: [jsxs("div", { className: "min-w-0 flex-1", children: [jsx("h2", { id: titleId, className: "m-0 flex flex-wrap items-center gap-2 text-[17px] font-semibold text-text", children: title }), description ? jsx("p", { id: descriptionId, className: "m-0 mt-1 text-[14px] text-muted", children: description }) : null] }), jsxs("div", { className: "flex flex-wrap items-center gap-2", children: [headerActions, jsx(Button, { type: "button", variant: "icon", className: "shrink-0", "aria-label": "Close", disabled: closeDisabled, onClick: onClose, children: jsx(FaIcon, { icon: faXmark, className: "h-4 w-4" }) })] })] });
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/Modal/ModalHeader.js
+function ModalHeader({ titleId, title, description, descriptionId, headerActions, closeDisabled = false, onClose, className, ...props }) {
+  return jsxs("div", { ...props, className: cn("hc-modal-header flex flex-wrap items-center gap-2 border-b border-separator px-4 py-4", className), children: [jsxs("div", { className: "hc-modal-header-content min-w-0 flex-1", children: [jsx("h2", { id: titleId, className: "hc-modal-header-title m-0 flex flex-wrap items-center gap-2 text-[17px] font-semibold text-text", children: title }), description ? jsx("p", { id: descriptionId, className: "hc-modal-header-description m-0 mt-1 text-[14px] text-muted", children: description }) : null] }), jsxs("div", { className: "hc-modal-header-actions flex flex-wrap items-center gap-2", children: [headerActions, jsx(Button, { type: "button", variant: "icon", className: "hc-modal-header-close shrink-0", "aria-label": "Close", disabled: closeDisabled, onClick: onClose, children: jsx(FaIcon, { icon: faXmark, className: "h-4 w-4" }) })] })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
-function ModalFooter({ children, spaced = false, className }) {
-  const base2 = spaced ? "mt-4 flex justify-end gap-2" : "flex justify-end gap-2";
-  const classes = className ? `${base2} ${className}` : base2;
-  return jsx("div", { className: classes, children });
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/Modal/ModalFooter.js
+function ModalFooter({ children, spaced = false, className, ...props }) {
+  return jsx("div", { ...props, className: cn("hc-modal-footer flex justify-end gap-2", spaced && "mt-4", className), children });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/Modal/index.js
-function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = false, title, description, headerActions, closeDisabled = false, labelledBy, label, children }) {
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/Modal/index.js
+function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = false, title, description, headerActions, closeDisabled = false, labelledBy, label, children, ...props }) {
   const panelRef = useRef(null);
   const overlayRef = useRef(null);
   useDialogFocus(overlayRef);
@@ -44744,75 +49316,19 @@ function Modal({ onClose, className = "w-96", overlayClassName, disableEscape = 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [disableEscape, onClose]);
-  const overlayClass = `fixed inset-0 flex items-center justify-center bg-black/40 ${overlayClassName ?? "z-50"}`;
-  const panelClass = title ? `${className} flex max-h-[85vh] flex-col overflow-hidden rounded-lg border border-separator bg-surface shadow-xl` : `${className} rounded-lg border border-separator bg-surface p-4 shadow-xl`;
+  const overlayClass = cn("hc-modal fixed inset-0 flex items-center justify-center bg-black/40", overlayClassName ?? "z-50");
+  const panelClass = title ? cn(className, "flex max-h-[85vh] flex-col overflow-hidden rounded-lg border border-separator bg-surface shadow-xl") : cn(className, "rounded-lg border border-separator bg-surface p-4 shadow-xl");
   const descriptionId = description && labelledBy ? `${labelledBy}-description` : void 0;
-  return jsxs("div", { ref: overlayRef, className: overlayClass, children: [jsx("div", { ref: panelRef, role: "dialog", "aria-modal": "true", "aria-labelledby": labelledBy, "aria-describedby": descriptionId, "aria-label": label, className: `relative z-10 ${panelClass}`, onClick: (event) => event.stopPropagation(), children: title && labelledBy ? jsxs(Fragment, { children: [jsx(ModalHeader, { titleId: labelledBy, title, description, descriptionId, headerActions, closeDisabled, onClose }), jsx("div", { className: "flex-1 overflow-y-auto p-4", children })] }) : children }), jsx("button", { type: "button", tabIndex: -1, className: "absolute inset-0 z-0 cursor-default border-none bg-transparent p-0", "aria-label": "Close dialog", onClick: onClose })] });
+  return jsxs("div", { ref: overlayRef, ...props, className: overlayClass, children: [jsx("div", { ref: panelRef, role: "dialog", "aria-modal": "true", "aria-labelledby": labelledBy, "aria-describedby": descriptionId, "aria-label": label, className: cn("hc-modal-panel relative z-10", panelClass), onClick: (event) => event.stopPropagation(), children: title && labelledBy ? jsxs(Fragment, { children: [jsx(ModalHeader, { titleId: labelledBy, title, description, descriptionId, headerActions, closeDisabled, onClose }), jsx("div", { className: "hc-modal-body flex-1 overflow-y-auto p-4", children })] }) : children }), jsx("button", { type: "button", tabIndex: -1, className: "hc-modal-backdrop absolute inset-0 z-0 cursor-default border-none bg-transparent p-0", "aria-label": "Close dialog", onClick: onClose })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/utils.js
-function isEnabled(index, disabled2) {
-  return !disabled2.has(index);
-}
-function firstEnabled(disabled2, itemCount) {
-  for (let index = 0; index < itemCount; index++) {
-    if (isEnabled(index, disabled2))
-      return index;
-  }
-  return null;
-}
-function lastEnabled(disabled2, itemCount) {
-  for (let index = itemCount - 1; index >= 0; index--) {
-    if (isEnabled(index, disabled2))
-      return index;
-  }
-  return null;
-}
-function nextEnabled(current, direction, disabled2, itemCount) {
-  for (let step = 1; step < itemCount; step++) {
-    const index = (current + direction * step + itemCount) % itemCount;
-    if (isEnabled(index, disabled2))
-      return index;
-  }
-  return null;
-}
-function resolveTabListKeyAction(key, currentIndex, itemCount, options) {
-  if (itemCount <= 0)
-    return null;
-  const disabled2 = new Set(options?.disabledIndices ?? []);
-  if (key === "Home")
-    return firstEnabled(disabled2, itemCount);
-  if (key === "End")
-    return lastEnabled(disabled2, itemCount);
-  if (key === "ArrowRight" || key === "ArrowDown") {
-    return nextEnabled(currentIndex, 1, disabled2, itemCount);
-  }
-  if (key === "ArrowLeft" || key === "ArrowUp") {
-    return nextEnabled(currentIndex, -1, disabled2, itemCount);
-  }
-  return null;
-}
-function resolveMenuTypeahead(labels, currentIndex, key, buffer) {
-  if (labels.length === 0 || key.length !== 1 || key === " ")
-    return null;
-  const newBuffer = buffer + key;
-  const prefix = newBuffer.toLowerCase();
-  for (let offset = 1; offset <= labels.length; offset++) {
-    const index = (currentIndex + offset) % labels.length;
-    if (labels[index].toLowerCase().startsWith(prefix)) {
-      return { index, buffer: newBuffer };
-    }
-  }
-  return null;
-}
-
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/RowActionsMenu/index.js
 var TYPEAHEAD_TIMEOUT_MS = 500;
 function menuItemClass(variant) {
-  const base2 = "block w-full cursor-pointer border-none bg-transparent px-3.5 py-1.5 text-left text-[14px] app-no-drag";
+  const base2 = "flex w-full cursor-pointer items-center gap-2 border-none bg-transparent px-3.5 py-1.5 text-left text-[16px] app-no-drag";
   return variant === "danger" ? `${base2} text-text hover:bg-danger/15 hover:text-danger` : `${base2} text-text hover:bg-selection`;
 }
-function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange }) {
+function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange, className, ...props }) {
   const isOpen = openMenuId === menuId;
   const menuElementId = `${menuId}-menu`;
   const rootRef = useRef(null);
@@ -44927,33 +49443,32 @@ function RowActionsMenu({ groups, menuId, openMenuId, onOpenChange }) {
       focusItem(typeahead.index);
     }
   };
-  return jsxs("div", { ref: rootRef, className: "relative shrink-0", children: [jsx(Button, { innerRef: triggerRef, type: "button", variant: "icon", title: "Actions", "aria-label": "Row actions", "aria-haspopup": "menu", "aria-expanded": isOpen, "aria-controls": isOpen ? menuElementId : void 0, onClick: (e4) => {
+  return jsxs("div", { ref: rootRef, ...props, className: cn("hc-row-actions-menu relative shrink-0", className), children: [jsx(Button, { innerRef: triggerRef, type: "button", variant: "icon", className: "hc-row-actions-menu-trigger", title: "Actions", "aria-label": "Row actions", "aria-haspopup": "menu", "aria-expanded": isOpen, "aria-controls": isOpen ? menuElementId : void 0, onClick: (e4) => {
     e4.stopPropagation();
     if (isOpen) {
       closeMenu();
     } else {
       openMenu(false);
     }
-  }, onKeyDown: handleTriggerKeyDown, children: jsx(FaIcon, { icon: faBars, className: "h-3.5 w-3.5" }) }), isOpen && jsx("div", { id: menuElementId, role: "menu", className: "absolute right-0 top-full z-10 mt-0.5 min-w-[120px] rounded-md border border-separator bg-surface py-1 shadow-md app-no-drag", onKeyDown: handleMenuKeyDown, children: groups.map((group, groupIndex) => {
+  }, onKeyDown: handleTriggerKeyDown, children: jsx(FaIcon, { icon: faBars, className: "h-3.5 w-3.5" }) }), isOpen && jsx("div", { id: menuElementId, role: "menu", className: "hc-row-actions-menu-panel app-no-drag absolute top-full right-0 z-10 mt-0.5 min-w-[200px] rounded-md border border-separator bg-surface py-1 shadow-md", onKeyDown: handleMenuKeyDown, children: groups.map((group, groupIndex) => {
     let flatIndex = groups.slice(0, groupIndex).reduce((count, g3) => count + g3.length, 0);
-    return jsx("div", { className: groupIndex > 0 ? "border-t border-separator" : void 0, children: group.map((item) => {
+    return jsx("div", { className: groupIndex > 0 ? "hc-row-actions-menu-group border-t border-separator" : "hc-row-actions-menu-group", children: group.map((item) => {
       const itemIndex = flatIndex++;
-      return jsx("button", { ref: (el) => {
+      const isCheckboxItem = item.checked !== void 0;
+      return jsxs("button", { ref: (el) => {
         itemRefs.current[itemIndex] = el;
-      }, type: "button", role: "menuitem", tabIndex: itemIndex === focusedIndex ? 0 : -1, className: menuItemClass(item.variant), onClick: (e4) => {
+      }, type: "button", role: isCheckboxItem ? "menuitemcheckbox" : "menuitem", "aria-checked": isCheckboxItem ? item.checked : void 0, tabIndex: itemIndex === focusedIndex ? 0 : -1, className: cn("hc-row-actions-menu-item", menuItemClass(item.variant)), onClick: (e4) => {
         e4.stopPropagation();
         closeMenu();
         item.onSelect();
-      }, children: item.label }, item.label);
+      }, children: [isCheckboxItem ? jsx("span", { className: "hc-row-actions-menu-item-check inline-flex w-4 shrink-0 justify-center", "aria-hidden": true, children: item.checked ? jsx(FaIcon, { icon: faCheck, className: "h-3 w-3" }) : null }) : null, jsx("span", { className: "hc-row-actions-menu-item-label min-w-0", children: item.label })] }, item.label);
     }) }, groupIndex);
   }) })] });
 }
 
-// node_modules/.pnpm/@harborclient+sdk@1.0.0_@babel+runtime@8.0.0_@codemirror+lint@6.9.7_@codemirror+search@_4a97bca4b8240b001fbe9e82dfd8384f/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
-function StatusMessage({ children, live = true, id: id2, className }) {
-  const base2 = "text-[14px] text-muted";
-  const classes = className ? `${base2} ${className}` : base2;
-  return jsx("p", { id: id2, className: classes, role: live ? "status" : void 0, "aria-live": live ? "polite" : void 0, children });
+// node_modules/.pnpm/@harborclient+sdk@1.0.67_@babel+runtime@8.0.0_@codemirror+search@6.7.1_@codemirror+them_3c89fa62c09d96ae3e3b559a96baacfd/node_modules/@harborclient/sdk/dist/components/StatusMessage/index.js
+function StatusMessage({ children, live = true, className, ...props }) {
+  return jsx("p", { ...props, className: cn("hc-status-message text-[14px] text-muted", className), role: live ? "status" : void 0, "aria-live": live ? "polite" : void 0, children });
 }
 
 // src/SchemasSidebar.tsx
@@ -45315,7 +49830,6 @@ function ValidationTab({ context }) {
 
 // src/renderer.tsx
 function activate(hc2) {
-  installReact(hc2.react);
   void initStore(hc2);
   hc2.subscriptions.push({ dispose: resetStore });
   hc2.subscriptions.push(
@@ -45350,8 +49864,8 @@ export {
 };
 /*! Bundled license information:
 
-@fortawesome/fontawesome-svg-core/index.mjs:
 @fortawesome/free-solid-svg-icons/index.mjs:
+@fortawesome/fontawesome-svg-core/index.mjs:
   (*!
    * Font Awesome Free 7.3.0 by @fontawesome - https://fontawesome.com
    * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)

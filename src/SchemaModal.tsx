@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type JSX } from '@harborclient/sdk/react';
+import { useEffect, useId, useState } from '@harborclient/sdk/react';
 import {
   Button,
   CodeEditor,
@@ -18,7 +18,7 @@ interface Props {
   /**
    * Host-provided context from {@link PluginUi.openModal}.
    */
-  context?: SchemaEditorContext;
+  context: unknown;
 }
 
 const DEFAULT_SCHEMA = '{\n  "type": "object",\n  "properties": {}\n}';
@@ -69,8 +69,8 @@ function closeSchemaModal(): void {
 /**
  * Modal for adding or editing a JSON Schema in the plugin library.
  */
-export function SchemaModal({ context }: Props): JSX.Element {
-  const editingId = context?.editingId ?? null;
+export function SchemaModal({ context }: Props) {
+  const editingId = (context as SchemaEditorContext | undefined)?.editingId ?? null;
   const titleId = useId();
   const nameId = useId();
   const schemaLabelId = useId();

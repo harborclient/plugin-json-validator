@@ -1,4 +1,3 @@
-import { installReact } from '@harborclient/sdk';
 import type { PluginContext, SidebarSectionContribution } from '@harborclient/sdk';
 import { initStore, resetStore } from './store';
 import { SchemasHeaderActions, SchemasSidebar } from './SchemasSidebar';
@@ -12,8 +11,6 @@ import { ValidationTab } from './ValidationTab';
  * @param hc - SDK surface from HarborClient.
  */
 export function activate(hc: PluginContext): void {
-  installReact(hc.react);
-
   void initStore(hc);
 
   hc.subscriptions.push({ dispose: resetStore });
