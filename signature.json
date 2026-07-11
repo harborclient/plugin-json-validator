@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "pluginId": "com.harborclient.plugins.json-schema",
-  "pluginVersion": "1.0.5",
+  "pluginVersion": "1.0.6",
   "algorithm": "Ed25519",
   "files": [
     {
@@ -22,7 +22,7 @@
     },
     {
       "path": "dist/renderer.js",
-      "sha256": "c7b7b9f2d71599e9086d2743d38e86e0a841f34d4ee82b5f4cff3b79eaa0d3ca"
+      "sha256": "9e54450439250fe2787a8447983c29a880c91034fae6c2cdfc587e16128cd80a"
     },
     {
       "path": "eslint.config.mjs",
@@ -30,15 +30,15 @@
     },
     {
       "path": "manifest.json",
-      "sha256": "00fc97975816c234d000309833b2922fa39e689fb9c7a9b5cb43c209ab96a174"
+      "sha256": "a117765e662c433a7cd536cde3df6e3041c2d9556c4e0cb09438ed22ff751d0c"
     },
     {
       "path": "package.json",
-      "sha256": "b320ebf21f23822f15638a0eefd1666cdffdee488e617e444d199c9001462dfb"
+      "sha256": "8ee1c45eb9ace7a369a354c0076870eae60058e98dcd9193f83a6881a2e71216"
     },
     {
       "path": "pnpm-lock.yaml",
-      "sha256": "2a5aee145552ff27019b04a12555d0716d0657c2b546f808eb4ea281e4c47d72"
+      "sha256": "c6abab3bae09202b252e96067f9c4e5a5e56322bbeec8e40cc24fd3e3f93a90b"
     },
     {
       "path": "README.md",
@@ -62,15 +62,15 @@
     },
     {
       "path": "scripts/publish.sh",
-      "sha256": "272abe246e7b12684741a9eb3a26928ec7dd9a62ad4e26b95fa104c32d516412"
+      "sha256": "8a0a899d425d2d3c67f5560a54a92f080225fa022e70eac920f14c963f825c69"
     },
     {
       "path": "src/renderer.tsx",
-      "sha256": "12c27752882000c2fc4af49aee5b78883c57a4a1262154c3cddeb38e6d9ba441"
+      "sha256": "73a75a90795f741bec2540644545635afb74d57319cf124b14586671d4a90484"
     },
     {
       "path": "src/SchemaModal.tsx",
-      "sha256": "da3e3d07aff540b8c484ae3390b419ddb6d64a07977a171b969f5a4caba26401"
+      "sha256": "68209c20cf35e7e9196b821148aeed5b77ced8c80191415dcc8220242a33e630"
     },
     {
       "path": "src/SchemaSelectTab.tsx",
@@ -106,5 +106,5 @@
     }
   ],
   "keyId": "com.harborclient.plugins.json-schema",
-  "signature": "xmsgLFuh0IozHqkKWWxncjVDUZptc1H3jltyWWUlEwYy5CZJEuRaF6kPixNlpwYfLeCc7LuVUUKavwtZik0aAg=="
+  "signature": "rc1q4z2TOMbP72r7mzGRPjFhiNWqk5faXsUoefDlLhi0poHiTRD/34ZCrm7nQg3jjLUrHyXUg8mDyz//cyrHBA=="
 }
